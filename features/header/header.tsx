@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import AdBar from "./ad-bar";
 import Logo from "./logo";
+import CartIcon from "../carts/components/cart-icon";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -117,18 +118,7 @@ export default function Header() {
               >
                 <User className="w-5 h-5" />
               </Button>
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-gray-700 hover:text-orange-500"
-                >
-                  <ShoppingBag className="w-5 h-5" />
-                </Button>
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  0
-                </span>
-              </div>
+              <CartIcon />
             </div>
           </div>
 

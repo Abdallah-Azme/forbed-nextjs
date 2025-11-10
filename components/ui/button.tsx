@@ -52,7 +52,7 @@ function Button({
     <Comp
       data-slot="button"
       className={cn(
-        "cursor-pointer hover:opacity-90",
+        "cursor-pointer hover:opacity-90 w-fit",
         buttonVariants({ variant, size, className })
       )}
       {...props}

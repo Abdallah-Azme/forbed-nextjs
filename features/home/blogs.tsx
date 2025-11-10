@@ -1,83 +1,114 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import ImageFallback from "@/components/image-fallback";
 
 const blogs = [
   {
     title: "مقدمة عن أفضل أنواع المراتب في مصر",
-    image: "/mattress.png",
+    image: "/mrtba.webp",
     excerpt:
       "اختيار المرتبة المناسبة يساعد في توفير راحة دائمة للنوم. في هذا المقال نستعرض أفضل أنواع المراتب الموجودة في مصر.",
-    comments: "1 comment",
   },
   {
     title: "ماهي المراتب الطبية؟",
-    image: "/mattress.png",
+    image: "/mrtba.webp",
     excerpt:
       "تعتبر المراتب الطبية من الأنواع الأكثر انتشارًا لتحسين صحة العمود الفقري والنوم الصحي. تعرف على ميزاتها.",
-    comments: "1 comment",
   },
   {
     title: "تعرف ايه عن مراتب فورد الطبية؟",
-    image: "/mattress.png",
+    image: "/mrtba.webp",
     excerpt:
       "كل اللي محتاج تعرفه عن مراتب فورد الطبية من حيث الجودة والراحة. اختيار مثالي للنوم الصحي والدعم الكامل للجسم.",
-    comments: "1 comment",
   },
   {
     title: "ايه الفرق بين السوست المنفصلة والمتصلة؟",
-    image: "/mattress.png",
+    image: "/mrtba.webp",
     excerpt:
       "تعرف على الفرق بين مراتب السوست المنفصلة والمتصلة، وأيها الأفضل لك حسب احتياجاتك وراحتك أثناء النوم.",
-    comments: "2 comments",
   },
 ];
 
 export function BlogSection() {
+  // Animation variants for cards
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, rotateX: -10 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        delay: i * 0.15,
+        duration: 0.6,
+        ease: "easeOut" as const,
+      },
+    }),
+  };
+
   return (
-    <section
-      dir="rtl"
-      className="container mx-auto py-12 px-4 text-right space-y-8"
-    >
-      <h2 className="text-3xl font-bold text-center">المقالات</h2>
+    <section className="container mx-auto py-12 px-4 space-y-8">
+      <motion.h2
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="text-3xl font-bold text-center"
+      >
+        المقالات
+      </motion.h2>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {blogs.map((blog, i) => (
-          <Card
+          <motion.div
             key={i}
-            className="flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-all"
+            custom={i}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            whileHover={{ y: -8, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 200 }}
           >
-            <CardHeader className="p-0">
-              <div className="relative w-full h-40 bg-gray-100 flex items-center justify-center">
-                <Image
-                  src={blog.image}
-                  alt={blog.title}
-                  fill
-                  className="object-contain p-6"
-                />
-              </div>
-            </CardHeader>
+            <Card className="flex flex-col overflow-hidden shadow-sm h-auto hover:shadow-md transition-all duration-300 bg-white pt-0">
+              <CardHeader className="p-0">
+                <div className="relative w-full h-48">
+                  <ImageFallback
+                    src={blog.image}
+                    alt={blog.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </CardHeader>
 
-            <CardContent className="p-4 space-y-3">
-              <h3 className="font-semibold text-lg leading-snug">
-                {blog.title}
-              </h3>
-              <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                {blog.excerpt}
-              </p>
-              <p className="text-xs text-gray-500 mt-2">{blog.comments}</p>
-            </CardContent>
-          </Card>
+              <CardContent className="p-4 space-y-3">
+                <h3 className="font-semibold text-lg leading-snug text-right">
+                  {blog.title}
+                </h3>
+                <p className="text-sm  min-h-[70px] text-gray-600 leading-relaxed line-clamp-3 text-right">
+                  {blog.excerpt}
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
-      <div className="flex justify-center pt-4">
-        <Button variant="default" className="rounded-full px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        viewport={{ once: true }}
+        className="flex justify-center pt-4"
+      >
+        <Button variant="default" className="px-8 py-6 rounded-none">
           عرض الكل
         </Button>
-      </div>
+      </motion.div>
     </section>
   );
 }

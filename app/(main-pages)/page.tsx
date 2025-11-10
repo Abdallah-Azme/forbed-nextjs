@@ -1,13 +1,11 @@
 "use client";
 import CategoriesCollection from "@/features/category/components/category-collection";
 import { BlogSection } from "@/features/home/blogs";
-import FeaturesSection from "@/features/home/features";
+import FeaturesSection from "@/features/home/features-section";
 import HeroBanner from "@/features/home/hero";
-import {
-  default as NewArrivalSection,
-  default as ProductOfCategory,
-} from "@/features/home/new-arrival-section";
+
 import PaymentSection from "@/features/home/payment-section";
+import ProductOfCategory from "@/features/home/product-of-category";
 
 export default function Home() {
   return (
@@ -15,7 +13,7 @@ export default function Home() {
       <HeroBanner />
       <CategoriesCollection />
       <FeaturesSection />
-      <NewArrivalSection />
+      <ProductOfCategory />
       <ProductOfCategory />
       <BlogSection />
       <PaymentSection />
