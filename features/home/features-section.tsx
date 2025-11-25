@@ -3,17 +3,29 @@
 import ImageFallback from "@/components/image-fallback";
 import {
   Carousel,
+  CarouselApi,
   CarouselContent,
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
 import { easeOut, motion } from "framer-motion";
+import { useLocale } from "next-intl";
 import * as React from "react";
 
 export default function FeaturesSection() {
-  const autoplay = React.useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: true })
-  );
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
+  }, [api]);
 
   const features = [
     {
@@ -42,91 +54,109 @@ export default function FeaturesSection() {
     },
   ];
 
-  // Framer Motion Variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.2 },
-    },
-  } as const;
-
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 40 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: easeOut },
+      transition: { duration: 0.5, ease: easeOut },
     },
-  } as const;
+  };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-4 bg-white">
       <div className="container mx-auto px-4">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: easeOut }}
-          viewport={{ once: true }}
-          className="text-3xl font-bold text-center mb-10"
-        >
-          Our Features
-        </motion.h2>
-
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          plugins={[autoplay.current]}
-          onMouseEnter={autoplay.current.stop}
-          onMouseLeave={autoplay.current.reset}
-          className="w-full mx-auto p-4 "
-        >
-          <CarouselContent className="-ml-2 md:-ml-4">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="flex w-full"
-            >
+        {/* MOBILE CAROUSEL */}
+        <div className="lg:hidden">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            setApi={setApi}
+            className="w-full mx-auto relative"
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
               {features.map((feature) => (
                 <CarouselItem
                   key={feature.id}
-                  className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 flex justify-center"
+                  className="pl-2 md:pl-4 basis-full"
                 >
                   <motion.div
                     variants={itemVariants}
-                    whileHover={{
-                      y: -6,
-                      boxShadow:
-                        "0 8px 18px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)",
-                      transition: { duration: 0.3 },
-                    }}
-                    className="bg-gray-50 rounded-lg p-6 text-center shadow-sm transition-all duration-300 w-[214px]"
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
                   >
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                      <ImageFallback
-                        src={feature.icon}
-                        alt={feature.title}
-                        className="size-12 object-contain"
-                        width={48}
-                        height={48}
-                      />
+                    <div className="rounded-lg p-6 text-center   transition-all duration-300">
+                      <div className=" mx-auto mb-4 rounded-full  flex items-center justify-center">
+                        <ImageFallback
+                          src={feature.icon}
+                          alt={feature.title}
+                          className="size-[230px] object-contain"
+                          width={230}
+                          height={230}
+                        />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        {feature.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm">
+                        {feature.description}
+                      </p>
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      {feature.description}
-                    </p>
                   </motion.div>
                 </CarouselItem>
               ))}
+            </CarouselContent>
+
+            {/* Controls */}
+            <div
+              className="flex items-center justify-center gap-2 "
+              dir={"lrt"}
+            >
+              <CarouselPrevious className="static translate-y-0 size-10 rounded-full transition-colors border-0 bg-transparent shadow-none hover:bg-transparent" />
+
+              <span className="text-sm font-medium text-gray-600 min-w-[2ch] text-center">
+                {current}
+              </span>
+
+              <CarouselNext className="static translate-y-0 size-10 rounded-full transition-colors border-0 bg-transparent shadow-none hover:bg-transparent" />
+            </div>
+          </Carousel>
+        </div>
+
+        {/* DESKTOP GRID */}
+        <div className="hidden lg:grid grid-cols-4 gap-6">
+          {features.map((feature) => (
+            <motion.div
+              key={feature.id}
+              variants={itemVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              whileHover={{
+                y: -6,
+
+                transition: { duration: 0.3 },
+              }}
+            >
+              <div className="rounded-lg p-6 text-center transition-all duration-300 h-full">
+                <div className="  mx-auto mb-4 rounded-full   flex items-center justify-center">
+                  <ImageFallback
+                    src={feature.icon}
+                    alt={feature.title}
+                    className="size-[71px] object-contain"
+                    width={71}
+                    height={71}
+                  />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
+              </div>
             </motion.div>
-          </CarouselContent>
-        </Carousel>
+          ))}
+        </div>
       </div>
     </section>
   );
