@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
+import HeaderSection from "@/components/header-section";
 
 export default function PaymentSection() {
   const [api, setApi] = React.useState<CarouselApi>();
@@ -30,10 +31,11 @@ export default function PaymentSection() {
   );
 
   return (
-    <section className="py-16 bg-gray-50 w-full overflow-hidden">
+    <section className="py-8 w-full overflow-hidden">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">Payment Method</h2>
-
+        <div className=" my-5 ">
+          <HeaderSection title={"Payment Method" || "New Arrival Products"} />
+        </div>
         {/* MOBILE CAROUSEL - Shows 2.15 items */}
         <div className="lg:hidden">
           <Carousel
