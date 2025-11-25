@@ -13,8 +13,8 @@ export default function Home() {
       <HeroBanner />
       <CategoriesCollection />
       <FeaturesSection />
-      <ProductOfCategory />
-      <ProductOfCategory />
+      <ProductOfCategory main />
+      <ProductOfCategory title="خداديه فوربد" />
       <BlogSection />
       <PaymentSection />
     </div>

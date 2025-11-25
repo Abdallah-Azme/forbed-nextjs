@@ -5,6 +5,18 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ImageFallback from "@/components/image-fallback";
+import HeaderSection from "@/components/header-section";
+import Link from "next/link";
+import * as React from "react";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import MainLink from "@/components/main-link";
 
 const blogs = [
   {
@@ -34,6 +46,19 @@ const blogs = [
 ];
 
 export function BlogSection() {
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
+  }, [api]);
+
   // Animation variants for cards
   const cardVariants = {
     hidden: { opacity: 0, y: 50, rotateX: -10 },
@@ -51,64 +76,108 @@ export function BlogSection() {
 
   return (
     <section className="container mx-auto py-12 px-4 space-y-8">
-      <motion.h2
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ once: true }}
-        className="text-3xl font-bold text-center"
-      >
-        المقالات
-      </motion.h2>
+      <div className=" my-5 ">
+        <HeaderSection title="المقالات" />
+      </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {blogs.map((blog, i) => (
-          <motion.div
-            key={i}
-            custom={i}
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            whileHover={{ y: -8, scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 200 }}
+      {/* MOBILE CAROUSEL */}
+      <div className="lg:hidden">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          setApi={setApi}
+          className="w-full mx-auto relative"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {blogs.map((blog, i) => (
+              <CarouselItem key={i} className="pl-2 md:pl-4 basis-full">
+                <BlogCard blog={blog} index={i} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+
+          {/* Controls */}
+          <div
+            className="flex items-center justify-center gap-2 mt-4"
+            dir="ltr"
           >
-            <Card className="flex flex-col overflow-hidden shadow-sm h-auto hover:shadow-md transition-all duration-300 bg-white pt-0">
-              <CardHeader className="p-0">
-                <div className="relative w-full h-48">
-                  <ImageFallback
-                    src={blog.image}
-                    alt={blog.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </CardHeader>
+            <CarouselPrevious className="static translate-y-0 size-10 rounded-full transition-colors border-0 bg-transparent shadow-none hover:bg-transparent" />
 
-              <CardContent className="p-4 space-y-3">
-                <h3 className="font-semibold text-lg leading-snug text-right">
-                  {blog.title}
-                </h3>
-                <p className="text-sm  min-h-[70px] text-gray-600 leading-relaxed line-clamp-3 text-right">
-                  {blog.excerpt}
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+            <span className="text-sm font-medium text-gray-600 min-w-[2ch] text-center">
+              {current}
+            </span>
+
+            <CarouselNext className="static translate-y-0 size-10 rounded-full transition-colors border-0 bg-transparent shadow-none hover:bg-transparent" />
+          </div>
+        </Carousel>
+      </div>
+
+      {/* DESKTOP GRID */}
+      <div className="hidden lg:grid grid-cols-4 gap-6">
+        {blogs.map((blog, i) => (
+          <BlogCard key={i} blog={blog} index={i} />
         ))}
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        viewport={{ once: true }}
-        className="flex justify-center pt-4"
-      >
-        <Button variant="default" className="px-8 py-6 rounded-none">
-          عرض الكل
-        </Button>
-      </motion.div>
+      <div className="mx-auto w-fit my-5 hidden lg:block">
+        <MainLink href="/collections" className="px-[30px] py-[10px]">
+          View all
+        </MainLink>
+      </div>
     </section>
+  );
+}
+
+function BlogCard({ blog, index }: { blog: any; index: number }) {
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, rotateX: -10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        delay: index * 0.15,
+        duration: 0.6,
+        ease: "easeOut" as const,
+      },
+    },
+  };
+
+  return (
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      whileHover={{ y: -1.5 }}
+      transition={{ type: "tween", duration: 0.2 }}
+    >
+      <Link
+        href={`/blog/${123}`}
+        className="flex rounded-none border-none flex-col overflow-hidden h-auto transition-all duration-300 bg-white pt-0"
+      >
+        <div className="p-0">
+          <div className="relative w-full h-[375px]">
+            <ImageFallback
+              src={blog.image}
+              alt={blog.title}
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
+
+        <div className="p-4 space-y-3">
+          <h3 className="font-semibold text-lg leading-snug text-right">
+            {blog.title}
+          </h3>
+          <p className="text-sm min-h-[70px] text-gray-600 leading-relaxed line-clamp-3 text-right">
+            {blog.excerpt}
+          </p>
+        </div>
+      </Link>
+    </motion.div>
   );
 }

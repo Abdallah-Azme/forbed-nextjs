@@ -1,15 +1,39 @@
 "use client";
 
 import * as React from "react";
-import Autoplay from "embla-carousel-autoplay";
 import ImageFallback from "@/components/image-fallback";
 import {
   Carousel,
+  CarouselApi,
   CarouselContent,
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
+import MainLink from "@/components/main-link";
+import Link from "next/link";
+import HeaderSection from "@/components/header-section";
 
-export default function ProductOfCategory() {
+export default function ProductOfCategory({
+  main,
+  title = "",
+}: {
+  main?: boolean;
+  title?: string;
+}) {
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) return;
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
+  }, [api]);
+
   const products = [
     {
       id: 1,
@@ -43,71 +67,97 @@ export default function ProductOfCategory() {
       price: "LE 6,000.00 EGP",
       image: "/mrtba.webp",
     },
+    {
+      id: 6,
+      name: "طقم ملايات فوربد قطن",
+      price: "LE 1,800.00 EGP",
+      image: "/mrtba.webp",
+    },
+    {
+      id: 7,
+      name: "مرتبة فوربد بلاتينيوم",
+      price: "LE 7,500.00 EGP",
+      image: "/mrtba.webp",
+    },
+    {
+      id: 8,
+      name: "كوفرتة صيفي فوربد",
+      price: "LE 1,200.00 EGP",
+      image: "/mrtba.webp",
+    },
+    {
+      id: 9,
+      name: "مخدة فوربد ميموري فوم",
+      price: "LE 650.00 EGP",
+      image: "/mrtba.webp",
+    },
+    {
+      id: 10,
+      name: "مرتبة فوربد كلاسيك",
+      price: "LE 3,500.00 EGP",
+      image: "/mrtba.webp",
+    },
   ];
 
-  // Duplicate products for seamless marquee feel
-  const duplicated = [...products, ...products];
-
-  // Plugins
-  const autoplayForward = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: false })
-  );
-  const autoplayBackward = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: false })
-  );
-
   return (
-    <section className="py-16 bg-gray-50 w-full overflow-hidden">
+    <section className="py-4  w-full overflow-hidden">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          New Arrival Products
-        </h2>
+        <div className=" my-5 ">
+          <HeaderSection title={title || "New Arrival Products"} />
+        </div>
 
-        {/* Row 1 - Forward */}
-        <Carousel
-          dir="rtl"
-          opts={{
-            align: "start",
-            loop: true,
-            dragFree: true,
-          }}
-          plugins={[autoplayForward.current]}
-          className="mb-10"
-        >
-          <CarouselContent>
-            {duplicated.map((product, i) => (
-              <CarouselItem
-                key={i}
-                className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 px-2"
-              >
-                <ProductCard product={product} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+        {/* MOBILE CAROUSEL - Shows 2.15 cards */}
+        <div className="lg:hidden">
+          <Carousel
+            dir="rtl"
+            opts={{
+              align: "end",
+              loop: true,
+            }}
+            setApi={setApi}
+            className="w-full mx-auto relative"
+          >
+            <CarouselContent className="-ml-2">
+              {products.map((product) => (
+                <CarouselItem key={product.id} className="pl-2 basis-[46.5%]">
+                  <ProductCard product={product} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
 
-        {/* Row 2 - Backward */}
-        <Carousel
-          dir="ltr"
-          opts={{
-            align: "start",
-            loop: true,
-            dragFree: true,
-            direction: "ltr",
-          }}
-          plugins={[autoplayBackward.current]}
-        >
-          <CarouselContent>
-            {duplicated.map((product, i) => (
-              <CarouselItem
-                key={i + 100}
-                className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 px-2"
-              >
-                <ProductCard product={product} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+            {/* Controls */}
+            <div
+              className="flex items-center justify-center gap-2 mt-4"
+              dir="ltr"
+            >
+              <CarouselPrevious className="static translate-y-0 size-10 rounded-full transition-colors border-0 bg-transparent shadow-none hover:bg-transparent" />
+
+              <span className="text-sm font-medium text-gray-600 min-w-[2ch] text-center">
+                {current}
+              </span>
+
+              <CarouselNext className="static translate-y-0 size-10 rounded-full transition-colors border-0 bg-transparent shadow-none hover:bg-transparent" />
+            </div>
+          </Carousel>
+        </div>
+        {/* DESKTOP GRID - Shows 5 items */}
+        <div className="hidden lg:grid grid-cols-5 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+        <div className="mx-auto w-fit my-5 hidden lg:block">
+          <MainLink
+            href="/collections"
+            className={
+              main
+                ? "px-[30px] py-[10px]"
+                : "bg-white border border-black text-black px-[30px] py-[10px]"
+            }
+          >
+            View all
+          </MainLink>
+        </div>
       </div>
     </section>
   );
@@ -115,26 +165,30 @@ export default function ProductOfCategory() {
 
 function ProductCard({ product }: { product: any }) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition-shadow">
+    <Link
+      href={"/products/123"}
+      className="bg-[#f3f3f3] cursor-pointer overflow-hidden group transition-transform duration-200 hover:-translate-y-1.5"
+    >
       <div className="relative aspect-4/5 overflow-hidden">
         <ImageFallback
           src={product.image}
           alt={product.name}
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+          className="object-cover w-full h-full transition-transform duration-300"
           fill
         />
         {product.soldOut && (
-          <div className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 text-xs rounded">
+          <div className="absolute bottom-2 left-2 bg-[#f7931d] text-white px-4 py-1 text-xs rounded-full">
             Sold out
           </div>
         )}
       </div>
-      <div className="p-4 text-center">
+      <div className="p-4 text-end">
         <h3 className="font-semibold text-sm mb-1 line-clamp-2">
           {product.name}
         </h3>
+        <p className="text-gray-400 text-xs">FORBED</p>
         <p className="text-gray-600 text-sm">{product.price}</p>
       </div>
-    </div>
+    </Link>
   );
 }

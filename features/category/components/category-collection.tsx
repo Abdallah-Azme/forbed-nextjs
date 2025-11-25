@@ -14,6 +14,7 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { CategoryCard } from "./category-card";
+import HeaderSection from "@/components/header-section";
 
 export default function CategoriesCollection() {
   const dir = useLocale() === "ar" ? "rtl" : "ltr";
@@ -70,15 +71,7 @@ export default function CategoriesCollection() {
             View all
           </GhostLink>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ ease: easeOut }}
-            viewport={{ once: true }}
-            className="text-3xl font-bold text-center ms-auto"
-          >
-            Collections
-          </motion.h2>
+          <HeaderSection title="Collections" />
         </div>
 
         {/* MOBILE CAROUSEL */}
