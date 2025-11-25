@@ -14,6 +14,8 @@ import {
   ChevronRight,
   X,
   ChevronLeft,
+  ArrowRight,
+  MoveRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -34,6 +36,7 @@ import CartIcon from "../carts/components/cart-icon";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -75,6 +78,39 @@ export default function Header() {
 
   return (
     <header className="bg-white sticky top-0 z-50">
+      {/* Search Overlay */}
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{
+          height: isSearchOpen ? "auto" : 0,
+          opacity: isSearchOpen ? 1 : 0,
+        }}
+        transition={{ duration: 0.3 }}
+        className="overflow-hidden bg-white border-b"
+      >
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center gap-4">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg"
+                autoFocus
+              />
+              <button className="absolute left-4 top-1/2 -translate-y-1/2">
+                <Search className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+            <button
+              onClick={() => setIsSearchOpen(false)}
+              className="text-gray-700 hover:text-gray-900 p-2"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
       <motion.div
         animate={{
           height: isScrolled ? 0 : "auto",
@@ -91,17 +127,9 @@ export default function Header() {
           side="left"
           className="w-full sm:w-[400px] p-0 flex flex-col"
         >
-          <SheetHeader className="border-b p-4">
+          <SheetHeader className="border-b p-4 sr-only">
             <div className="flex items-center justify-between">
               <Logo className="size-16" />
-              <div className="flex items-center gap-2">
-                <button className="text-gray-700">
-                  <Search className="size-5" />
-                </button>
-                <button className="text-gray-700">
-                  <User className="size-5" />
-                </button>
-              </div>
             </div>
           </SheetHeader>
 
@@ -122,15 +150,15 @@ export default function Header() {
                       onClick={() => handleSubmenuClick(link.label)}
                       className="w-full flex items-center justify-between text-gray-700 hover:text-gray-900 text-lg py-2"
                     >
+                      <MoveRight className="w-5 h-5" />
                       <span>{link.label}</span>
-                      <ChevronRight className="w-5 h-5" />
                     </button>
                   ) : (
                     <Link
                       key={index}
                       href={link.href ?? "#"}
                       onClick={() => setIsMenuOpen(false)}
-                      className="block text-gray-700 hover:text-gray-900 text-lg py-2"
+                      className="block text-end text-gray-700 hover:text-gray-900 text-lg py-2"
                     >
                       {link.label}
                     </Link>
@@ -215,7 +243,10 @@ export default function Header() {
           <div className="flex items-center justify-between">
             {/* --- Header Icons --- */}
             <div className="flex items-center gap-3">
-              <button className="text-[#848484] hover:underline cursor-pointer">
+              <button
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                className="text-[#848484] hover:underline cursor-pointer"
+              >
                 <Search className="size-6" />
               </button>
               <button className="text-[#848484] hover:underline  cursor-pointer">
