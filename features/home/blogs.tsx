@@ -156,21 +156,21 @@ function BlogCard({ blog, index }: { blog: any; index: number }) {
     >
       <Link
         href={`/blog/${123}`}
-        className="flex rounded-none border-none flex-col overflow-hidden h-auto transition-all duration-300 bg-white pt-0"
+        className="group flex rounded-none border-none flex-col overflow-hidden h-auto transition-all duration-300 bg-white pt-0"
       >
-        <div className="p-0">
-          <div className="relative w-full h-[375px]">
+        <div className="p-0 overflow-hidden">
+          <div className="relative w-full aspect-4/3 lg:aspect-auto lg:h-[244px]">
             <ImageFallback
               src={blog.image}
               alt={blog.title}
               fill
-              className="object-cover"
+              className="object-cover transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
             />
           </div>
         </div>
 
         <div className="p-4 space-y-3">
-          <h3 className="font-semibold text-lg leading-snug text-right">
+          <h3 className="font-semibold text-lg leading-snug text-right group-hover:underline transition-all duration-200">
             {blog.title}
           </h3>
           <p className="text-sm min-h-[70px] text-gray-600 leading-relaxed line-clamp-3 text-right">
