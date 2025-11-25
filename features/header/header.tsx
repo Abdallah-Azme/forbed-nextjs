@@ -5,13 +5,28 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, Search, User, ShoppingBag, ChevronDown } from "lucide-react";
+import {
+  Menu,
+  Search,
+  User,
+  ShoppingBag,
+  ChevronDown,
+  ChevronRight,
+  X,
+  ChevronLeft,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import AdBar from "./ad-bar";
 import Logo from "./logo";
@@ -19,6 +34,7 @@ import CartIcon from "../carts/components/cart-icon";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -48,9 +64,17 @@ export default function Header() {
     },
     { label: "تواصل معنا", href: "/contact" },
   ];
+
+  const handleSubmenuClick = (label: string) => {
+    setActiveSubmenu(label);
+  };
+
+  const handleBackClick = () => {
+    setActiveSubmenu(null);
+  };
+
   return (
     <header className="bg-white sticky top-0 z-50">
-      {/* Announcement Bar */}
       <motion.div
         animate={{
           height: isScrolled ? 0 : "auto",
@@ -61,6 +85,125 @@ export default function Header() {
       >
         <AdBar />
       </motion.div>
+      {/* --- Mobile Side Sheet Menu --- */}
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <SheetContent
+          side="left"
+          className="w-full sm:w-[400px] p-0 flex flex-col"
+        >
+          <SheetHeader className="border-b p-4">
+            <div className="flex items-center justify-between">
+              <Logo className="size-16" />
+              <div className="flex items-center gap-2">
+                <button className="text-gray-700">
+                  <Search className="size-5" />
+                </button>
+                <button className="text-gray-700">
+                  <User className="size-5" />
+                </button>
+              </div>
+            </div>
+          </SheetHeader>
+
+          <div className="flex-1 overflow-hidden relative">
+            {/* Main Menu */}
+            <motion.div
+              animate={{
+                x: activeSubmenu ? "-100%" : "0%",
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="absolute inset-0 overflow-y-auto p-6"
+            >
+              <nav className="space-y-4">
+                {navLinks.map((link, index) =>
+                  link.items ? (
+                    <button
+                      key={index}
+                      onClick={() => handleSubmenuClick(link.label)}
+                      className="w-full flex items-center justify-between text-gray-700 hover:text-gray-900 text-lg py-2"
+                    >
+                      <span>{link.label}</span>
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <Link
+                      key={index}
+                      href={link.href ?? "#"}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block text-gray-700 hover:text-gray-900 text-lg py-2"
+                    >
+                      {link.label}
+                    </Link>
+                  )
+                )}
+              </nav>
+            </motion.div>
+
+            {/* Submenu */}
+            <motion.div
+              animate={{
+                x: activeSubmenu ? "0%" : "100%",
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="absolute inset-0 bg-white overflow-y-auto p-6"
+            >
+              {activeSubmenu && (
+                <>
+                  <button
+                    onClick={handleBackClick}
+                    className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-6"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    <span>رجوع</span>
+                  </button>
+                  <h3 className="text-xl font-semibold mb-4">
+                    {activeSubmenu}
+                  </h3>
+                  <nav className="space-y-3">
+                    {navLinks
+                      .find((link) => link.label === activeSubmenu)
+                      ?.items?.map((item, idx) => (
+                        <Link
+                          key={idx}
+                          href="#"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="block text-gray-600 hover:text-gray-900 py-2"
+                        >
+                          {item}
+                        </Link>
+                      ))}
+                  </nav>
+                </>
+              )}
+            </motion.div>
+          </div>
+
+          {/* Footer with social icons */}
+          <div className="border-t p-6">
+            <div className="flex gap-4">
+              <button className="text-gray-700 hover:text-gray-900">
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+              </button>
+              <button className="text-gray-700 hover:text-gray-900">
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       {/* Main Header */}
       <motion.header
         initial={{ opacity: 0, y: -30 }}
@@ -70,13 +213,16 @@ export default function Header() {
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* --- Mobile Menu Button --- */}
-            <button
-              className="lg:hidden text-gray-700 cursor-pointer transition-transform duration-300 hover:scale-110"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <Menu className="size-11" />
-            </button>
+            {/* --- Header Icons --- */}
+            <div className="flex items-center gap-3">
+              <button className="text-[#848484] hover:underline cursor-pointer">
+                <Search className="size-6" />
+              </button>
+              <button className="text-[#848484] hover:underline  cursor-pointer">
+                <User className="size-6" />
+              </button>
+              <CartIcon />
+            </div>
 
             {/* --- Logo --- */}
             <Logo
@@ -123,56 +269,13 @@ export default function Header() {
               )}
             </nav>
 
-            {/* --- Header Icons --- */}
-            <div className="flex items-center gap-3">
-              <button className="text-[#848484] hover:underline cursor-pointer">
-                <Search className="size-6" />
-              </button>
-              <button className="text-[#848484] hover:underline  cursor-pointer">
-                <User className="size-6" />
-              </button>
-              <CartIcon />
-            </div>
-          </div>
-
-          {/* --- Mobile Menu --- */}
-          {isMenuOpen && (
-            <motion.nav
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="lg:hidden mt-4 border-t pt-3 space-y-3"
+            <button
+              className="lg:hidden text-gray-700 cursor-pointer transition-transform duration-300 hover:scale-110"
+              onClick={() => setIsMenuOpen(true)}
             >
-              {navLinks.map((link, index) =>
-                link.items ? (
-                  <details key={index} className="group">
-                    <summary className="cursor-pointer  text-gray-700 hover:underline flex justify-between items-center">
-                      {link.label}
-                      <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
-                    </summary>
-                    <div className="mt-2 ps-4 space-y-1 text-sm">
-                      {link.items.map((item, idx) => (
-                        <p
-                          key={idx}
-                          className="text-gray-600 hover:underline cursor-pointer"
-                        >
-                          {item}
-                        </p>
-                      ))}
-                    </div>
-                  </details>
-                ) : (
-                  <Link
-                    key={index}
-                    href={link.href ?? "#"}
-                    className=" text-gray-700 hover:underline block"
-                  >
-                    {link.label}
-                  </Link>
-                )
-              )}
-            </motion.nav>
-          )}
+              <Menu className="size-11" />
+            </button>
+          </div>
         </div>
       </motion.header>
     </header>
