@@ -22,7 +22,11 @@ export default async function RootLayout({
 }>) {
   const l = await getLocale();
   return (
-    <html lang={l} dir={l === "ar" ? "rtl" : "ltr"}>
+    <html
+      lang={l}
+      dir={l === "ar" ? "rtl" : "ltr"}
+      className="overflow-x-hidden"
+    >
       <body className={`${assistant.className} antialiased overflow-x-hidden`}>
         <NextIntlClientProvider>
           {children}
