@@ -1,16 +1,14 @@
 "use client";
 
-import * as React from "react";
-import Autoplay from "embla-carousel-autoplay";
 import ImageFallback from "@/components/image-fallback";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
-import { motion, easeOut } from "framer-motion";
+import Autoplay from "embla-carousel-autoplay";
+import { easeOut, motion } from "framer-motion";
+import * as React from "react";
 
 export default function FeaturesSection() {
   const autoplay = React.useRef(

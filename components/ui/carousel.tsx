@@ -4,7 +4,7 @@ import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -52,9 +52,8 @@ function Carousel({
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
-  const dir = useLocale() === "ar" ? "rtl" : "ltr";
   const [carouselRef, api] = useEmblaCarousel(
-    { direction: dir, ...opts, axis: orientation === "horizontal" ? "x" : "y" },
+    { ...opts, axis: orientation === "horizontal" ? "x" : "y" },
     plugins
   );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
@@ -194,7 +193,7 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft />
+      <ChevronLeft />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -224,7 +223,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight />
+      <ChevronRight />
       <span className="sr-only">Next slide</span>
     </Button>
   );

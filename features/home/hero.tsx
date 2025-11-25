@@ -9,27 +9,28 @@ export default function HeroBanner() {
       initial={{ opacity: 0, scale: 1.02 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1, ease: "easeOut" }}
-      className="relative h-[calc(100vh_-_140px)] w-full overflow-hidden"
+      className="relative  w-full overflow-hidden"
     >
       {/* Background Image */}
       <motion.div
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
         transition={{ duration: 2, ease: "easeOut" }}
-        className="absolute inset-0"
+        className="relative w-full"
       >
         <ImageFallback
           src="/pages/home/hero-image.webp"
           alt="Forbed Mattresses"
-          className="w-full h-full object-cover"
-          fill
-          priority
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="w-full h-auto"
         />
-        <div className="absolute inset-0 bg-black/30" />
+        {/* <div className="absolute inset-0 bg-black/30" /> */}
       </motion.div>
 
       {/* Optional Overlay Text */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
@@ -49,7 +50,7 @@ export default function HeroBanner() {
         >
           تسوّق الآن
         </motion.a>
-      </motion.div>
+      </motion.div> */}
     </motion.section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
@@ -12,12 +12,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import AdBar from "./ad-bar";
 import Logo from "./logo";
 import CartIcon from "../carts/components/cart-icon";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const scrolled = latest > 50;
+    if (scrolled !== isScrolled) {
+      setIsScrolled(scrolled);
+    }
+  });
 
   const navLinks = [
     { label: "الرئيسية", href: "/" },
@@ -39,31 +49,42 @@ export default function Header() {
     { label: "تواصل معنا", href: "/contact" },
   ];
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-white sticky top-0 z-50">
       {/* Announcement Bar */}
-      <AdBar />
+      <motion.div
+        animate={{
+          height: isScrolled ? 0 : "auto",
+          opacity: isScrolled ? 0 : 1,
+        }}
+        initial={{ height: "auto", opacity: 1 }}
+        className="overflow-hidden"
+      >
+        <AdBar />
+      </motion.div>
       {/* Main Header */}
       <motion.header
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        dir="rtl"
         className="border-b bg-white"
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* --- Mobile Menu Button --- */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden text-gray-700"
+            <button
+              className="lg:hidden text-gray-700 cursor-pointer transition-transform duration-300 hover:scale-110"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <Menu className="w-6 h-6" />
-            </Button>
+              <Menu className="size-11" />
+            </button>
 
             {/* --- Logo --- */}
-            <Logo />
+            <Logo
+              className={cn(
+                "shrink-0 transition-all duration-300",
+                isScrolled ? "size-[75px]" : "size-[100px]"
+              )}
+            />
 
             {/* --- Desktop Navigation --- */}
             <nav className="hidden lg:flex items-center gap-3 text-gray-700">
@@ -71,7 +92,7 @@ export default function Header() {
                 link.items ? (
                   <DropdownMenu key={index}>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-1 font-medium hover:text-orange-500 transition-colors">
+                      <button className="flex items-center gap-1  hover:underline cursor-pointer transition-colors">
                         {link.label}
                         <ChevronDown className="w-4 h-4" />
                       </button>
@@ -83,7 +104,7 @@ export default function Header() {
                       {link.items.map((item, idx) => (
                         <DropdownMenuItem
                           key={idx}
-                          className="hover:bg-orange-50 cursor-pointer"
+                          className="hover:underline cursor-pointer"
                         >
                           {item}
                         </DropdownMenuItem>
@@ -94,7 +115,7 @@ export default function Header() {
                   <Link
                     key={index}
                     href={link.href ?? "#"}
-                    className="font-medium hover:text-orange-500 transition-colors"
+                    className=" hover:underline cursor-pointer transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -103,21 +124,13 @@ export default function Header() {
             </nav>
 
             {/* --- Header Icons --- */}
-            <div className="flex items-center space-x-reverse space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-700 hover:text-orange-500"
-              >
-                <Search className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-700 hover:text-orange-500"
-              >
-                <User className="w-5 h-5" />
-              </Button>
+            <div className="flex items-center gap-3">
+              <button className="text-[#848484] hover:underline cursor-pointer">
+                <Search className="size-6" />
+              </button>
+              <button className="text-[#848484] hover:underline  cursor-pointer">
+                <User className="size-6" />
+              </button>
               <CartIcon />
             </div>
           </div>
@@ -133,7 +146,7 @@ export default function Header() {
               {navLinks.map((link, index) =>
                 link.items ? (
                   <details key={index} className="group">
-                    <summary className="cursor-pointer font-medium text-gray-700 hover:text-orange-500 flex justify-between items-center">
+                    <summary className="cursor-pointer  text-gray-700 hover:underline flex justify-between items-center">
                       {link.label}
                       <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
                     </summary>
@@ -141,7 +154,7 @@ export default function Header() {
                       {link.items.map((item, idx) => (
                         <p
                           key={idx}
-                          className="text-gray-600 hover:text-orange-500 cursor-pointer"
+                          className="text-gray-600 hover:underline cursor-pointer"
                         >
                           {item}
                         </p>
@@ -152,7 +165,7 @@ export default function Header() {
                   <Link
                     key={index}
                     href={link.href ?? "#"}
-                    className="font-medium text-gray-700 hover:text-orange-500 block"
+                    className=" text-gray-700 hover:underline block"
                   >
                     {link.label}
                   </Link>

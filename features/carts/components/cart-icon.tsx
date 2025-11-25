@@ -28,14 +28,10 @@ export default function CartIcon() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-gray-700 hover:text-orange-500"
-          >
-            <ShoppingBag className="w-5 h-5" />
-          </Button>
-          <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+          <button className="text-[#848484] cursor-pointer hover:underline">
+            <ShoppingBag className="size-6" />
+          </button>
+          <span className="absolute -bottom-1 -right-1 bg-[#151625] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
             {totalItems}
           </span>
         </div>
