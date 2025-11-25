@@ -10,11 +10,11 @@ export default async function RootLayout({
   return (
     <div className="flex h-screen w-full">
       <div className="flex-1 flex items-center justify-center p-6 md:p-10 bg-background">
-        <div className="w-full max-w-md">{children}</div>
+        <div className="w-full max-w-2xl">{children}</div>
       </div>
 
       {/* Right side - Image */}
-      <div className="hidden lg:block relative flex-1 2xl:flex-2">
+      <div className="hidden lg:block relative flex-1 ">
         <ImageFallback
           src="/richhouse.webp"
           alt="Login background"
