@@ -255,10 +255,9 @@ export default function Header() {
               <CartIcon />
             </div>
 
-            {/* --- Logo --- */}
             <Logo
               className={cn(
-                "shrink-0 transition-all duration-300",
+                "shrink-0 transition-all duration-300 block lg:hidden ",
                 isScrolled ? "size-[75px]" : "size-[100px]"
               )}
             />
@@ -299,6 +298,14 @@ export default function Header() {
                 )
               )}
             </nav>
+
+            {/* --- Logo --- */}
+            <Logo
+              className={cn(
+                "shrink-0 transition-all duration-300 hidden lg:block ",
+                isScrolled ? "size-[75px]" : "size-[100px]"
+              )}
+            />
 
             <button
               className="lg:hidden text-gray-700 cursor-pointer transition-transform duration-300 hover:scale-110"

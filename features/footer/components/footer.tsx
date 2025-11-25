@@ -1,121 +1,110 @@
 "use client";
 
-import Logo from "@/features/header/logo";
-import { motion } from "framer-motion";
-import {
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Phone,
-  Mail,
-  MapPin,
-} from "lucide-react";
-import Image from "next/image";
+import { Mail, MapPin, Phone, Facebook, Instagram } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
-  const fadeUpVariants = {
-    hidden: { opacity: 0, y: 50, rotateX: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      rotateX: 0,
-      transition: { duration: 0.8, ease: "easeInOut" as const },
-    },
-  };
-
   return (
-    <footer className="bg-[#121212] text-white pt-10 pb-4 font-sans">
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeUpVariants}
-        className="container mx-auto px-6 sm:px-10 lg:px-16 grid grid-cols-1 md:grid-cols-3 gap-10  "
-      >
-        {/* Logo and description */}
-        <div className="flex flex-col   space-y-4">
-          <Logo />
-          <p className="text-sm leading-relaxed text-gray-300 max-w-xs">
-            جمعية خيرية تهدف إلى مساعدة المحتاجين وتحسين جودة الحياة في المجتمع.
-          </p>
-          <div className="flex gap-4">
-            {[Facebook, Twitter, Instagram, Linkedin].map((Icon, index) => (
-              <motion.a
-                key={index}
-                href="#"
-                whileHover={{ scale: 1.2, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-              >
-                <Icon className="w-4 h-4" />
-              </motion.a>
-            ))}
+    <footer className="bg-black text-white pt-10 pb-6 font-sans overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-16">
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 ">
+          {/* Column 3 — LINKS */}
+          <div className="flex flex-col gap-2  text-end">
+            <Link href="/" className="hover:text-gray-300 transition">
+              Home page
+            </Link>
+            <Link href="/shipping" className="hover:text-gray-300 transition">
+              shipping policy
+            </Link>
+            <Link href="/terms" className="hover:text-gray-300 transition">
+              Terms & Conditions
+            </Link>
+            <Link href="/refund" className="hover:text-gray-300 transition">
+              Refund Policy
+            </Link>
+            <Link href="/search" className="hover:text-gray-300 transition">
+              Search
+            </Link>
+            <Link href="/contact" className="hover:text-gray-300 transition">
+              contact
+            </Link>
           </div>
-        </div>
 
-        {/* Navigation links */}
-        <div className="flex flex-col  space-y-3">
-          <h3 className="text-lg font-semibold mb-2">روابط مهمة</h3>
-          {[
-            { label: "الرئيسية", href: "/" },
-            { label: "عن الجمعية", href: "/about" },
-            { label: "مشاريعنا", href: "/projects" },
-            { label: "تواصل معنا", href: "/contact" },
-          ].map((link) => (
-            <motion.div
-              key={link.href}
-              whileHover={{ scale: 1.05, rotateX: 5 }}
-              transition={{ type: "spring", stiffness: 200 }}
+          {/* Column 2 — CONTACT */}
+          <div className="flex flex-col gap-3 text-end">
+            <h3 className="font-semibold text-lg">ارقامنا للتواصل</h3>
+
+            <Link
+              href="tel:01060008582"
+              className="text-gray-300 hover:text-white transition"
             >
-              <Link
-                href={link.href}
-                className="hover:text-[#B1E3C2] transition-colors duration-300"
-              >
-                {link.label}
-              </Link>
-            </motion.div>
-          ))}
+              01060008582
+            </Link>
+          </div>
+
+          {/* Column 1 — ADDRESS */}
+          <div className="flex flex-col gap-3 text-end">
+            <h3 className="font-semibold text-lg flex items-center gap-2 justify-end">
+              مقر فورد الرئيسي
+              <span className="text-pink-500">📍</span>
+            </h3>
+
+            <p className="text-gray-300 leading-relaxed">
+              مصر – القاهرة للمنطقة الصناعية، تقاطع شارع 300
+            </p>
+          </div>
         </div>
 
-        {/* Contact info and subscribe */}
-        <div className="flex flex-col  space-y-3">
-          <h3 className="text-lg font-semibold mb-2">تواصل معنا</h3>
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <Phone className="w-4 h-4 text-[#B1E3C2]" />
-            <span>+20 123 456 7890</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <Mail className="w-4 h-4 text-[#B1E3C2]" />
-            <span>info@gm3ya.org</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <MapPin className="w-4 h-4 text-[#B1E3C2]" />
-            <span>القاهرة، مصر</span>
+        {/* EMAIL SUBSCRIBE & SOCIAL ICONS ROW */}
+        <div className="mt-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+          {/* SOCIAL ICONS */}
+          <div className="flex gap-4 text-white">
+            <Link
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-300 transition"
+            >
+              <Facebook className="w-6 h-6" />
+            </Link>
+            <Link
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-300 transition"
+            >
+              <Instagram className="w-6 h-6" />
+            </Link>
           </div>
 
-          {/* Subscribe form */}
-          <form className="w-full max-w-xs mt-3">
-            <div className="flex items-center border-b border-gray-400 py-1">
+          {/* Email Subscribe */}
+          <div className="max-w-md w-full">
+            <h3 className="text-white text-lg mb-3 text-end">
+              Subscribe to our emails
+            </h3>
+
+            <div className="flex items-center border border-gray-600 flex-row-reverse overflow-hidden">
               <input
                 type="email"
-                placeholder="أدخل بريدك الإلكتروني"
-                className="bg-transparent w-full text-sm px-2 py-1 text-right focus:outline-none placeholder-gray-400"
-              />
+                placeholder="Email"
+                dir="ltr"
+                className="bg-transparent px-4 py-3 w-full text-white placeholder-gray-400 focus:outline-none"
+              />{" "}
               <button
                 type="submit"
-                className="text-[#B1E3C2] font-semibold hover:text-white transition-colors"
+                className="px-4 py-3 hover:bg-white/20 transition"
               >
-                إرسال
+                →
               </button>
             </div>
-          </form>
+          </div>
         </div>
-      </motion.div>
 
-      <div className="text-center text-gray-500 text-sm mt-10 border-t border-white/10 pt-4">
-        © {new Date().getFullYear()} جميع الحقوق محفوظة لجمعية خيرية.
+        {/* COPYRIGHT */}
+        <div className="text-center text-gray-500 text-sm mt-10 border-t border-white/10 pt-4">
+          © {new Date().getFullYear()}, forbed
+        </div>
       </div>
     </footer>
   );
