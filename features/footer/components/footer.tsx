@@ -8,9 +8,9 @@ export default function Footer() {
     <footer className="bg-black text-white pt-10 pb-6 font-sans overflow-x-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-16">
         {/* GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 ">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
           {/* Column 3 — LINKS */}
-          <div className="flex flex-col gap-2  text-end">
+          <div className="flex flex-col gap-2 text-end order-3 md:order-1">
             <Link href="/" className="hover:text-gray-300 transition">
               Home page
             </Link>
@@ -32,7 +32,7 @@ export default function Footer() {
           </div>
 
           {/* Column 2 — CONTACT */}
-          <div className="flex flex-col gap-3 text-end">
+          <div className="flex flex-col gap-3 text-end order-2 md:order-2">
             <h3 className="font-semibold text-lg">ارقامنا للتواصل</h3>
 
             <Link
@@ -44,7 +44,7 @@ export default function Footer() {
           </div>
 
           {/* Column 1 — ADDRESS */}
-          <div className="flex flex-col gap-3 text-end">
+          <div className="flex flex-col gap-3 text-end order-1 md:order-3">
             <h3 className="font-semibold text-lg flex items-center gap-2 justify-end">
               مقر فورد الرئيسي
               <span className="text-pink-500">📍</span>
@@ -102,7 +102,7 @@ export default function Footer() {
         </div>
 
         {/* COPYRIGHT */}
-        <div className="text-center text-gray-500 text-sm mt-10 border-t border-white/10 pt-4">
+        <div className="text-end text-gray-500 text-sm mt-10 border-t border-white/10 pt-4">
           © {new Date().getFullYear()}, forbed
         </div>
       </div>

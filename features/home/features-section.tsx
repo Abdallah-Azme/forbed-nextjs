@@ -64,7 +64,7 @@ export default function FeaturesSection() {
   };
 
   return (
-    <section className="py-4 bg-white">
+    <section className="py-4 bg-white overflow-x-hidden">
       <div className="container mx-auto px-4">
         {/* MOBILE CAROUSEL */}
         <div className="lg:hidden">
@@ -76,11 +76,11 @@ export default function FeaturesSection() {
             setApi={setApi}
             className="w-full mx-auto relative"
           >
-            <CarouselContent className="-ml-2 md:-ml-4">
+            <CarouselContent className="-ml-1 md:-ml-2">
               {features.map((feature) => (
                 <CarouselItem
                   key={feature.id}
-                  className="pl-2 md:pl-4 basis-full"
+                  className="pl-1 md:pl-2 basis-full"
                 >
                   <motion.div
                     variants={itemVariants}
