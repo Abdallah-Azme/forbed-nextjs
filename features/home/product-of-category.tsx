@@ -17,9 +17,11 @@ import HeaderSection from "@/components/header-section";
 export default function ProductOfCategory({
   main,
   title = "",
+  number = 4,
 }: {
   main?: boolean;
   title?: string;
+  number?: number;
 }) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -142,7 +144,10 @@ export default function ProductOfCategory({
         </div>
         {/* DESKTOP GRID - Shows 5 items */}
         <div className="hidden lg:grid grid-cols-5 gap-6">
-          {products.map((product) => (
+          {(number !== undefined && number !== null
+            ? products?.slice(0, number)
+            : products
+          )?.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
