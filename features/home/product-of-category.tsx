@@ -17,7 +17,7 @@ import HeaderSection from "@/components/header-section";
 export default function ProductOfCategory({
   main,
   title = "",
-  number = 4,
+  number = 5,
 }: {
   main?: boolean;
   title?: string;

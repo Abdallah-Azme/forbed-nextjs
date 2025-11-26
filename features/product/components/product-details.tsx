@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
+import { useCartStore } from "@/features/carts/stores/cart-store";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -17,6 +20,8 @@ import {
 export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
+  const router = useRouter();
+  const addToCart = useCartStore((state) => state.addToCart);
 
   const product = {
     id: "product-1",
@@ -27,6 +32,24 @@ export default function ProductDetail() {
 
   const increase = () => setQuantity((prev) => prev + 1);
   const decrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+
+  const handleAddToCart = (redirect = false) => {
+    addToCart(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      },
+      quantity
+    );
+
+    toast.success("Added to cart");
+
+    if (redirect) {
+      router.push("/cart");
+    }
+  };
 
   // ✨ Animation Variants
   const containerVariants: Variants = {
@@ -164,11 +187,15 @@ export default function ProductDetail() {
         >
           <Button
             variant="outline"
+            onClick={() => handleAddToCart(false)}
             className="w-full h-12 rounded-none border-gray-900 text-gray-900 hover:bg-gray-50 font-normal"
           >
             Add to cart
           </Button>
-          <Button className="w-full h-12 rounded-none bg-black text-white hover:bg-gray-800 font-normal">
+          <Button
+            onClick={() => handleAddToCart(true)}
+            className="w-full h-12 rounded-none bg-black text-white hover:bg-gray-800 font-normal"
+          >
             Buy it now
           </Button>
         </motion.div>
