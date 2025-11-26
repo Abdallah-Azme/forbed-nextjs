@@ -231,9 +231,12 @@ export default function Header() {
               >
                 <Search className="size-6" />
               </button>
-              <button className="text-[#848484] hover:underline  cursor-pointer">
+              <Link
+                href="/signin"
+                className="text-[#848484] hover:underline  cursor-pointer"
+              >
                 <User className="size-6" />
-              </button>
+              </Link>
               <CartIcon />
             </div>
 
