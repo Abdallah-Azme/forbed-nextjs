@@ -25,6 +25,17 @@ export default function CartIcon() {
   const totalPrice = getTotalPrice();
 
   return (
+    <Link href={"/cart"} className="relative">
+      <div className="text-[#848484] cursor-pointer hover:underline">
+        <ShoppingBag className="size-6" />
+      </div>
+      <span className="absolute -bottom-1 -right-1 bg-[#151625] text-white text-xs rounded-full size-4 flex items-center justify-center font-semibold">
+        {totalItems}
+      </span>
+    </Link>
+  );
+
+  return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="relative">

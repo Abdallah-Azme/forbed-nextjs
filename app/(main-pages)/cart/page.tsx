@@ -110,7 +110,7 @@ export default function CartPage() {
                   </div>
 
                   {/* Product Info - 6 columns */}
-                  <div className="lg:col-span-8 flex gap-8">
+                  <div className="lg:col-span-8 flex gap-1 sm:gap-8">
                     {/* Product Details */}
                     <div className="flex-1 space-y-2 text-end">
                       <h3 className="font-medium text-base lg:text-lg">

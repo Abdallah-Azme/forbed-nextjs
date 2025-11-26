@@ -1,38 +1,28 @@
 "use client";
 
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  Search,
-  User,
-  ShoppingBag,
-  ChevronDown,
-  ChevronRight,
-  X,
-  ChevronLeft,
-  ArrowRight,
-  MoveRight,
-} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import {
+  ChevronDown,
+  ChevronLeft,
+  Menu,
+  MoveRight,
+  Search,
+  User,
+  X,
+} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import CartIcon from "../carts/components/cart-icon";
 import AdBar from "./ad-bar";
 import Logo from "./logo";
-import CartIcon from "../carts/components/cart-icon";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
