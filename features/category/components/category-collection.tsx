@@ -16,7 +16,13 @@ import {
 import { CategoryCard } from "./category-card";
 import HeaderSection from "@/components/header-section";
 
-export default function CategoriesCollection() {
+export default function CategoriesCollection({
+  title,
+  secondary = false,
+}: {
+  title: string;
+  secondary?: boolean;
+}) {
   const dir = useLocale() === "ar" ? "rtl" : "ltr";
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -67,11 +73,13 @@ export default function CategoriesCollection() {
       <div className="container mx-auto px-4">
         {/* Title */}
         <div className="flex justify-between items-center mb-8">
-          <GhostLink href="/collections" className="lg:hidden">
-            View all
-          </GhostLink>
+          {!secondary && (
+            <GhostLink href="/categories" className="lg:hidden">
+              View all
+            </GhostLink>
+          )}
 
-          <HeaderSection title="Collections" />
+          <HeaderSection title={title} />
         </div>
 
         {/* MOBILE CAROUSEL */}
@@ -134,11 +142,13 @@ export default function CategoriesCollection() {
           ))}
         </div>
 
-        <div className="mx-auto w-fit my-5 hidden lg:block">
-          <MainLink href="/collections" className="px-[30px] py-[10px]">
-            View all
-          </MainLink>
-        </div>
+        {!secondary && (
+          <div className="mx-auto w-fit my-5 hidden lg:block">
+            <MainLink href="/categories" className="px-[30px] py-[10px]">
+              View all
+            </MainLink>
+          </div>
+        )}
       </div>
     </section>
   );

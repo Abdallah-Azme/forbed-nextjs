@@ -17,7 +17,10 @@ export const CategoryCard = ({
     }}
     className="bg-white transition-all overflow-hidden h-full group"
   >
-    <Link href={collection.href} className="flex flex-col h-full">
+    <Link
+      href={`/categories/${collection.href}`}
+      className="flex flex-col h-full"
+    >
       <div className="relative aspect-4/3 overflow-hidden shrink-0">
         <ImageFallback
           src={collection.image}

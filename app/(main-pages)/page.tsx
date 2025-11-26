@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center ">
       <HeroBanner />
-      <CategoriesCollection />
+      <CategoriesCollection title="Collections" />
       <FeaturesSection />
       <ProductOfCategory main />
       <ProductOfCategory title="خداديه فوربد" />
