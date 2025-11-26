@@ -34,7 +34,7 @@ export default function PaymentSection() {
     <section className="py-2 w-full overflow-hidden">
       <div className="container mx-auto px-4">
         <div className=" my-5 ">
-          <HeaderSection title={"Payment Method" || "New Arrival Products"} />
+          <HeaderSection title={"Payment Method"} />
         </div>
         {/* MOBILE CAROUSEL - Shows 2.15 items */}
         <div className="lg:hidden">
