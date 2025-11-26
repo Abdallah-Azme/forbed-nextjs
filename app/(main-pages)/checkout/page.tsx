@@ -102,8 +102,72 @@ export default function Page() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Right Column - Order Summary */}
+          <div className="lg:border-l lg:pl-8">
+            <div className="sticky top-8 space-y-6">
+              {/* Products */}
+              <div className="space-y-4">
+                {items.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center justify-between gap-4"
+                  >
+                    {/* Left: Name + Price */}
+                    <div className="flex-1 space-y-1">
+                      <div className="text-sm font-semibold">
+                        E£{(product.price * product.quantity).toFixed(2)}
+                      </div>
+                    </div>
+
+                    {/* Right: Image + Qty */}
+                    <div className="relative flex items-center gap-3 shrink-0">
+                      <p className="text-sm font-medium line-clamp-2">
+                        {product.name}
+                      </p>
+                      <div className="relative w-16 h-16 rounded-lg border-2 border-white bg-gray-100">
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                        />
+                        {/* Qty badge */}
+                        <span className="absolute -top-2 border-2 border-white -right-2 bg-black text-white text-xs rounded-md size-6 flex items-center justify-center">
+                          {product.quantity}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Summary */}
+              <div className="space-y-2 pt-4">
+                <div className="flex justify-between text-sm">
+                  <span>E£{subtotal.toFixed(2)}</span>
+                  <span>Subtotal</span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span>E£{shipping.toFixed(2)}</span>
+                  <span>Shipping</span>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div className="flex justify-between items-center  ">
+                <div className="text-right">
+                  <span className="text-sm text-gray-500 mr-1">EGP</span>
+                  <span className="text-lg font-bold">
+                    E£{total.toFixed(2)}
+                  </span>
+                </div>
+                <span className="text-lg font-bold">Total</span>
+              </div>
+            </div>
+          </div>
           {/* Left Column - Form */}
-          <div className="space-y-8">
+          <div className="space-y-8 text-end">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Contact */}
               <div>
@@ -122,6 +186,7 @@ export default function Page() {
                   placeholder="Email or mobile phone number"
                   value={formData.email}
                   onChange={handleInputChange}
+                  className="h-12 placeholder:text-end"
                   required
                 />
               </div>
@@ -129,14 +194,14 @@ export default function Page() {
               {/* Delivery */}
               <div>
                 <h2 className="text-xl font-semibold mb-4">Delivery</h2>
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4 text-end">
                   <Select
                     value={formData.governorate}
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, governorate: value }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12!">
                       <SelectValue placeholder="Country/Region" />
                     </SelectTrigger>
                     <SelectContent>
@@ -150,6 +215,7 @@ export default function Page() {
                       placeholder="First name"
                       value={formData.firstName}
                       onChange={handleInputChange}
+                      className="h-12 placeholder:text-end"
                       required
                     />
                     <Input
@@ -157,6 +223,7 @@ export default function Page() {
                       placeholder="Last name"
                       value={formData.lastName}
                       onChange={handleInputChange}
+                      className="h-12 placeholder:text-end"
                       required
                     />
                   </div>
@@ -166,6 +233,7 @@ export default function Page() {
                     placeholder="Address"
                     value={formData.address}
                     onChange={handleInputChange}
+                    className="h-12 placeholder:text-end"
                     required
                   />
 
@@ -174,14 +242,16 @@ export default function Page() {
                     placeholder="Apartment, suite, etc. (optional)"
                     value={formData.apartment}
                     onChange={handleInputChange}
+                    className="h-12 placeholder:text-end"
                   />
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-4 ">
                     <Input
                       name="city"
                       placeholder="City"
                       value={formData.city}
                       onChange={handleInputChange}
+                      className="h-12 placeholder:text-end"
                       required
                     />
                     <Select
@@ -190,7 +260,7 @@ export default function Page() {
                         setFormData((prev) => ({ ...prev, governorate: value }))
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="h-12!">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -206,6 +276,7 @@ export default function Page() {
                       placeholder="Postal code (optional)"
                       value={formData.postalCode}
                       onChange={handleInputChange}
+                      className="h-12 placeholder:text-end"
                     />
                   </div>
 
@@ -213,16 +284,19 @@ export default function Page() {
                     <Input
                       name="phone"
                       placeholder="Phone"
-                      type="tel"
                       value={formData.phone}
                       onChange={handleInputChange}
+                      className="h-12 placeholder:text-end"
                       required
                     />
-                    <Info className="absolute right-3 top-3 w-4 h-4 text-gray-400" />
+                    <Info className="absolute start-3 -translate-y-1/2 top-1/2 w-4 h-4 text-gray-400" />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="gap-2 flex flex-col self-end">
                     <div className="flex items-center space-x-2">
+                      <label htmlFor="saveInfo" className="text-sm">
+                        Save this information for next time
+                      </label>
                       <Checkbox
                         id="saveInfo"
                         checked={formData.saveInfo}
@@ -230,11 +304,11 @@ export default function Page() {
                           handleCheckboxChange("saveInfo", checked as boolean)
                         }
                       />
-                      <label htmlFor="saveInfo" className="text-sm">
-                        Save this information for next time
-                      </label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center ms-auto space-x-2">
+                      <label htmlFor="newsletter" className="text-sm">
+                        Text me with news and offers
+                      </label>
                       <Checkbox
                         id="newsletter"
                         checked={formData.newsletter}
@@ -242,9 +316,6 @@ export default function Page() {
                           handleCheckboxChange("newsletter", checked as boolean)
                         }
                       />
-                      <label htmlFor="newsletter" className="text-sm">
-                        Text me with news and offers
-                      </label>
                     </div>
                   </div>
                 </div>
@@ -253,7 +324,7 @@ export default function Page() {
               {/* Shipping Method */}
               <div>
                 <h2 className="text-xl font-semibold mb-4">Shipping method</h2>
-                <div className="border border-orange-500 bg-orange-50 rounded-lg p-4 flex justify-between items-center">
+                <div className="border border-[#f7931d] bg-orange-50 rounded-lg p-4 flex justify-between items-center">
                   <span className="font-medium">Standard</span>
                   <span className="font-semibold">EE70.00</span>
                 </div>
@@ -271,7 +342,7 @@ export default function Page() {
                   onValueChange={setPaymentMethod}
                 >
                   <div className="border rounded-lg overflow-hidden">
-                    <div className="border-b border-orange-500 bg-orange-50 p-4">
+                    <div className="border-b border-[#f7931d] bg-orange-50 p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="card" id="card" />
@@ -280,13 +351,26 @@ export default function Page() {
                           </Label>
                         </div>
                         <div className="flex gap-2">
-                          <img src="/visa.svg" alt="Visa" className="h-5" />
                           <img
-                            src="/mastercard.svg"
+                            src="/payment-1.svg"
+                            alt="Visa"
+                            className="h-5"
+                          />
+                          <img
+                            src="/payment-2.svg"
                             alt="Mastercard"
                             className="h-5"
                           />
-                          <img src="/mada.svg" alt="Mada" className="h-5" />
+                          <img
+                            src="/payment-3.svg"
+                            alt="Mada"
+                            className="h-5"
+                          />
+                          <img
+                            src="/payment-4.svg"
+                            alt="Mada"
+                            className="h-5"
+                          />
                         </div>
                       </div>
                     </div>
@@ -326,7 +410,7 @@ export default function Page() {
                   onValueChange={setBillingAddress}
                 >
                   <div className="border rounded-lg overflow-hidden">
-                    <div className="border-b border-orange-500 bg-orange-50 p-4">
+                    <div className="border-b border-[#f7931d] bg-orange-50 p-4">
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="same" id="same" />
                         <Label htmlFor="same" className="cursor-pointer">
@@ -349,13 +433,13 @@ export default function Page() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg h-12 text-base font-semibold"
+                className="w-full bg-[#f7931d] hover:bg-[#f7931d] text-white rounded-lg h-12 text-base font-semibold"
               >
                 Pay now
               </Button>
 
               {/* Footer Links */}
-              <div className="flex justify-center gap-4 text-sm text-orange-500">
+              <div className="flex  gap-4 justify-end text-sm text-orange-500 border-t pt-5">
                 <Link href="/refund-policy" className="hover:underline">
                   Refund policy
                 </Link>
@@ -364,66 +448,6 @@ export default function Page() {
                 </Link>
               </div>
             </form>
-          </div>
-
-          {/* Right Column - Order Summary */}
-          <div className="lg:border-l lg:pl-8">
-            <div className="sticky top-8 space-y-6">
-              {/* Products */}
-              <div className="space-y-4">
-                {items.map((product) => (
-                  <div key={product.id} className="flex gap-4">
-                    <div className="relative">
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <span className="absolute -top-2 -right-2 bg-gray-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        {product.quantity}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium line-clamp-2">
-                        {product.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        قطعة {product.quantity}
-                      </p>
-                    </div>
-                    <div className="text-sm font-semibold">
-                      EE{(product.price * product.quantity).toFixed(2)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Summary */}
-              <div className="space-y-2 pt-4 border-t">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal</span>
-                  <span>EE{subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Shipping</span>
-                  <span>EE{shipping.toFixed(2)}</span>
-                </div>
-              </div>
-
-              {/* Total */}
-              <div className="flex justify-between text-lg font-bold pt-4 border-t">
-                <span>Total</span>
-                <div className="text-right">
-                  <span className="text-sm text-gray-500 line-through mr-2">
-                    EGP
-                  </span>
-                  <span>EE{total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
