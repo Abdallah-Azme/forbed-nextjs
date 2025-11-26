@@ -63,7 +63,7 @@ export default function CategoriesCollection() {
   };
 
   return (
-    <section className="pt-4 pb-8 w-full">
+    <section className="pt-4 pb-4 w-full">
       <div className="container mx-auto px-4">
         {/* Title */}
         <div className="flex justify-between items-center mb-8">

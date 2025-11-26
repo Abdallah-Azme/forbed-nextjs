@@ -75,7 +75,7 @@ export function BlogSection() {
   };
 
   return (
-    <section className="container mx-auto py-12 px-4 space-y-8">
+    <section className="container mx-auto py-2 px-4 space-y-8">
       <div className=" my-5 ">
         <HeaderSection title="المقالات" />
       </div>

@@ -88,7 +88,7 @@ export default function FeaturesSection() {
                     whileInView="visible"
                     viewport={{ once: true }}
                   >
-                    <div className="rounded-lg p-6 text-center   transition-all duration-300">
+                    <div className="rounded-lg p-2 text-center   transition-all duration-300">
                       <div className=" mx-auto mb-4 rounded-full  flex items-center justify-center">
                         <ImageFallback
                           src={feature.icon}
@@ -113,7 +113,7 @@ export default function FeaturesSection() {
             {/* Controls */}
             <div
               className="flex items-center justify-center gap-2 "
-              dir={"lrt"}
+              dir={"ltr"}
             >
               <CarouselPrevious className="static translate-y-0 size-10 rounded-full transition-colors border-0 bg-transparent shadow-none hover:bg-transparent" />
 

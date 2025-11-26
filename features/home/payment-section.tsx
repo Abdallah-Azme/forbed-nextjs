@@ -31,7 +31,7 @@ export default function PaymentSection() {
   );
 
   return (
-    <section className="py-8 w-full overflow-hidden">
+    <section className="py-2 w-full overflow-hidden">
       <div className="container mx-auto px-4">
         <div className=" my-5 ">
           <HeaderSection title={"Payment Method" || "New Arrival Products"} />
@@ -48,7 +48,7 @@ export default function PaymentSection() {
           >
             <CarouselContent className="-ml-2">
               {paymentMethods.map((payment, i) => (
-                <CarouselItem key={i} className="pl-2 basis-[46.5%]">
+                <CarouselItem key={i} className="pl-2 shrink-0 basis-[46.5%]">
                   <div className="flex items-center justify-center">
                     <ImageFallback
                       src={payment}
