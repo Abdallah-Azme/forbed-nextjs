@@ -17,28 +17,52 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/features/header/logo";
+import { useLogin } from "@/hooks/use-auth";
+import { PhoneInput } from "@/components/ui/phone-input";
+
+import { parsePhoneNumber } from "react-phone-number-input";
 
 const formSchema = z.object({
-  email: z.string().email("البريد الإلكتروني غير صالح"),
+  auth: z.string().min(1, "البريد الإلكتروني أو رقم الهاتف مطلوب"),
   password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
 });
 
 export default function SigninForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { mutate: login, isPending } = useLogin();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      auth: "",
       password: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    let auth = values.auth;
+    let phone_code = "";
+
+    try {
+      // Try to parse as phone number
+      const phoneNumber = parsePhoneNumber(values.auth);
+      if (phoneNumber) {
+        auth = phoneNumber.nationalNumber;
+        phone_code = phoneNumber.countryCallingCode;
+      }
+    } catch (error) {
+      // If parsing fails, it might be an email or invalid phone
+      // We'll send it as is, and let the backend handle it
+      console.log("Not a phone number or invalid format:", error);
+    }
+
+    login({
+      auth: auth,
+      password: values.password,
+      phone_code: phone_code,
+    });
   }
 
   return (
@@ -56,20 +80,21 @@ export default function SigninForm() {
         {/* Form */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            {/* Email Field */}
+            {/* Email or Phone Field */}
             <FormField
               control={form.control}
-              name="email"
+              name="auth"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>البريد الإلكتروني</FormLabel>
+                  <FormLabel>رقم الهاتف</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="example@mail.com"
-                      type="email"
-                      className="h-12 text-right"
-                      {...field}
-                    />
+                    <div className="" dir={"ltr"}>
+                      <PhoneInput
+                        placeholder="رقم الهاتف"
+                        className="h-12 text-right"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,9 +137,10 @@ export default function SigninForm() {
             {/* Continue Button */}
             <Button
               type="submit"
-              className="w-full h-12 text-base bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg"
+              disabled={isPending}
+              className="w-full h-12 text-base bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              تسجيل الدخول
+              {isPending ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
             </Button>
 
             <div className="text-center text-sm text-gray-600 ">

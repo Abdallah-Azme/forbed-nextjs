@@ -4,6 +4,8 @@ import { getLocale } from "next-intl/server";
 import { Assistant } from "next/font/google";
 import "./globals.css";
 import FloatingWhatsapp from "@/features/footer/components/floating-whatsapp";
+import { QueryProvider } from "@/providers/query-provider";
+import { Toaster } from "sonner";
 
 const assistant = Assistant({
   subsets: ["latin"],
@@ -28,10 +30,13 @@ export default async function RootLayout({
       className="overflow-x-hidden"
     >
       <body className={`${assistant.className} antialiased overflow-x-hidden`}>
-        <NextIntlClientProvider>
-          {children}
-          <FloatingWhatsapp />
-        </NextIntlClientProvider>
+        <QueryProvider>
+          <NextIntlClientProvider>
+            {children}
+            <FloatingWhatsapp />
+          </NextIntlClientProvider>
+          <Toaster position="top-center" richColors />
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,0 +1,395 @@
+/**
+ * API Response Types
+ * Common response structures from the API
+ */
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message: string;
+  data: T;
+  errors?: Record<string, string[]>;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number;
+  to: number;
+}
+
+export interface ApiError {
+  message: string;
+  errors?: Record<string, string[]>;
+  status?: number;
+}
+
+/**
+ * User & Authentication Types
+ */
+
+export interface User {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string;
+  phone_code: string;
+  image?: string;
+  d_o_b?: string;
+  gender?: "male" | "female";
+  country_id?: number;
+  is_active: boolean;
+  notify?: boolean;
+  times_notify?: boolean;
+  mail_notify?: boolean;
+  sms_notify?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+export interface LoginRequest {
+  auth: string; // phone or email
+  phone_code?: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  phone_code: string;
+  phone: string;
+}
+
+export interface SocialLoginRequest {
+  social_provider_id: string;
+  provider_type: "facebook" | "google" | "twitter" | "apple";
+  full_name?: string;
+  phone?: string;
+  email?: string;
+  image?: string;
+}
+
+export interface VerifyOtpRequest {
+  auth: string;
+  code: string;
+  phone_code?: string;
+}
+
+export interface ResetPasswordRequest {
+  phone_code: string;
+  auth: string;
+  code: string;
+  password: string;
+  password_confirmation: string;
+}
+
+/**
+ * Address Types
+ */
+
+export interface Address {
+  id: number;
+  user_id: number;
+  lat: string;
+  lng: string;
+  address: string;
+  city: string;
+  type: "home" | "work" | "other";
+  description: string;
+  phone_code: string;
+  phone: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateAddressRequest {
+  lat: string;
+  lng: string;
+  address: string;
+  city: string;
+  type: "home" | "work" | "other";
+  description: string;
+  phone_code: string;
+  phone: string;
+}
+
+/**
+ * Product Types
+ */
+
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  discount_price?: number;
+  image: string;
+  images?: string[];
+  category_id: number;
+  category?: Category;
+  brand_id?: number;
+  brand?: Brand;
+  is_favorite: boolean;
+  is_new: boolean;
+  status: number;
+  stock: number;
+  specifications?: ProductSpecification[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProductSpecification {
+  id: number;
+  product_id: number;
+  name: string;
+  value: string;
+  price_modifier?: number;
+}
+
+export interface ProductFilters {
+  category_id?: string;
+  sub_category_id?: string;
+  brand_id?: string;
+  keyword?: string;
+  order_by?: "asc" | "desc";
+  order_by_new?: boolean;
+  price_min?: number;
+  price_max?: number;
+}
+
+export interface ProductFilterOptions {
+  sub_categories: Category[];
+  brands: Brand[];
+  price_range: {
+    min: number;
+    max: number;
+  };
+}
+
+/**
+ * Category & Brand Types
+ */
+
+export interface Category {
+  id: number;
+  name: string;
+  description?: string;
+  image?: string;
+  parent_id?: number;
+  children?: Category[];
+  status: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+  logo?: string;
+  status: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Cart Types
+ */
+
+export interface Cart {
+  id: number;
+  user_id: number;
+  items: CartItem[];
+  subtotal: number;
+  discount: number;
+  total: number;
+  coupon?: Coupon;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CartItem {
+  id: number;
+  cart_id: number;
+  product_id: number;
+  product: Product;
+  quantity: number;
+  price: number;
+  specification_id?: number;
+  specification?: ProductSpecification;
+  total: number;
+}
+
+export interface AddToCartRequest {
+  product_id: string;
+  quantity: number;
+  specification_id?: string;
+}
+
+export interface Coupon {
+  id: number;
+  code: string;
+  type: "percentage" | "fixed";
+  value: number;
+  min_amount?: number;
+  max_discount?: number;
+  expires_at?: string;
+}
+
+/**
+ * Order Types
+ */
+
+export interface Order {
+  id: number;
+  user_id: number;
+  order_number: string;
+  address_id: number;
+  address: Address;
+  items: OrderItem[];
+  subtotal: number;
+  discount: number;
+  total: number;
+  payment_method_id: number;
+  payment_method?: PaymentMethod;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  transaction_code?: string;
+  transaction_screenshot?: string;
+  coupon?: Coupon;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderItem {
+  id: number;
+  order_id: number;
+  product_id: number;
+  product: Product;
+  quantity: number;
+  price: number;
+  specification_id?: number;
+  specification?: ProductSpecification;
+  total: number;
+}
+
+export interface CreateOrderRequest {
+  address_id: string;
+  amount: number;
+  payment_method_id: string;
+  coupon?: string;
+  transaction_code?: string;
+  transaction_screenshot?: File;
+}
+
+export interface PaymentMethod {
+  id: number;
+  name: string;
+  type: "cash" | "card" | "wallet";
+  status: number;
+}
+
+/**
+ * Blog Types
+ */
+
+export interface Blog {
+  id: number;
+  title: string;
+  content: string;
+  excerpt?: string;
+  image: string;
+  author?: string;
+  status: number;
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Home Page Types
+ */
+
+export interface HomeData {
+  sliders: Slider[];
+  featured_products: Product[];
+  categories: Category[];
+  brands: Brand[];
+  banners: Banner[];
+}
+
+export interface Slider {
+  id: number;
+  title: string;
+  description?: string;
+  image: string;
+  link?: string;
+  order: number;
+}
+
+export interface Banner {
+  id: number;
+  title: string;
+  image: string;
+  link?: string;
+  position: string;
+}
+
+export interface FooterData {
+  about: string;
+  contact: {
+    phone: string;
+    email: string;
+    address: string;
+  };
+  social_links: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  links: {
+    title: string;
+    url: string;
+  }[];
+}
+
+/**
+ * Account Update Types
+ */
+
+export interface UpdateAccountRequest {
+  email?: string;
+  full_name?: string;
+  d_o_b?: string;
+  image?: File | string;
+  country_id?: string;
+  gender?: "male" | "female";
+}
+
+export interface UpdatePasswordRequest {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface UpdateEmailRequest {
+  email: string;
+  resend?: boolean;
+}
+
+export interface UpdatePhoneRequest {
+  phone_code: string;
+  phone: string;
+  resend?: boolean;
+}
+
+export interface NotificationSettingsRequest {
+  notify?: boolean;
+  times_notify?: boolean;
+  mail_notify?: boolean;
+  sms_notify?: boolean;
+}
