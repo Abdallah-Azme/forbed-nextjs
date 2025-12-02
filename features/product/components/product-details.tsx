@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
 import { useCartStore } from "@/features/carts/stores/cart-store";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -9,24 +8,44 @@ import { useQuery } from "@tanstack/react-query";
 import { productService } from "@/services/product.service";
 import ProductOfCategory from "@/features/home/product-of-category";
 import ProductInfoSection from "./product-info-section";
+import { ProductDetails, HomeProduct } from "@/types/api";
 
 interface ProductDetailProps {
-  productId: string;
+  productId?: string;
+  productData?: HomeProduct; // For featured product on home page
 }
 
-export default function ProductDetail({ productId }: ProductDetailProps) {
+export default function ProductDetail({
+  productId,
+  productData,
+}: ProductDetailProps) {
   const router = useRouter();
   const { addToCart, isLoading: isAddingToCart } = useCartStore();
 
+  // Only fetch if productId is provided and no productData
   const {
-    data: product,
+    data: fetchedProduct,
     isLoading,
     error,
   } = useQuery({
     queryKey: ["product", productId],
-    queryFn: () => productService.getProduct(productId),
-    enabled: !!productId,
+    queryFn: () => productService.getProduct(productId!),
+    enabled: !!productId && !productData,
   });
+
+  // Convert HomeProduct to ProductDetails format if productData is provided
+  const product: ProductDetails | undefined = productData
+    ? {
+        id: productData.id,
+        slug: productData.slug,
+        name: productData.name,
+        images: [productData.thumbnail],
+        price: productData.price,
+        description: "", // HomeProduct doesn't have description
+        specifications: [], // HomeProduct doesn't have specifications
+        related: [], // HomeProduct doesn't have related products
+      }
+    : fetchedProduct;
 
   const handleAddToCart = async (
     redirect: boolean,
@@ -77,11 +96,11 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         isAddingToCart={isAddingToCart}
       />
 
-      {/* Related Products */}
-      {product.related && product.related.length > 0 && (
+      {/* Related Products - only show if fetched from API */}
+      {fetchedProduct?.related && fetchedProduct.related.length > 0 && (
         <ProductOfCategory
           title="Related Products"
-          products={product.related}
+          products={fetchedProduct.related}
         />
       )}
     </>

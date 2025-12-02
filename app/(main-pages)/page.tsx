@@ -61,7 +61,9 @@ export default function Home() {
 
       <BlogSection blogs={homeData?.blogs} />
 
-      <ProductDetail productId="" />
+      {homeData?.featured_product && (
+        <ProductDetail productData={homeData.featured_product} />
+      )}
 
       <PaymentSection
         paymentMethods={homeData?.payment_methods}
