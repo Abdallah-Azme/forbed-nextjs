@@ -5,6 +5,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -17,12 +18,17 @@ import {
   Search,
   User,
   X,
+  LogOut,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CartIcon from "../carts/components/cart-icon";
 import AdBar from "./ad-bar";
 import Logo from "./logo";
+import { userManager } from "@/lib/utils/auth";
+import { useLogout } from "@/hooks/use-auth";
+import Image from "next/image";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,6 +36,14 @@ export default function Header() {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const { mutate: logout } = useLogout();
+
+  useEffect(() => {
+    // Get user data on mount
+    const userData = userManager.getUser();
+    setUser(userData);
+  }, []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrolled = latest > 50;
@@ -38,9 +52,14 @@ export default function Header() {
     }
   });
 
+  const handleLogout = () => {
+    logout({});
+  };
+
   const navLinks = [
     { label: "الرئيسية", href: "/" },
-    { label: "الشتوي", href: "/winter" },
+    { label: "Shop", href: "/shop" },
+    { label: "Orders", href: "/orders" },
     {
       label: "مجموعة المراتب",
       items: ["مراتب فوربد", "مراتب طبية", "مراتب سوست"],
@@ -231,12 +250,85 @@ export default function Header() {
               >
                 <Search className="size-6" />
               </button>
-              <Link
-                href="/signin"
-                className="text-[#848484] hover:underline  cursor-pointer"
-              >
-                <User className="size-6" />
-              </Link>
+
+              {/* User Avatar or Sign In */}
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                      <div className="relative size-8 rounded-full overflow-hidden bg-gray-200">
+                        {user.image ? (
+                          <Image
+                            src={user.image}
+                            alt={user.full_name || "User"}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center size-full bg-gray-300">
+                            <User className="size-4 text-gray-600" />
+                          </div>
+                        )}
+                      </div>
+                      <ChevronDown className="size-4 text-gray-600" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64">
+                    <div className="px-3 py-2">
+                      <div className="flex items-center gap-3">
+                        <div className="relative size-10 rounded-full overflow-hidden bg-gray-200">
+                          {user.image ? (
+                            <Image
+                              src={user.image}
+                              alt={user.full_name || "User"}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center size-full bg-gray-300">
+                              <User className="size-5 text-gray-600" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {user.email || user.phone_complete_form}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="cursor-pointer">
+                        <User className="size-4 mr-2" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="cursor-pointer">
+                        <Settings className="size-4 mr-2" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer text-red-600 focus:text-red-600"
+                    >
+                      <LogOut className="size-4 mr-2" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  href="/signin"
+                  className="text-[#848484] hover:underline cursor-pointer"
+                >
+                  <User className="size-6" />
+                </Link>
+              )}
+
               <CartIcon />
             </div>
 

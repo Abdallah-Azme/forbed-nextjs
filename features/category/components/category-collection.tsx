@@ -15,13 +15,16 @@ import {
 } from "@/components/ui/carousel";
 import { CategoryCard } from "./category-card";
 import HeaderSection from "@/components/header-section";
+import { HomeCategory } from "@/types/api";
 
 export default function CategoriesCollection({
   title,
   secondary = false,
+  categories = [],
 }: {
   title: string;
   secondary?: boolean;
+  categories?: HomeCategory[];
 }) {
   const dir = useLocale() === "ar" ? "rtl" : "ltr";
   const [api, setApi] = React.useState<CarouselApi>();
@@ -37,26 +40,13 @@ export default function CategoriesCollection({
     api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
   }, [api]);
 
-  const collections = [
-    { id: 1, title: "مراتب", image: "/mrtba.webp", href: "/mattresses" },
-    { id: 2, title: "مفروشات", image: "/mrtba.webp", href: "/bedding" },
-    {
-      id: 3,
-      title: "اكسسوارات السرير",
-      image: "/mrtba.webp",
-      href: "/bed-accessories",
-    },
-    { id: 4, title: "شتاء 2025", image: "/mrtba.webp", href: "/winter-2025" },
-    { id: 5, title: "مراتب", image: "/mrtba.webp", href: "/mattresses" },
-    { id: 6, title: "مفروشات", image: "/mrtba.webp", href: "/bedding" },
-    {
-      id: 7,
-      title: "اكسسوارات السرير",
-      image: "/mrtba.webp",
-      href: "/bed-accessories",
-    },
-    { id: 8, title: "شتاء 2025", image: "/mrtba.webp", href: "/winter-2025" },
-  ];
+  // Map HomeCategory to the format expected by CategoryCard
+  const collections = categories.map((cat) => ({
+    id: cat.id,
+    title: cat.name,
+    image: cat.image,
+    href: cat.slug,
+  }));
 
   // Animations
   const itemVariants = {
@@ -67,6 +57,8 @@ export default function CategoriesCollection({
       transition: { duration: 0.5, ease: easeOut },
     },
   };
+
+  if (!collections.length) return null;
 
   return (
     <section className="pt-4 pb-4 w-full">

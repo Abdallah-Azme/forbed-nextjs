@@ -9,6 +9,18 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https" as const,
+        hostname: "**",
+      },
+      {
+        protocol: "http" as const,
+        hostname: "**",
+      },
+    ],
+  },
   /* config options here */
 };
 

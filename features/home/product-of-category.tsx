@@ -13,15 +13,18 @@ import {
 import MainLink from "@/components/main-link";
 import Link from "next/link";
 import HeaderSection from "@/components/header-section";
+import { HomeProduct } from "@/types/api";
 
 export default function ProductOfCategory({
   main,
   title = "",
   number = 5,
+  products = [],
 }: {
   main?: boolean;
   title?: string;
   number?: number;
+  products?: HomeProduct[];
 }) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -36,70 +39,7 @@ export default function ProductOfCategory({
     api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
   }, [api]);
 
-  const products = [
-    {
-      id: 1,
-      name: "كوفرتة 3 قطع فوربد مجوز 240*240",
-      price: "LE 1,550.00 EGP",
-      image: "/mrtba.webp",
-      soldOut: true,
-    },
-    {
-      id: 2,
-      name: "مرتبة فوربد سوبر",
-      price: "LE 4,250.00 EGP",
-      image: "/mrtba.webp",
-    },
-    {
-      id: 3,
-      name: "كوفرتة فوربد فاخرة",
-      price: "LE 2,100.00 EGP",
-      image: "/mrtba.webp",
-    },
-    {
-      id: 4,
-      name: "مخدة طبية فوربد",
-      price: "LE 450.00 EGP",
-      image: "/mrtba.webp",
-      soldOut: true,
-    },
-    {
-      id: 5,
-      name: "مرتبة فوربد جولد",
-      price: "LE 6,000.00 EGP",
-      image: "/mrtba.webp",
-    },
-    {
-      id: 6,
-      name: "طقم ملايات فوربد قطن",
-      price: "LE 1,800.00 EGP",
-      image: "/mrtba.webp",
-    },
-    {
-      id: 7,
-      name: "مرتبة فوربد بلاتينيوم",
-      price: "LE 7,500.00 EGP",
-      image: "/mrtba.webp",
-    },
-    {
-      id: 8,
-      name: "كوفرتة صيفي فوربد",
-      price: "LE 1,200.00 EGP",
-      image: "/mrtba.webp",
-    },
-    {
-      id: 9,
-      name: "مخدة فوربد ميموري فوم",
-      price: "LE 650.00 EGP",
-      image: "/mrtba.webp",
-    },
-    {
-      id: 10,
-      name: "مرتبة فوربد كلاسيك",
-      price: "LE 3,500.00 EGP",
-      image: "/mrtba.webp",
-    },
-  ];
+  if (!products.length) return null;
 
   return (
     <section className="py-4  w-full overflow-hidden">
@@ -168,31 +108,60 @@ export default function ProductOfCategory({
   );
 }
 
-function ProductCard({ product }: { product: any }) {
+function ProductCard({ product }: { product: HomeProduct }) {
+  const isSoldOut = product.stock <= 0;
+
   return (
     <Link
-      href={"/products/123"}
-      className="bg-[#f3f3f3] cursor-pointer overflow-hidden group transition-transform duration-200 hover:-translate-y-1.5"
+      href={`/products/${product.slug}`}
+      className="bg-[#f3f3f3] cursor-pointer overflow-hidden group transition-transform duration-200 hover:-translate-y-1.5 block h-full"
     >
       <div className="relative aspect-4/5 overflow-hidden">
         <ImageFallback
-          src={product.image}
+          src={product.thumbnail}
           alt={product.name}
           className="object-cover w-full h-full transition-transform duration-300"
           fill
         />
-        {product.soldOut && (
+        {isSoldOut && (
           <div className="absolute bottom-2 left-2 bg-[#f7931d] text-white px-4 py-1 text-xs rounded-full">
             Sold out
           </div>
         )}
+        {product.is_new && !isSoldOut && (
+          <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 text-[10px] rounded">
+            NEW
+          </div>
+        )}
+        {product.price.has_offer && !isSoldOut && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-[10px] rounded">
+            SALE
+          </div>
+        )}
       </div>
       <div className="p-4 text-end">
-        <h3 className="font-semibold text-sm mb-1 line-clamp-2">
+        <h3 className="font-semibold text-sm mb-1 line-clamp-2 min-h-[40px]">
           {product.name}
         </h3>
-        <p className="text-gray-400 text-xs">FORBED</p>
-        <p className="text-gray-600 text-sm">{product.price}</p>
+        <p className="text-gray-400 text-xs mb-1">FORBED</p>
+
+        <div className="flex flex-col items-end gap-1">
+          {product.price.start_from && (
+            <span className="text-xs text-gray-500">Starts from</span>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <span className="text-gray-800 font-bold text-sm">
+              LE {product.price.price_after_discount.toLocaleString()}
+            </span>
+
+            {product.price.has_offer && (
+              <span className="text-gray-400 text-xs line-through">
+                LE {product.price.price_before_discount.toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     </Link>
   );

@@ -28,13 +28,24 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (data: LoginRequest) => authService.login(data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // New API structure: data contains both user info and token at same level
       // Store token and user data
       tokenManager.setToken(data.token);
-      userManager.setUser(data.user);
+      userManager.setUser(data);
+
+      // Store token in HTTP-only cookie
+      await createSession(data.token);
 
       // Show success message
       toast.success("Login successful!");
+
+      // Sync local cart to server
+      const { useCartStore } = await import(
+        "@/features/carts/stores/cart-store"
+      );
+      const { syncLocalCartToServer } = useCartStore.getState();
+      await syncLocalCartToServer();
 
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ["account"] });
@@ -57,11 +68,28 @@ export function useSocialLogin() {
 
   return useMutation({
     mutationFn: (data: SocialLoginRequest) => authService.socialLogin(data),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // Store token and user data
       tokenManager.setToken(data.token);
       userManager.setUser(data.user);
+
+      // Store token in HTTP-only cookie
+      await createSession(data.token);
+
+      // Show success message
       toast.success("Login successful!");
+
+      // Sync local cart to server
+      const { useCartStore } = await import(
+        "@/features/carts/stores/cart-store"
+      );
+      const { syncLocalCartToServer } = useCartStore.getState();
+      await syncLocalCartToServer();
+
+      // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ["account"] });
+
+      // Redirect to home
       router.push("/");
     },
     onError: (error: any) => {
@@ -105,16 +133,22 @@ export function useVerifyOtp() {
     mutationFn: (data: VerifyOtpRequest) => authService.verifyOtp(data),
     onSuccess: async (data: any) => {
       // Store token in HTTP-only cookie
-      // data is the AuthResponse object (which contains the token)
       await createSession(data.token);
 
-      // Keep localStorage for client-side access (optional, but good for now)
+      // Keep localStorage for client-side access
       tokenManager.setToken(data.token);
-      // The API returns the user data mixed with the token in the 'data' object
-      // So 'data' here IS the user object (plus token)
       userManager.setUser(data);
 
       toast.success("Verification successful!");
+
+      // Sync local cart to server
+      // Import dynamically to avoid circular dependencies
+      const { useCartStore } = await import(
+        "@/features/carts/stores/cart-store"
+      );
+      const { syncLocalCartToServer } = useCartStore.getState();
+      await syncLocalCartToServer();
+
       queryClient.invalidateQueries({ queryKey: ["account"] });
       router.push("/");
     },
@@ -162,7 +196,7 @@ export function useLogout() {
       queryClient.clear();
 
       toast.success("Logged out successfully!");
-      router.push("/sign-in");
+      router.push("/signin");
     },
     onError: async (error: any) => {
       // Even if logout fails on server, clear local data
@@ -172,7 +206,7 @@ export function useLogout() {
       queryClient.clear();
 
       toast.error(error.message || "Logout failed.");
-      router.push("/sign-in");
+      router.push("/signin");
     },
   });
 }
@@ -223,7 +257,7 @@ export function useResetPassword() {
     mutationFn: (data: ResetPasswordRequest) => authService.resetPassword(data),
     onSuccess: (data) => {
       toast.success(data.message || "Password reset successfully!");
-      router.push("/sign-in");
+      router.push("/signin");
     },
     onError: (error: any) => {
       toast.error(error.message || "Password reset failed. Please try again.");

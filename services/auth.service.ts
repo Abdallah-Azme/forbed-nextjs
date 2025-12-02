@@ -56,13 +56,19 @@ export const authService = {
    */
   async register(data: RegisterRequest): Promise<any> {
     const formData = new FormData();
+
     formData.append("phone_code", data.phone_code);
     formData.append("phone", data.phone);
+
+    formData.append("full_name", data.full_name);
+    formData.append("password", data.password);
+    formData.append("password_confirmation", data.password_confirmation);
 
     const response = await apiClient.postFormData<any>(
       "/client/auth/register",
       formData
     );
+
     return response;
   },
 

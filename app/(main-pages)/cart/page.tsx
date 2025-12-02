@@ -87,22 +87,24 @@ export default function CartPage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => decreaseQuantity(item.id)}
-                        className="h-10 w-10 rounded-none hover:bg-gray-100"
+                        className="h-10 w-8 rounded-none hover:bg-gray-100"
                       >
                         <Minus className="w-4 h-4" />
                       </Button>
                       <Input
+                        type="number"
                         value={item.quantity}
                         onChange={(e) =>
                           handleQuantityChange(item.id, e.target.value)
                         }
-                        className="w-10 text-center border-none focus-visible:ring-0 h-10"
+                        className="w-24 px-2 text-center border-none focus-visible:ring-0 h-10 text-black font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        min="1"
                       />
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => increaseQuantity(item.id)}
-                        className="h-10 w-10 rounded-none hover:bg-gray-100"
+                        className="h-10 w-8 rounded-none hover:bg-gray-100"
                       >
                         <Plus className="w-4 h-4" />
                       </Button>

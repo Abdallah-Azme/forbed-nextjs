@@ -18,16 +18,25 @@ import Logo from "@/features/header/logo";
 import { useRegister } from "@/hooks/use-auth";
 import Link from "next/link";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { Input } from "@/components/ui/input";
 
 import { parsePhoneNumber } from "react-phone-number-input";
 
 import { useRouter } from "next/navigation";
 
-// API expects only phone_code and phone for registration
-// OTP verification happens in the next step
-const signupSchema = z.object({
-  phone: z.string().min(6, "رقم الهاتف غير صالح"),
-});
+const signupSchema = z
+  .object({
+    full_name: z.string().min(3, "الاسم الكامل يجب أن يكون 3 أحرف على الأقل"),
+    phone: z.string().min(6, "رقم الهاتف غير صالح"),
+    password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+    password_confirmation: z
+      .string()
+      .min(6, "تأكيد كلمة المرور يجب أن يكون 6 أحرف على الأقل"),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: "كلمة المرور غير متطابقة",
+    path: ["password_confirmation"],
+  });
 
 export default function SignupForm() {
   const router = useRouter();
@@ -36,11 +45,15 @@ export default function SignupForm() {
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
+      full_name: "",
       phone: "",
+      password: "",
+      password_confirmation: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof signupSchema>) {
+    console.log({ values });
     let phone = values.phone;
     let phone_code = "";
 
@@ -59,15 +72,36 @@ export default function SignupForm() {
       {
         phone_code,
         phone,
+        full_name: values.full_name,
+        password: values.password,
+        password_confirmation: values.password_confirmation,
       },
       {
-        onSuccess: () => {
-          // Redirect to verify page with phone and code
-          // Note: We need to pass the full phone number (without code) and the code separately
-          // or handle it however the verify page expects it
+        onSuccess: (data) => {
+          if (data?.status === "fail" && data?.messages) {
+            Object.keys(data.messages).forEach((key) => {
+              form.setError(key as any, {
+                type: "server",
+                message: data.messages[key][0],
+              });
+            });
+            return;
+          }
+
           router.push(
             `/verify?phone=${phone}&code=${encodeURIComponent(phone_code)}`
           );
+        },
+        onError: (error: any) => {
+          if (error?.response?.data?.messages) {
+            const messages = error.response.data.messages;
+            Object.keys(messages).forEach((key) => {
+              form.setError(key as any, {
+                type: "server",
+                message: messages[key][0],
+              });
+            });
+          }
         },
       }
     );
@@ -88,6 +122,25 @@ export default function SignupForm() {
         {/* Form */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            {/* Full Name Field */}
+            <FormField
+              control={form.control}
+              name="full_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الاسم الكامل</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="الاسم الكامل"
+                      {...field}
+                      className="h-12"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Phone Field */}
             <FormField
               control={form.control}
@@ -98,11 +151,52 @@ export default function SignupForm() {
                   <FormControl>
                     <div dir="ltr" className="">
                       <PhoneInput
-                        placeholder="رقم الهاتف"
+                        defaultCountry="EG"
+                        placeholder="10xxxxxxxx"
                         className="h-12 text-right"
                         {...field}
                       />
                     </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Password Field */}
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>كلمة المرور</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="********"
+                      className="h-12"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Password Confirmation Field */}
+            <FormField
+              control={form.control}
+              name="password_confirmation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>تأكيد كلمة المرور</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="********"
+                      className="h-12"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

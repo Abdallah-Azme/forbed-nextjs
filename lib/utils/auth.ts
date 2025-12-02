@@ -74,7 +74,16 @@ export const userManager = {
   getUser(): any | null {
     if (typeof window === "undefined") return null;
     const userData = localStorage.getItem(AUTH_CONFIG.userKey);
-    return userData ? JSON.parse(userData) : null;
+    if (!userData || userData === "undefined") return null;
+
+    try {
+      return JSON.parse(userData);
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
+      // Clear invalid data
+      localStorage.removeItem(AUTH_CONFIG.userKey);
+      return null;
+    }
   },
 
   /**

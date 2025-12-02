@@ -63,6 +63,9 @@ export interface LoginRequest {
 export interface RegisterRequest {
   phone_code: string;
   phone: string;
+  full_name: string;
+  password: string;
+  password_confirmation: string;
 }
 
 export interface SocialLoginRequest {
@@ -143,12 +146,23 @@ export interface Product {
   updated_at: string;
 }
 
+export interface ProductDetails {
+  id: number;
+  slug: string;
+  images: string[];
+  name: string;
+  price: ProductPrice;
+  description: string;
+  specifications: ProductSpecification[];
+  related: HomeProduct[];
+}
+
 export interface ProductSpecification {
   id: number;
-  product_id: number;
-  name: string;
+  key: string;
   value: string;
-  price_modifier?: number;
+  price: number;
+  images: string[];
 }
 
 export interface ProductFilters {
@@ -313,12 +327,77 @@ export interface Blog {
  * Home Page Types
  */
 
+export interface ProductPrice {
+  start_from: boolean;
+  has_offer: boolean;
+  price_after_discount: number;
+  price_before_discount: number;
+  discount: number;
+}
+
+export interface HomeProduct {
+  id: number;
+  slug: string;
+  name: string;
+  thumbnail: string;
+  is_favourite: boolean;
+  is_new: boolean;
+  price: ProductPrice;
+  stock: number;
+  is_cart: boolean;
+  is_cart_quantity: number;
+}
+
+export interface HomeCategory {
+  id: number;
+  slug: string;
+  name: string;
+  image: string;
+}
+
+export interface Service {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+}
+
+export interface HomeBlog {
+  slug: string | null;
+  image: string;
+  visitors: number;
+  title: string;
+  text: string;
+}
+
+export interface HomePaymentMethod {
+  id: number;
+  status: number;
+  name: string;
+  value: string | null;
+  image: string;
+}
+
+export interface HomeBranch {
+  id: number;
+  map_link: string;
+  lat: string;
+  lng: string;
+  icon: string;
+  title: string;
+  text: string;
+}
+
 export interface HomeData {
   sliders: Slider[];
-  featured_products: Product[];
-  categories: Category[];
-  brands: Brand[];
-  banners: Banner[];
+  categories: HomeCategory[];
+  services: Service[];
+  new_products: HomeProduct[];
+  random_products: HomeProduct[];
+  featured_product: HomeProduct;
+  blogs: HomeBlog[];
+  payment_methods: HomePaymentMethod[];
+  branches: HomeBranch[];
 }
 
 export interface Slider {
@@ -327,7 +406,6 @@ export interface Slider {
   description?: string;
   image: string;
   link?: string;
-  order: number;
 }
 
 export interface Banner {
