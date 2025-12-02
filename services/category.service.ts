@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { Category } from "@/types/api";
+import type { Category, CategoryDetails } from "@/types/api";
 
 /**
  * Category Service
@@ -18,9 +18,12 @@ export const categoryService = {
   /**
    * Get single category
    */
-  async getCategory(categoryId: string): Promise<Category> {
-    const response = await apiClient.get<Category>(
-      `/client/categories/${categoryId}`
+  async getCategory(
+    categoryId: string,
+    page: number = 1
+  ): Promise<CategoryDetails> {
+    const response = await apiClient.get<CategoryDetails>(
+      `/client/categories/${categoryId}?page=${page}`
     );
     return response.data;
   },

@@ -41,10 +41,10 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
   const { mutate: logout } = useLogout();
 
-  // Fetch header categories
+  // Fetch categories
   const { data: categories = [] } = useQuery({
-    queryKey: ["header-categories"],
-    queryFn: () => categoryService.getHeaderCategories(),
+    queryKey: ["categories"],
+    queryFn: () => categoryService.getCategories(),
   });
 
   useEffect(() => {
@@ -202,18 +202,37 @@ export default function Header() {
                     {navLinks
                       .find((link) => link.label === activeSubmenu)
                       ?.items?.map((item: any, idx) => (
-                        <Link
-                          key={idx}
-                          href={
-                            typeof item === "string"
-                              ? "#"
-                              : `/categories/${item.slug}`
-                          }
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-gray-600 hover:text-gray-900 py-2"
-                        >
-                          {typeof item === "string" ? item : item.name}
-                        </Link>
+                        <div key={idx}>
+                          <Link
+                            href={
+                              typeof item === "string"
+                                ? "#"
+                                : `/categories/${item.slug}`
+                            }
+                            onClick={() => setIsMenuOpen(false)}
+                            className="block text-gray-600 hover:text-gray-900 py-2 font-medium"
+                          >
+                            {typeof item === "string" ? item : item.name}
+                          </Link>
+                          {/* Subcategories in mobile menu */}
+                          {item.subcategories &&
+                            item.subcategories.length > 0 && (
+                              <div className="mr-4 space-y-2 border-r pr-4 mt-1">
+                                {item.subcategories.map(
+                                  (sub: any, subIdx: number) => (
+                                    <Link
+                                      key={subIdx}
+                                      href={`/categories/${sub.slug}`}
+                                      onClick={() => setIsMenuOpen(false)}
+                                      className="block text-sm text-gray-500 hover:text-gray-900 py-1"
+                                    >
+                                      {sub.name}
+                                    </Link>
+                                  )
+                                )}
+                              </div>
+                            )}
+                        </div>
                       ))}
                   </nav>
                 </>
@@ -358,24 +377,48 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="text-right bg-white border shadow-md"
+                      className="text-right bg-white border shadow-md min-w-[200px]"
                     >
                       {link.items.map((item: any, idx) => (
-                        <DropdownMenuItem
-                          key={idx}
-                          className="hover:underline cursor-pointer"
-                          asChild
-                        >
-                          <Link
-                            href={
-                              typeof item === "string"
-                                ? "#"
-                                : `/categories/${item.slug}`
-                            }
+                        <div key={idx} className="relative group/item">
+                          <DropdownMenuItem
+                            className="hover:underline cursor-pointer justify-between w-full"
+                            asChild
                           >
-                            {typeof item === "string" ? item : item.name}
-                          </Link>
-                        </DropdownMenuItem>
+                            <Link
+                              href={
+                                typeof item === "string"
+                                  ? "#"
+                                  : `/categories/${item.slug}`
+                              }
+                              className="flex items-center justify-between w-full"
+                            >
+                              {typeof item === "string" ? item : item.name}
+                              {item.subcategories &&
+                                item.subcategories.length > 0 && (
+                                  <ChevronLeft className="w-4 h-4" />
+                                )}
+                            </Link>
+                          </DropdownMenuItem>
+
+                          {/* Nested Dropdown for Subcategories */}
+                          {item.subcategories &&
+                            item.subcategories.length > 0 && (
+                              <div className="absolute right-full top-0 hidden group-hover/item:block min-w-[200px] bg-white border shadow-md rounded-md p-1 mr-1">
+                                {item.subcategories.map(
+                                  (sub: any, subIdx: number) => (
+                                    <Link
+                                      key={subIdx}
+                                      href={`/categories/${sub.slug}`}
+                                      className="block px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-sm"
+                                    >
+                                      {sub.name}
+                                    </Link>
+                                  )
+                                )}
+                              </div>
+                            )}
+                        </div>
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>

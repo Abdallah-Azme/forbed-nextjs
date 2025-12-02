@@ -204,13 +204,43 @@ export interface ProductFilterOptions {
 export interface Category {
   id: number;
   name: string;
+  slug: string;
   description?: string;
   image?: string;
   parent_id?: number;
-  children?: Category[];
-  status: number;
-  created_at: string;
-  updated_at: string;
+  subcategories?: Category[];
+  children?: Category[]; // Keeping for backward compatibility if needed, but API uses subcategories
+  status?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CategoryDetails {
+  category: Category;
+  products_count: number;
+  products: {
+    data: HomeProduct[];
+    links: {
+      first: string;
+      last: string;
+      prev: string | null;
+      next: string | null;
+    };
+    meta: {
+      current_page: number;
+      from: number | null;
+      last_page: number;
+      links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+      }[];
+      path: string;
+      per_page: number;
+      to: number | null;
+      total: number;
+    };
+  };
 }
 
 export interface Brand {
