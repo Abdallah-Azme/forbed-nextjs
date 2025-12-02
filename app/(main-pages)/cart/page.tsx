@@ -24,6 +24,7 @@ export default function CartPage() {
     updateQuantity(id, quantity);
   };
 
+  console.log({ items });
   return (
     <div className="min-h-screen bg-white">
       <div className=" mx-auto px-4  py-8  container">
@@ -119,7 +120,7 @@ export default function CartPage() {
                         {item.name}
                       </h3>
                       <p className="text-gray-600">
-                        LE {item.price.toFixed(2)}
+                        LE {item?.price?.toFixed(2)}
                       </p>
 
                       {/* Mobile Quantity Controls */}

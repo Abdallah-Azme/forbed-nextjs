@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { cartService } from "@/services/cart.service";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
+import { tokenManager } from "@/lib/utils/auth";
 
 // Define the Cart Item type
 export interface CartItem {
@@ -49,7 +49,7 @@ export const useCartStore = create<CartStore>()(
 
       // Check if user is authenticated
       checkAuth: () => {
-        const token = Cookies.get("auth_token");
+        const token = tokenManager.getToken();
         const isAuth = !!token;
         set({ isAuthenticated: isAuth });
         return isAuth;
@@ -61,6 +61,7 @@ export const useCartStore = create<CartStore>()(
         if (isAuth) {
           await get().fetchServerCart();
         }
+        set({ isLoading: false });
       },
 
       // Sync local cart to server
@@ -92,8 +93,6 @@ export const useCartStore = create<CartStore>()(
           set({ isLoading: false });
         }
       },
-
-      // Fetch cart from server
       fetchServerCart: async () => {
         const { checkAuth } = get();
         if (!checkAuth()) return;
@@ -103,14 +102,30 @@ export const useCartStore = create<CartStore>()(
           const serverCart = await cartService.getCart();
 
           // Map server cart items to local cart format
-          const mappedItems: CartItem[] = serverCart.items.map((item) => ({
-            id: item.product_id.toString(),
-            name: item.product.name,
-            price: item.price,
-            image: item.product.image,
-            quantity: item.quantity,
-            addedAt: Date.now(),
-          }));
+          // API returns items nested in 'item' object
+          const cartItems = serverCart.item?.items || [];
+
+          const mappedItems: CartItem[] = cartItems.map((item) => {
+            // Helper to safely get price
+            let price = 0;
+            if (typeof item.price === "number") {
+              price = item.price;
+            } else if (item.product?.price) {
+              price =
+                item.product.price.price_after_discount ||
+                item.product.price.price_before_discount ||
+                0;
+            }
+
+            return {
+              id: item.product.id.toString(),
+              name: item.product.name,
+              price: Number(price) || 0, // Ensure it's always a number
+              image: item.product.thumbnail, // API uses 'thumbnail', local store uses 'image'
+              quantity: item.quantity,
+              addedAt: Date.now(),
+            };
+          });
 
           set({ items: mappedItems });
         } catch (error) {
@@ -131,83 +146,159 @@ export const useCartStore = create<CartStore>()(
 
         set({ isLoading: true });
         try {
-          // Optimistic update for both auth and non-auth users
-          const existingItem = get().items.find(
-            (item) => item.id === product.id
-          );
-          if (existingItem) {
-            set((state) => ({
-              items: state.items.map((item) =>
-                item.id === product.id
-                  ? { ...item, quantity: item.quantity + quantity }
-                  : item
-              ),
-            }));
-          } else {
-            const newItem: CartItem = {
-              ...product,
-              quantity,
-              addedAt: Date.now(),
-            };
-            set((state) => ({
-              items: [...state.items, newItem],
-            }));
-          }
-
-          // If authenticated, also send to server
           if (isAuth) {
+            // AUTH FLOW: Call API directly, then refresh state
             await cartService.addToCart({
               product_id: product.id,
               quantity,
               specification_id,
             });
+            await get().fetchServerCart();
+          } else {
+            // GUEST FLOW: Update local state
+            const existingItem = get().items.find(
+              (item) => item.id === product.id
+            );
+            if (existingItem) {
+              set((state) => ({
+                items: state.items.map((item) =>
+                  item.id === product.id
+                    ? { ...item, quantity: item.quantity + quantity }
+                    : item
+                ),
+              }));
+            } else {
+              const newItem: CartItem = {
+                ...product,
+                quantity,
+                addedAt: Date.now(),
+              };
+              set((state) => ({
+                items: [...state.items, newItem],
+              }));
+            }
           }
-          // If not authenticated, item is already in local storage via optimistic update
         } catch (error) {
           console.error("Failed to add to cart:", error);
           toast.error("Failed to add to cart");
-          // Revert optimistic update if needed (omitted for brevity)
         } finally {
           set({ isLoading: false });
         }
       },
 
       // Remove item from cart
-      removeFromCart: (id: string) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
-        }));
+      removeFromCart: async (id: string) => {
+        const { checkAuth } = get();
+        const isAuth = checkAuth();
+
+        if (isAuth) {
+          // AUTH FLOW: Sync to backend by setting quantity to 0
+          try {
+            await cartService.addToCart({
+              product_id: id,
+              quantity: 0,
+            });
+            await get().fetchServerCart();
+          } catch (error) {
+            console.error("Failed to remove from cart:", error);
+          }
+        } else {
+          // GUEST FLOW: Remove from local state
+          set((state) => ({
+            items: state.items.filter((item) => item.id !== id),
+          }));
+        }
       },
 
       // Increase item quantity
-      increaseQuantity: (id: string, amount: number = 1) => {
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id
-              ? { ...item, quantity: item.quantity + amount }
-              : item
-          ),
-        }));
+      increaseQuantity: async (id: string, amount: number = 1) => {
+        const { checkAuth, items } = get();
+        const isAuth = checkAuth();
+
+        // Get current item to calculate new quantity
+        const currentItem = items.find((item) => item.id === id);
+        if (!currentItem) return;
+
+        const newQuantity = currentItem.quantity + amount;
+
+        if (isAuth) {
+          // AUTH FLOW: Call API with new TOTAL quantity
+          try {
+            await cartService.addToCart({
+              product_id: id,
+              quantity: newQuantity,
+            });
+            await get().fetchServerCart();
+          } catch (error) {
+            console.error("Failed to update quantity:", error);
+          }
+        } else {
+          // GUEST FLOW: Update local state
+          set((state) => ({
+            items: state.items.map((item) =>
+              item.id === id ? { ...item, quantity: newQuantity } : item
+            ),
+          }));
+        }
       },
 
       // Decrease item quantity (removes if quantity becomes 0)
-      decreaseQuantity: (id: string, amount: number = 1) => {
-        set((state) => ({
-          items: state.items
-            .map((item) =>
-              item.id === id
-                ? { ...item, quantity: item.quantity - amount }
-                : item
-            )
-            .filter((item) => item.quantity > 0),
-        }));
+      decreaseQuantity: async (id: string, amount: number = 1) => {
+        const { checkAuth, items } = get();
+        const isAuth = checkAuth();
+
+        // Get current item to calculate new quantity
+        const currentItem = items.find((item) => item.id === id);
+        if (!currentItem) return;
+
+        const newQuantity = Math.max(0, currentItem.quantity - amount);
+
+        if (isAuth) {
+          // AUTH FLOW: Call API with new TOTAL quantity
+          try {
+            await cartService.addToCart({
+              product_id: id,
+              quantity: newQuantity,
+            });
+            await get().fetchServerCart();
+          } catch (error) {
+            console.error("Failed to update quantity:", error);
+          }
+        } else {
+          // GUEST FLOW: Update local state
+          set((state) => ({
+            items: state.items
+              .map((item) =>
+                item.id === id ? { ...item, quantity: newQuantity } : item
+              )
+              .filter((item) => item.quantity > 0),
+          }));
+        }
       },
 
       // Update item quantity directly
-      updateQuantity: (id: string, quantity: number) => {
+      updateQuantity: async (id: string, quantity: number) => {
+        const { checkAuth } = get();
+        const isAuth = checkAuth();
+
         if (quantity <= 0) {
-          get().removeFromCart(id);
+          await get().removeFromCart(id);
+          return;
+        }
+
+        if (isAuth) {
+          // AUTH FLOW: Call API with new TOTAL quantity
+          try {
+            await cartService.addToCart({
+              product_id: id,
+              quantity,
+            });
+            await get().fetchServerCart();
+          } catch (error) {
+            console.error("Failed to update quantity:", error);
+          }
         } else {
+          // GUEST FLOW: Update local state
           set((state) => ({
             items: state.items.map((item) =>
               item.id === id ? { ...item, quantity } : item

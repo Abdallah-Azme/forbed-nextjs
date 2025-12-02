@@ -217,7 +217,9 @@ export interface Brand {
 export interface Cart {
   id: number;
   user_id: number;
-  items: CartItem[];
+  item: {
+    items: CartItem[];
+  };
   subtotal: number;
   discount: number;
   total: number;
@@ -228,14 +230,31 @@ export interface Cart {
 
 export interface CartItem {
   id: number;
-  cart_id: number;
-  product_id: number;
-  product: Product;
+  cart_id?: number;
+  product_id?: number;
+  product: {
+    id: number;
+    slug: string;
+    name: string;
+    thumbnail: string;
+    is_favourite: boolean;
+    is_new: boolean;
+    price: {
+      start_from: boolean;
+      has_offer: boolean;
+      price_after_discount: number;
+      price_before_discount: number;
+      discount: number;
+    };
+    stock: number;
+    is_cart: boolean;
+    is_cart_quantity: number;
+  };
   quantity: number;
-  price: number;
+  price?: number; // Some responses might still have it? Keeping optional just in case
   specification_id?: number;
   specification?: ProductSpecification;
-  total: number;
+  total?: number;
 }
 
 export interface AddToCartRequest {

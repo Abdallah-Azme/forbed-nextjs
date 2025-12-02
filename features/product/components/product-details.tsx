@@ -53,7 +53,8 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         price: product.price.price_after_discount,
         image: product.images[0] || "/placeholder.png",
       },
-      quantity
+      quantity,
+      selectedSize || undefined // Pass specification_id if selected
     );
 
     toast.success("Added to cart");

@@ -7,6 +7,7 @@ import FloatingWhatsapp from "@/features/footer/components/floating-whatsapp";
 import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "sonner";
 import CartInitializer from "@/features/carts/components/cart-initializer";
+import SessionSync from "@/features/auth/components/session-sync";
 
 const assistant = Assistant({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default async function RootLayout({
     >
       <body className={`${assistant.className} antialiased overflow-x-hidden`}>
         <QueryProvider>
+          <SessionSync />
           <CartInitializer />
           <NextIntlClientProvider>
             {children}
