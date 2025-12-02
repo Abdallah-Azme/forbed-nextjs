@@ -107,6 +107,15 @@ export default function Header() {
                 placeholder="Search"
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg"
                 autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const target = e.target as HTMLInputElement;
+                    if (target.value.trim()) {
+                      window.location.href = `/search?keyword=${target.value}`;
+                      setIsSearchOpen(false);
+                    }
+                  }
+                }}
               />
               <button className="absolute left-4 top-1/2 -translate-y-1/2">
                 <Search className="w-5 h-5 text-gray-600" />

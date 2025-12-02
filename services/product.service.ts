@@ -5,6 +5,7 @@ import type {
   ProductFilters,
   ProductFilterOptions,
   ProductDetails,
+  ProductListingResponse,
 } from "@/types/api";
 
 /**
@@ -16,10 +17,11 @@ export const productService = {
   /**
    * Get paginated list of products with filters
    */
-  async getProducts(
-    filters?: ProductFilters
-  ): Promise<PaginatedResponse<Product>> {
-    const response = await apiClient.get<PaginatedResponse<Product>>(
+  /**
+   * Get paginated list of products with filters
+   */
+  async getProducts(filters?: ProductFilters): Promise<ProductListingResponse> {
+    const response = await apiClient.get<ProductListingResponse>(
       "/client/products",
       filters
     );
@@ -31,9 +33,9 @@ export const productService = {
    */
   async searchProducts(
     filters?: ProductFilters
-  ): Promise<{ suggestions: Product[] }> {
-    const response = await apiClient.get<{ suggestions: Product[] }>(
-      "/client/products/search",
+  ): Promise<ProductListingResponse> {
+    const response = await apiClient.get<ProductListingResponse>(
+      "/client/products",
       filters
     );
     return response.data;

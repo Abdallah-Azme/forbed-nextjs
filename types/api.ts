@@ -186,6 +186,7 @@ export interface ProductFilters {
   order_by_new?: boolean;
   price_min?: number;
   price_max?: number;
+  page?: number;
 }
 
 export interface ProductFilterOptions {
@@ -215,8 +216,8 @@ export interface Category {
   updated_at?: string;
 }
 
-export interface CategoryDetails {
-  category: Category;
+export interface ProductListingResponse {
+  category: Category | null;
   products_count: number;
   products: {
     data: HomeProduct[];
