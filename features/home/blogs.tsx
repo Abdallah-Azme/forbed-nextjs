@@ -17,10 +17,11 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import MainLink from "@/components/main-link";
-import { HomeBlog } from "@/types/api";
+import { Blog } from "@/types/api";
+import { cn } from "@/lib/utils";
 
 interface BlogSectionProps {
-  blogs?: HomeBlog[];
+  blogs?: Blog[];
 }
 
 export function BlogSection({ blogs = [] }: BlogSectionProps) {
@@ -95,7 +96,7 @@ export function BlogSection({ blogs = [] }: BlogSectionProps) {
   );
 }
 
-function BlogCard({ blog, index }: { blog: HomeBlog; index: number }) {
+function BlogCard({ blog, index }: { blog: Blog; index: number }) {
   const cardVariants = {
     hidden: { opacity: 0, y: 50, rotateX: -10 },
     visible: {

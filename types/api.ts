@@ -342,16 +342,19 @@ export interface PaymentMethod {
  */
 
 export interface Blog {
-  id: number;
+  id?: number;
   title: string;
-  content: string;
-  excerpt?: string;
+  slug: string | null;
   image: string;
+  text: string;
+  visitors: number;
+  content?: string;
+  excerpt?: string;
   author?: string;
-  status: number;
+  status?: number;
   published_at?: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 /**
@@ -393,14 +396,6 @@ export interface Service {
   image: string;
 }
 
-export interface HomeBlog {
-  slug: string | null;
-  image: string;
-  visitors: number;
-  title: string;
-  text: string;
-}
-
 export interface HomePaymentMethod {
   id: number;
   status: number;
@@ -426,7 +421,7 @@ export interface HomeData {
   new_products: HomeProduct[];
   random_products: HomeProduct[];
   featured_product: HomeProduct;
-  blogs: HomeBlog[];
+  blogs: Blog[];
   payment_methods: HomePaymentMethod[];
   branches: HomeBranch[];
 }

@@ -29,6 +29,8 @@ import Logo from "./logo";
 import { userManager } from "@/lib/utils/auth";
 import { useLogout } from "@/hooks/use-auth";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { categoryService } from "@/services/category.service";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,6 +40,12 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { mutate: logout } = useLogout();
+
+  // Fetch header categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ["header-categories"],
+    queryFn: () => categoryService.getHeaderCategories(),
+  });
 
   useEffect(() => {
     // Get user data on mount
@@ -60,20 +68,14 @@ export default function Header() {
     { label: "الرئيسية", href: "/" },
     { label: "Shop", href: "/shop" },
     { label: "Orders", href: "/orders" },
-    {
-      label: "مجموعة المراتب",
-      items: ["مراتب فوربد", "مراتب طبية", "مراتب سوست"],
-    },
-    {
-      label: "اعرف أكثر",
-      items: [
-        "مقدمة عن أفضل أنواع المراتب في مصر",
-        "إيه بتقدمه فوربد؟",
-        "ماهي المراتب الطبية؟",
-        "تعرف إيه عن مراتب فوربد الطبية؟",
-        "إيه الفرق بين السوست المنفصلة والمتصلة؟",
-      ],
-    },
+    ...(categories.length > 0
+      ? [
+          {
+            label: "Categories",
+            items: categories,
+          },
+        ]
+      : []),
     { label: "تواصل معنا", href: "/contact" },
   ];
 
@@ -199,14 +201,18 @@ export default function Header() {
                   <nav className="space-y-3">
                     {navLinks
                       .find((link) => link.label === activeSubmenu)
-                      ?.items?.map((item, idx) => (
+                      ?.items?.map((item: any, idx) => (
                         <Link
                           key={idx}
-                          href="#"
+                          href={
+                            typeof item === "string"
+                              ? "#"
+                              : `/categories/${item.slug}`
+                          }
                           onClick={() => setIsMenuOpen(false)}
                           className="block text-gray-600 hover:text-gray-900 py-2"
                         >
-                          {item}
+                          {typeof item === "string" ? item : item.name}
                         </Link>
                       ))}
                   </nav>
@@ -354,12 +360,21 @@ export default function Header() {
                       align="end"
                       className="text-right bg-white border shadow-md"
                     >
-                      {link.items.map((item, idx) => (
+                      {link.items.map((item: any, idx) => (
                         <DropdownMenuItem
                           key={idx}
                           className="hover:underline cursor-pointer"
+                          asChild
                         >
-                          {item}
+                          <Link
+                            href={
+                              typeof item === "string"
+                                ? "#"
+                                : `/categories/${item.slug}`
+                            }
+                          >
+                            {typeof item === "string" ? item : item.name}
+                          </Link>
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuContent>
