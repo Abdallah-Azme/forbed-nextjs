@@ -13,7 +13,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const keyword = searchParams.get("keyword") || "";
@@ -190,5 +190,19 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-8">
+          <LoadingState type="spinner" text="Loading search..." />
+        </div>
+      }
+    >
+      <SearchContent />
+    </React.Suspense>
   );
 }
