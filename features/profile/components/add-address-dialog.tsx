@@ -69,11 +69,13 @@ export default function AddAddressDialog({
       city: address?.city || "",
       type: (address?.type as "home" | "work" | "other") || "home",
       description: address?.description || "",
-      phone: address?.phone ? `+${address.phone_code}${address.phone}` : "",
+      phone: address?.phone || "",
     },
   });
 
-  const { mutate: createAddress, isPending } = useMutation({
+  const isEditMode = !!address?.id;
+
+  const { mutate: createAddress, isPending: isCreating } = useMutation({
     mutationFn: addressService.createAddress,
     onSuccess: () => {
       toast.success("Address added successfully!");
@@ -85,6 +87,21 @@ export default function AddAddressDialog({
       toast.error(error.message || "Failed to add address");
     },
   });
+
+  const { mutate: updateAddress, isPending: isUpdating } = useMutation({
+    mutationFn: (data: any) => addressService.updateAddress(address.id, data),
+    onSuccess: () => {
+      toast.success("Address updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+      onOpenChange(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update address");
+    },
+  });
+
+  const isPending = isCreating || isUpdating;
 
   function onSubmit(values: AddressFormData) {
     let phone = values.phone;
@@ -100,16 +117,22 @@ export default function AddAddressDialog({
       console.log("Phone parsing error:", error);
     }
 
-    createAddress({
+    const payload = {
       lat: values.lat,
       lng: values.lng,
       address: values.address,
       city: values.city,
-      type: values.type,
+      type: values.type as "home" | "work" | "other",
       description: values.description,
       phone_code: phone_code || "20",
       phone: phone,
-    });
+    };
+
+    if (isEditMode) {
+      updateAddress(payload);
+    } else {
+      createAddress(payload);
+    }
   }
 
   const getCurrentLocation = () => {
@@ -269,13 +292,11 @@ export default function AddAddressDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      placeholder="Phone number"
-                      {...field}
-                      defaultCountry="EG"
-                    />
-                  </FormControl>
+                  <div className="" dir="ltr">
+                    <FormControl>
+                      <PhoneInput placeholder="Phone number" {...field} />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -296,7 +317,13 @@ export default function AddAddressDialog({
                 className="bg-orange-500 hover:bg-orange-600"
                 disabled={isPending}
               >
-                {isPending ? "Saving..." : "Save"}
+                {isPending
+                  ? isEditMode
+                    ? "Updating..."
+                    : "Saving..."
+                  : isEditMode
+                  ? "Update"
+                  : "Save"}
               </Button>
             </div>
           </form>

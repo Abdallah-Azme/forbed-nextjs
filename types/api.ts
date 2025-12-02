@@ -33,20 +33,32 @@ export interface ApiError {
 export interface User {
   id: number;
   full_name: string;
-  email: string;
+  country: string | null;
+  phone_code: {
+    id: number;
+    name: string;
+    flag: string;
+    phone_code: string;
+    short_name: string;
+    phone_limit: number;
+  };
   phone: string;
-  phone_code: string;
-  image?: string;
+  phone_complete_form: string;
+  email: string | null;
+  image: string;
+  locale: string;
+  app_theme: boolean;
+  is_active: number;
+  user_type: string;
   d_o_b?: string;
   gender?: "male" | "female";
   country_id?: number;
-  is_active: boolean;
   notify?: boolean;
   times_notify?: boolean;
   mail_notify?: boolean;
   sms_notify?: boolean;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AuthResponse {

@@ -2,31 +2,66 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Pencil, Plus, MapPin } from "lucide-react";
+import { Pencil, Plus, MapPin, Trash2, Key } from "lucide-react";
 import { userManager } from "@/lib/utils/auth";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import AddAddressDialog from "@/features/profile/components/add-address-dialog";
-import { useQuery } from "@tanstack/react-query";
+import EditProfileDialog from "@/features/profile/components/edit-profile-dialog";
+import ChangePasswordDialog from "@/features/profile/components/change-password-dialog";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addressService } from "@/services/address.service";
+import { accountService } from "@/services/account.service";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<any>(null);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const userData = userManager.getUser();
-    setUser(userData);
-  }, []);
+  const { data: user, isLoading: isLoadingUser } = useQuery({
+    queryKey: ["user-account"],
+    queryFn: accountService.getAccount,
+  });
 
   const { data: addresses, isLoading: isLoadingAddresses } = useQuery({
     queryKey: ["addresses"],
     queryFn: addressService.getAddresses,
   });
 
-  if (!user) {
+  const { mutate: deleteAddress, isPending: isDeletingAddress } = useMutation({
+    mutationFn: (addressId: string) => addressService.deleteAddress(addressId),
+    onSuccess: () => {
+      toast.success("Address deleted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+      setAddressToDelete(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to delete address");
+    },
+  });
+
+  const handleDeleteAddress = () => {
+    if (addressToDelete) {
+      deleteAddress(addressToDelete.id);
+    }
+  };
+
+  if (isLoadingUser || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-500">Loading...</p>
@@ -79,7 +114,10 @@ export default function ProfilePage() {
                   <label className="text-sm font-medium text-gray-700">
                     Name
                   </label>
-                  <button className="text-orange-600 hover:text-orange-700 flex items-center gap-1 text-sm">
+                  <button
+                    className="text-orange-600 hover:text-orange-700 flex items-center gap-1 text-sm"
+                    onClick={() => setIsEditProfileOpen(true)}
+                  >
                     <Pencil className="size-3" />
                   </button>
                 </div>
@@ -89,9 +127,18 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Email
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <button
+                    className="text-orange-600 hover:text-orange-700 flex items-center gap-1 text-sm"
+                    onClick={() => setIsChangePasswordOpen(true)}
+                  >
+                    <Key className="size-3" />
+                    <span>Change Password</span>
+                  </button>
+                </div>
                 <p className="mt-1 text-gray-900">
                   {user.email || user.phone_complete_form}
                 </p>
@@ -136,16 +183,27 @@ export default function ProfilePage() {
                           {address.type_trans || address.type}
                         </span>
                       </div>
-                      <button
-                        className="text-orange-600 hover:text-orange-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedAddress(address);
-                          setIsEditDialogOpen(true);
-                        }}
-                      >
-                        <Pencil className="size-4" />
-                      </button>
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          className="text-orange-600 hover:text-orange-700"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedAddress(address);
+                            setIsEditDialogOpen(true);
+                          }}
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                        <button
+                          className="text-red-600 hover:text-red-700"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAddressToDelete(address);
+                          }}
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
                     </div>
                     <div className="space-y-1 text-sm text-gray-600">
                       <p className="font-medium text-gray-900">
@@ -185,6 +243,49 @@ export default function ProfilePage() {
             address={selectedAddress}
           />
         )}
+
+        {/* Edit Profile Dialog */}
+        {user && (
+          <EditProfileDialog
+            open={isEditProfileOpen}
+            onOpenChange={setIsEditProfileOpen}
+            user={user}
+          />
+        )}
+
+        {/* Change Password Dialog */}
+        <ChangePasswordDialog
+          open={isChangePasswordOpen}
+          onOpenChange={setIsChangePasswordOpen}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog
+          open={!!addressToDelete}
+          onOpenChange={(open) => !open && setAddressToDelete(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Address</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this address? This action cannot
+                be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeletingAddress}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteAddress}
+                disabled={isDeletingAddress}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {isDeletingAddress ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
