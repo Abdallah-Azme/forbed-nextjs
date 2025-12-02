@@ -3,9 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/features/carts/stores/cart-store";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function CartPage() {
   const {
@@ -24,7 +25,6 @@ export default function CartPage() {
     updateQuantity(id, quantity);
   };
 
-  console.log({ items });
   return (
     <div className="min-h-screen bg-white">
       <div className=" mx-auto px-4  py-8  container">
@@ -41,14 +41,18 @@ export default function CartPage() {
 
         {items.length === 0 ? (
           /* Empty Cart State */
-          <div className="text-center py-16 flex-1">
-            <p className="text-gray-500 mb-6 text-lg">Your cart is empty</p>
-            <Link href="/">
-              <Button className="bg-black hover:bg-gray-800 rounded-none px-8">
-                Continue shopping
-              </Button>
-            </Link>
-          </div>
+          <EmptyState
+            icon={ShoppingCart}
+            title="Your cart is empty"
+            description="Add some products to your cart to get started."
+            action={
+              <Link href="/">
+                <Button className="bg-orange-500 hover:bg-orange-600">
+                  Start Shopping
+                </Button>
+              </Link>
+            }
+          />
         ) : (
           <>
             {/* Table Header - Desktop Only */}

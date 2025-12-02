@@ -1,5 +1,10 @@
 import { apiClient } from "@/lib/api-client";
-import type { Order, CreateOrderRequest, PaginatedResponse } from "@/types/api";
+import type {
+  Order,
+  CreateOrderRequest,
+  PaginatedResponse,
+  OrderListingResponse,
+} from "@/types/api";
 
 /**
  * Order Service
@@ -10,11 +15,9 @@ export const orderService = {
   /**
    * Get user's order history
    */
-  async getOrders(): Promise<PaginatedResponse<Order>> {
-    const response = await apiClient.get<PaginatedResponse<Order>>(
-      "/client/orders"
-    );
-    return response.data;
+  async getOrders(): Promise<OrderListingResponse> {
+    const response = await apiClient.get<any>("/client/orders");
+    return response as unknown as OrderListingResponse;
   },
 
   /**

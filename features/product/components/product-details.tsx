@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, PackageX } from "lucide-react";
 import { useCartStore } from "@/features/carts/stores/cart-store";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,11 @@ import { productService } from "@/services/product.service";
 import ProductOfCategory from "@/features/home/product-of-category";
 import ProductInfoSection from "./product-info-section";
 import { ProductDetails, HomeProduct } from "@/types/api";
+import { ErrorState } from "@/components/ui/error-state";
+import { LoadingState } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface ProductDetailProps {
   productId?: string;
@@ -27,6 +32,7 @@ export default function ProductDetail({
     data: fetchedProduct,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["product", productId],
     queryFn: () => productService.getProduct(productId!),
@@ -73,18 +79,33 @@ export default function ProductDetail({
   };
 
   if (isLoading) {
+    return <LoadingState type="spinner" text="Loading product details..." />;
+  }
+
+  if (error) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
+      <ErrorState
+        title="Failed to load product"
+        description="We couldn't load this product. It may have been removed or is temporarily unavailable."
+        onRetry={() => refetch()}
+      />
     );
   }
 
-  if (error || !product) {
+  if (!product) {
     return (
-      <div className="flex h-[50vh] items-center justify-center text-red-500">
-        Failed to load product details.
-      </div>
+      <EmptyState
+        icon={PackageX}
+        title="Product not found"
+        description="The product you're looking for doesn't exist or has been removed."
+        action={
+          <Link href="/">
+            <Button className="bg-orange-500 hover:bg-orange-600">
+              Browse Products
+            </Button>
+          </Link>
+        }
+      />
     );
   }
 

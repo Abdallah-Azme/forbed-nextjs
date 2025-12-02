@@ -6,7 +6,12 @@ import { CategoryProductCard } from "@/features/category/components/category-pro
 import { useQuery } from "@tanstack/react-query";
 import { categoryService } from "@/services/category.service";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { FolderOpen } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
+import { ErrorState } from "@/components/ui/error-state";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Page() {
   const params = useParams();
@@ -15,23 +20,15 @@ export default function Page() {
   const categoryId = params.categoryId as string;
   const page = searchParams.get("page") || "1";
 
-  const { data: categoryDetails, isLoading } = useQuery({
+  const {
+    data: categoryDetails,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["category", categoryId, page],
     queryFn: () => categoryService.getCategory(categoryId, parseInt(page)),
   });
-
-  // Since the API response structure for pagination is provided, we assume getCategory handles the page param or we need to append it.
-  // The provided API endpoint example was /client/categories/test-1?page=1
-  // So we should update the service to accept query params or handle it here.
-  // For now, let's assume the service needs a small update to pass the query string,
-  // OR we can just append it to the ID if the service doesn't support params object.
-  // Actually, looking at the service, it just takes categoryId.
-  // I should probably update the service to accept params, but for now I'll hack it slightly or rely on the fact that I can pass "slug?page=1" if needed,
-  // but better to fix the service.
-  // Wait, I can't easily change the service signature without breaking other things potentially.
-  // Let's assume for this step I'll just fetch the category.
-  // BUT the user wants pagination.
-  // Let's update the queryFn to include the page in the URL.
 
   const handlePageChange = (newPage: number) => {
     router.push(`/categories/${categoryId}?page=${newPage}`);
@@ -39,28 +36,72 @@ export default function Page() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <div className="container mx-auto px-4 py-8">
+        <div className="h-12 w-48 bg-gray-200 rounded mb-8 animate-pulse" />
+        <LoadingState type="skeleton" count={4} />
       </div>
     );
   }
 
-  if (!categoryDetails) {
-    return <div className="text-center py-20">Category not found</div>;
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorState
+          title="Failed to load category"
+          description="We couldn't load this category. Please try again."
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (!categoryDetails || !categoryDetails.category) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <EmptyState
+          icon={FolderOpen}
+          title="Category not found"
+          description="The category you're looking for doesn't exist or has been removed."
+          action={
+            <Link href="/categories">
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                Browse All Categories
+              </Button>
+            </Link>
+          }
+        />
+      </div>
+    );
   }
 
   const { category, products } = categoryDetails;
+
+  const [sortBy, setSortBy] = useState("best-selling");
+  const [priceRange, setPriceRange] = useState("all");
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-medium text-right mb-8">{category.name}</h1>
 
-      <FilterBar count={products.meta.total} />
+      <FilterBar
+        count={products.meta.total}
+        onSortChange={setSortBy}
+        onPriceChange={setPriceRange}
+      />
 
       {products.data.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">
-          No products found in this category.
-        </div>
+        <EmptyState
+          icon={FolderOpen}
+          title="No products in this category"
+          description="This category doesn't have any products yet. Check back later!"
+          action={
+            <Link href="/">
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                Browse All Products
+              </Button>
+            </Link>
+          }
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

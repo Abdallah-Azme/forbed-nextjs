@@ -320,6 +320,32 @@ export interface Coupon {
  * Order Types
  */
 
+export interface OrderListingResponse {
+  data: Order[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
+  message: string;
+  status: string;
+}
+
 export interface Order {
   id: number;
   user_id: number;
@@ -333,23 +359,31 @@ export interface Order {
   payment_method_id: number;
   payment_method?: PaymentMethod;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  status_trans: string;
   transaction_code?: string;
   transaction_screenshot?: string;
   coupon?: Coupon;
+  item_count: number;
+  vat: number;
+  shipping_cost: number;
+  grand_total: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface OrderItem {
   id: number;
-  order_id: number;
+  order_id?: number;
   product_id: number;
-  product: Product;
+  product?: Product; // Optional as it might not be fully populated in order details
+  name: string;
+  thumbnail: string;
+  brand: Brand | null;
   quantity: number;
   price: number;
   specification_id?: number;
-  specification?: ProductSpecification;
-  total: number;
+  spcification?: { id: number | null }; // Note typo in API response "spcification"
+  total?: number;
 }
 
 export interface CreateOrderRequest {

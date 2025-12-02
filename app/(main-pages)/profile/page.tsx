@@ -13,6 +13,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addressService } from "@/services/address.service";
 import { accountService } from "@/services/account.service";
 import { toast } from "sonner";
+import { LoadingState } from "@/components/ui/loading-state";
+import { ErrorState } from "@/components/ui/error-state";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,12 +35,21 @@ export default function ProfilePage() {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading: isLoadingUser } = useQuery({
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    error: userError,
+    refetch: refetchUser,
+  } = useQuery({
     queryKey: ["user-account"],
     queryFn: accountService.getAccount,
   });
 
-  const { data: addresses, isLoading: isLoadingAddresses } = useQuery({
+  const {
+    data: addresses,
+    isLoading: isLoadingAddresses,
+    error: addressesError,
+  } = useQuery({
     queryKey: ["addresses"],
     queryFn: addressService.getAddresses,
   });
@@ -61,10 +72,26 @@ export default function ProfilePage() {
     }
   };
 
-  if (isLoadingUser || !user) {
+  if (isLoadingUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Loading...</p>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <LoadingState type="spinner" text="Loading profile..." />
+        </div>
+      </div>
+    );
+  }
+
+  if (userError || !user) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <ErrorState
+            title="Failed to load profile"
+            description="We couldn't load your profile information. Please try again."
+            onRetry={() => refetchUser()}
+          />
+        </div>
       </div>
     );
   }
