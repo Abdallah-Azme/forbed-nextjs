@@ -1,9 +1,35 @@
 "use client";
 
-import { Mail, MapPin, Phone, Facebook, Instagram } from "lucide-react";
+import {
+  Mail,
+  MapPin,
+  Phone,
+  Facebook,
+  Instagram,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { homeService } from "@/services/content.service";
+import Image from "next/image";
+import { API_CONFIG } from "@/config/api.config";
 
 export default function Footer() {
+  const { data: footerData, isLoading } = useQuery({
+    queryKey: ["footer-data"],
+    queryFn: () => homeService.getFooterData(),
+  });
+
+  if (isLoading) {
+    return (
+      <footer className="bg-black text-white pt-10 pb-6 font-sans overflow-x-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-16 flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="bg-black text-white pt-10 pb-6 font-sans overflow-x-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-16">
@@ -35,12 +61,34 @@ export default function Footer() {
           <div className="flex flex-col gap-3 text-end order-2 md:order-2">
             <h3 className="font-semibold text-lg">ارقامنا للتواصل</h3>
 
-            <Link
-              href="tel:01060008582"
-              className="text-gray-300 hover:text-white transition"
-            >
-              01060008582
-            </Link>
+            {footerData?.contact_info.phone && (
+              <Link
+                href={`tel:${footerData.contact_info.phone}`}
+                className="text-gray-300 hover:text-white transition"
+              >
+                {footerData.contact_info.phone}
+              </Link>
+            )}
+
+            {footerData?.contact_info.whatsapp && (
+              <Link
+                href={`https://wa.me/${footerData.contact_info.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-white transition"
+              >
+                WhatsApp: {footerData.contact_info.whatsapp}
+              </Link>
+            )}
+
+            {footerData?.contact_info.email && (
+              <Link
+                href={`mailto:${footerData.contact_info.email}`}
+                className="text-gray-300 hover:text-white transition"
+              >
+                {footerData.contact_info.email}
+              </Link>
+            )}
           </div>
 
           {/* Column 1 — ADDRESS */}
@@ -50,9 +98,11 @@ export default function Footer() {
               <span className="text-pink-500">📍</span>
             </h3>
 
-            <p className="text-gray-300 leading-relaxed">
-              مصر – القاهرة للمنطقة الصناعية، تقاطع شارع 300
-            </p>
+            {footerData?.contact_info.location.address && (
+              <p className="text-gray-300 leading-relaxed">
+                {footerData.contact_info.location.address}
+              </p>
+            )}
           </div>
         </div>
 
@@ -60,22 +110,36 @@ export default function Footer() {
         <div className="mt-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
           {/* SOCIAL ICONS */}
           <div className="flex gap-4 text-white">
-            <Link
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-300 transition"
-            >
-              <Facebook className="w-6 h-6" />
-            </Link>
-            <Link
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-300 transition"
-            >
-              <Instagram className="w-6 h-6" />
-            </Link>
+            {footerData?.socials.map((social) => (
+              <Link
+                key={social.id}
+                href={social.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-300 transition"
+                title={social.title}
+              >
+                {social.icon ? (
+                  <div className="relative w-6 h-6">
+                    <Image
+                      src={
+                        social.icon.startsWith("http")
+                          ? social.icon
+                          : `${API_CONFIG.baseURL.replace(
+                              "/api",
+                              ""
+                            )}/${social.icon.replace(/\\/g, "/")}`
+                      }
+                      alt={social.title}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                ) : (
+                  <Facebook className="w-6 h-6" />
+                )}
+              </Link>
+            ))}
           </div>
 
           {/* Email Subscribe */}
@@ -90,7 +154,7 @@ export default function Footer() {
                 placeholder="Email"
                 dir="ltr"
                 className="bg-transparent px-4 py-3 w-full text-white placeholder-gray-400 focus:outline-none"
-              />{" "}
+              />
               <button
                 type="submit"
                 className="px-4 py-3 hover:bg-white/20 transition"

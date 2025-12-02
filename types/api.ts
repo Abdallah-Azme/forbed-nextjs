@@ -448,21 +448,21 @@ export interface Banner {
 }
 
 export interface FooterData {
-  about: string;
-  contact: {
-    phone: string;
+  contact_info: {
+    location: {
+      lat: string;
+      lng: string;
+      address: string;
+    };
     email: string;
-    address: string;
+    phone: string | null;
+    whatsapp: string;
   };
-  social_links: {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-    youtube?: string;
-  };
-  links: {
+  socials: {
+    id: number;
+    link: string;
+    icon: string;
     title: string;
-    url: string;
   }[];
 }
 
