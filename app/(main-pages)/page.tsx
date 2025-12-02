@@ -9,6 +9,7 @@ import PaymentSection from "@/features/home/payment-section";
 import ProductOfCategory from "@/features/home/product-of-category";
 import { homeService } from "@/services/content.service";
 import { Loader2 } from "lucide-react";
+import ProductDetail from "@/features/product/components/product-details";
 
 export default function Home() {
   const {
@@ -59,6 +60,8 @@ export default function Home() {
       />
 
       <BlogSection blogs={homeData?.blogs} />
+
+      <ProductDetail productId="" />
 
       <PaymentSection
         paymentMethods={homeData?.payment_methods}
