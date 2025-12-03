@@ -98,7 +98,7 @@ export default function Footer() {
               <span className="text-pink-500">📍</span>
             </h3>
 
-            {footerData?.contact_info.location.address && (
+            {footerData?.contact_info?.location?.address && (
               <p className="text-gray-300 leading-relaxed">
                 {footerData.contact_info.location.address}
               </p>
