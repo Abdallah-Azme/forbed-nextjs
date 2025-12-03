@@ -47,8 +47,8 @@ export default function Page() {
     return (
       <div className="container mx-auto px-4 py-8">
         <ErrorState
-          title="Failed to load category"
-          description="We couldn't load this category. Please try again."
+          title="فشل تحميل الفئة"
+          description="لم نتمكن من تحميل هذه الفئة. يرجى المحاولة مرة أخرى."
           onRetry={() => refetch()}
         />
       </div>
@@ -60,12 +60,12 @@ export default function Page() {
       <div className="container mx-auto px-4 py-8">
         <EmptyState
           icon={FolderOpen}
-          title="Category not found"
-          description="The category you're looking for doesn't exist or has been removed."
+          title="الفئة غير موجودة"
+          description="الفئة التي تبحث عنها غير موجودة أو تم حذفها."
           action={
             <Link href="/categories">
               <Button className="bg-orange-500 hover:bg-orange-600">
-                Browse All Categories
+                تصفح جميع الفئات
               </Button>
             </Link>
           }
@@ -92,12 +92,12 @@ export default function Page() {
       {products.data.length === 0 ? (
         <EmptyState
           icon={FolderOpen}
-          title="No products in this category"
-          description="This category doesn't have any products yet. Check back later!"
+          title="لا توجد منتجات في هذه الفئة"
+          description="لا توجد منتجات في هذه الفئة بعد. تحقق مرة أخرى لاحقاً!"
           action={
             <Link href="/">
               <Button className="bg-orange-500 hover:bg-orange-600">
-                Browse All Products
+                تصفح جميع المنتجات
               </Button>
             </Link>
           }
@@ -112,16 +112,13 @@ export default function Page() {
 
           {/* Pagination */}
           {products.meta.last_page > 1 && (
-            <div
-              className="flex justify-center items-center gap-2 mt-12"
-              dir="ltr"
-            >
+            <div className="flex justify-center items-center gap-2 mt-12">
               <button
                 onClick={() => handlePageChange(products.meta.current_page - 1)}
                 disabled={products.meta.current_page === 1}
                 className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Previous
+                السابق
               </button>
 
               <div className="flex gap-2">
@@ -150,7 +147,7 @@ export default function Page() {
                 }
                 className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Next
+                التالي
               </button>
             </div>
           )}

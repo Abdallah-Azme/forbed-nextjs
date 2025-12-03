@@ -10,8 +10,8 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({
-  title = "Something went wrong",
-  description = "We couldn't load this content. Please try again.",
+  title = "حدث خطأ ما",
+  description = "لم نتمكن من تحميل المحتوى. يرجى المحاولة مرة أخرى.",
   onRetry,
   className,
 }: ErrorStateProps) {
@@ -33,8 +33,8 @@ export function ErrorState({
           variant="outline"
           className="border-orange-200 text-orange-500 hover:bg-orange-50"
         >
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Try Again
+          <RefreshCw className="ml-2 h-4 w-4" />
+          حاول مرة أخرى
         </Button>
       )}
     </div>

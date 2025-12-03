@@ -133,7 +133,7 @@ export default function SignupForm() {
                     <Input
                       placeholder="الاسم الكامل"
                       {...field}
-                      className="h-12"
+                      className="h-12 text-right"
                     />
                   </FormControl>
                   <FormMessage />
@@ -174,7 +174,7 @@ export default function SignupForm() {
                     <Input
                       type="password"
                       placeholder="********"
-                      className="h-12"
+                      className="h-12 text-right"
                       {...field}
                     />
                   </FormControl>
@@ -194,7 +194,7 @@ export default function SignupForm() {
                     <Input
                       type="password"
                       placeholder="********"
-                      className="h-12"
+                      className="h-12 text-right"
                       {...field}
                     />
                   </FormControl>

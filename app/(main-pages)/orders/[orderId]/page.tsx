@@ -40,7 +40,7 @@ export default function OrderDetailsPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <LoadingState type="spinner" text="Loading order details..." />
+          <LoadingState type="spinner" text="جاري تحميل تفاصيل الطلب..." />
         </div>
       </div>
     );
@@ -51,8 +51,8 @@ export default function OrderDetailsPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
           <ErrorState
-            title="Failed to load order"
-            description="We couldn't load this order. Please try again."
+            title="فشل تحميل الطلب"
+            description="لم نتمكن من تحميل هذا الطلب. يرجى المحاولة مرة أخرى."
             onRetry={() => refetch()}
           />
         </div>
@@ -66,12 +66,12 @@ export default function OrderDetailsPage() {
         <div className="container mx-auto px-4 max-w-5xl">
           <EmptyState
             icon={Receipt}
-            title="Order not found"
-            description="The order you're looking for doesn't exist or has been removed."
+            title="الطلب غير موجود"
+            description="الطلب الذي تبحث عنه غير موجود أو تم حذفه."
             action={
               <Link href="/orders">
                 <Button className="bg-orange-500 hover:bg-orange-600">
-                  View All Orders
+                  عرض كل الطلبات
                 </Button>
               </Link>
             }
@@ -109,11 +109,11 @@ export default function OrderDetailsPage() {
             onClick={() => router.back()}
             className="hover:bg-gray-100"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 rotate-180" />
           </Button>
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-3">
-              Order {order.order_number}
+              طلب رقم {order.order_number}
               <Badge
                 variant="outline"
                 className={`text-sm font-medium ${getStatusColor(
@@ -124,8 +124,8 @@ export default function OrderDetailsPage() {
               </Badge>
             </h1>
             <p className="text-gray-500 text-sm mt-1">
-              Placed on{" "}
-              {new Date(order.created_at).toLocaleDateString("en-US", {
+              تم الطلب في{" "}
+              {new Date(order.created_at).toLocaleDateString("ar-EG", {
                 weekday: "long",
                 year: "numeric",
                 month: "long",
@@ -144,7 +144,7 @@ export default function OrderDetailsPage() {
               <div className="p-6 border-b">
                 <h2 className="font-semibold flex items-center gap-2">
                   <Package className="w-5 h-5 text-orange-500" />
-                  Order Items ({order.items.length})
+                  عناصر الطلب ({order.items.length})
                 </h2>
               </div>
               <div className="divide-y">
@@ -172,20 +172,21 @@ export default function OrderDetailsPage() {
                           </h3>
                           {item.brand && (
                             <p className="text-sm text-gray-500">
-                              Brand: {item.brand.name}
+                              الماركة: {item.brand.name}
                             </p>
                           )}
                         </div>
                         <p className="font-semibold">
-                          E£{item.price.toFixed(2)}
+                          {item.price.toFixed(2)} ج.م
                         </p>
                       </div>
                       <div className="mt-2 flex items-center justify-between text-sm">
                         <span className="text-gray-500">
-                          Qty: {item.quantity}
+                          الكمية: {item.quantity}
                         </span>
                         <span className="font-medium text-gray-900">
-                          Total: E£{(item.price * item.quantity).toFixed(2)}
+                          الإجمالي: {(item.price * item.quantity).toFixed(2)}{" "}
+                          ج.م
                         </span>
                       </div>
                     </div>
@@ -199,31 +200,31 @@ export default function OrderDetailsPage() {
           <div className="space-y-6">
             {/* Order Summary */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="font-semibold mb-4">Order Summary</h2>
+              <h2 className="font-semibold mb-4">ملخص الطلب</h2>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>E£{order.total.toFixed(2)}</span>
+                  <span>المجموع الفرعي</span>
+                  <span>{order.total.toFixed(2)} ج.م</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>E£{order.shipping_cost.toFixed(2)}</span>
+                  <span>الشحن</span>
+                  <span>{order.shipping_cost.toFixed(2)} ج.م</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>VAT</span>
-                  <span>E£{order.vat.toFixed(2)}</span>
+                  <span>ضريبة القيمة المضافة</span>
+                  <span>{order.vat.toFixed(2)} ج.م</span>
                 </div>
                 {order.discount > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
-                    <span>-E£{order.discount.toFixed(2)}</span>
+                    <span>الخصم</span>
+                    <span>-{order.discount.toFixed(2)} ج.م</span>
                   </div>
                 )}
                 <Separator />
                 <div className="flex justify-between font-bold text-lg pt-2">
-                  <span>Total</span>
+                  <span>الإجمالي</span>
                   <span className="text-orange-600">
-                    E£{order.grand_total.toFixed(2)}
+                    {order.grand_total.toFixed(2)} ج.م
                   </span>
                 </div>
               </div>
@@ -233,12 +234,16 @@ export default function OrderDetailsPage() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="font-semibold mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-gray-500" />
-                Shipping Address
+                عنوان الشحن
               </h2>
               {order.address ? (
                 <div className="text-sm text-gray-600 space-y-1">
                   <p className="font-medium text-gray-900">
-                    {order.address.type_trans || order.address.type}
+                    {order.address.type === "home"
+                      ? "المنزل"
+                      : order.address.type === "work"
+                      ? "العمل"
+                      : "آخر"}
                   </p>
                   <p>{order.address.address}</p>
                   <p>{order.address.city}</p>
@@ -250,7 +255,7 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No address information</p>
+                <p className="text-sm text-gray-500">لا توجد معلومات عنوان</p>
               )}
             </div>
 
@@ -258,7 +263,7 @@ export default function OrderDetailsPage() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="font-semibold mb-4 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-gray-500" />
-                Payment Method
+                طريقة الدفع
               </h2>
               <div className="text-sm text-gray-600">
                 {order.payment_method ? (
@@ -266,7 +271,7 @@ export default function OrderDetailsPage() {
                     <span>{order.payment_method.name}</span>
                   </div>
                 ) : (
-                  <span>Cash on Delivery</span>
+                  <span>الدفع عند الاستلام</span>
                 )}
               </div>
             </div>

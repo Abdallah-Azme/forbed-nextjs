@@ -63,7 +63,7 @@ export default function ProductInfoSection({
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="w-full flex flex-col lg:flex-row-reverse items-start gap-10 px-4 md:px-10 py-10 font-sans"
+      className="w-full flex flex-col lg:flex-row items-start gap-10 px-4 md:px-10 py-10 font-sans"
     >
       {/* Image */}
       <motion.div
@@ -105,26 +105,26 @@ export default function ProductInfoSection({
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="w-full lg:w-1/2 space-y-6 flex flex-col items-end"
+        className="w-full lg:w-1/2 space-y-6 flex flex-col items-start"
       >
-        <div className="space-y-3 w-full text-end">
-          <p className="text-xs text-gray-500 tracking-wider">FORBED</p>
+        <div className="space-y-3 w-full text-start">
+          <p className="text-xs text-gray-500 tracking-wider">فوربد</p>
           <h1 className="text-3xl md:text-4xl font-normal leading-relaxed">
             {product.name}
           </h1>
-          <div className="flex items-center justify-end gap-3">
+          <div className="flex items-center justify-start gap-3">
             <p className="text-xl font-bold text-gray-900">
-              LE {product.price.price_after_discount.toLocaleString()} EGP
+              {product.price.price_after_discount.toLocaleString()} ج.م
             </p>
             {product.price.has_offer && (
               <p className="text-sm text-gray-500 line-through">
-                LE {product.price.price_before_discount.toLocaleString()} EGP
+                {product.price.price_before_discount.toLocaleString()} ج.م
               </p>
             )}
           </div>
           {product.price.has_offer && (
             <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-600">
-              Save LE {product.price.discount.toLocaleString()}
+              وفر {product.price.discount.toLocaleString()} ج.م
             </span>
           )}
         </div>
@@ -138,12 +138,12 @@ export default function ProductInfoSection({
             transition={{ delay: 0.2 }}
             className="space-y-2 w-full"
           >
-            <p className="text-sm text-gray-700 text-end">المواصفات</p>
-            <div className="flex flex-col gap-2 items-end">
+            <p className="text-sm text-gray-700 text-start">المواصفات</p>
+            <div className="flex flex-col gap-2 items-start">
               {product.specifications.map((spec) => (
                 <div key={spec.id} className="flex gap-2 text-sm">
+                  <span className="text-gray-500">{spec.key}:</span>
                   <span className="font-medium">{spec.value}</span>
-                  <span className="text-gray-500">: {spec.key}</span>
                 </div>
               ))}
             </div>
@@ -156,9 +156,9 @@ export default function ProductInfoSection({
           initial="hidden"
           animate="show"
           transition={{ delay: 0.25 }}
-          className="space-y-2 w-full flex flex-col items-end"
+          className="space-y-2 w-full flex flex-col items-start"
         >
-          <p className="text-sm text-gray-700 text-end">Quantity</p>
+          <p className="text-sm text-gray-700 text-start">الكمية</p>
           <div className="flex items-center w-40 h-12 border border-black rounded-none overflow-hidden">
             <Button
               variant="ghost"
@@ -204,15 +204,15 @@ export default function ProductInfoSection({
             }
           >
             {isAddingToCart ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <Loader2 className="h-4 w-4 animate-spin ml-2" />
             ) : null}
-            Add to cart
+            أضف إلى السلة
           </Button>
           <Button
             onClick={() => handleAddToCart(true)}
             className="w-full h-12 rounded-none bg-black text-white hover:bg-gray-800 font-normal"
           >
-            Buy it now
+            اشترِ الآن
           </Button>
         </motion.div>
 
@@ -222,7 +222,7 @@ export default function ProductInfoSection({
           initial="hidden"
           animate="show"
           transition={{ delay: 0.4 }}
-          className="pt-4 text-gray-700 text-sm leading-loose space-y-1 w-full text-end"
+          className="pt-4 text-gray-700 text-sm leading-loose space-y-1 w-full text-start"
         >
           <div dangerouslySetInnerHTML={{ __html: product.description }} />
         </motion.div>

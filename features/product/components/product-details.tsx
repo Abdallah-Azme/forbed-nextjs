@@ -71,7 +71,7 @@ export default function ProductDetail({
       specification_id
     );
 
-    toast.success("Added to cart");
+    toast.success("تمت الإضافة إلى السلة");
 
     if (redirect) {
       router.push("/cart");
@@ -79,14 +79,14 @@ export default function ProductDetail({
   };
 
   if (isLoading) {
-    return <LoadingState type="spinner" text="Loading product details..." />;
+    return <LoadingState type="spinner" text="جاري تحميل تفاصيل المنتج..." />;
   }
 
   if (error) {
     return (
       <ErrorState
-        title="Failed to load product"
-        description="We couldn't load this product. It may have been removed or is temporarily unavailable."
+        title="فشل تحميل المنتج"
+        description="لم نتمكن من تحميل هذا المنتج. قد يكون تم حذفه أو غير متاح حالياً."
         onRetry={() => refetch()}
       />
     );
@@ -96,12 +96,12 @@ export default function ProductDetail({
     return (
       <EmptyState
         icon={PackageX}
-        title="Product not found"
-        description="The product you're looking for doesn't exist or has been removed."
+        title="المنتج غير موجود"
+        description="المنتج الذي تبحث عنه غير موجود أو تم حذفه."
         action={
           <Link href="/">
             <Button className="bg-orange-500 hover:bg-orange-600">
-              Browse Products
+              تصفح المنتجات
             </Button>
           </Link>
         }
@@ -120,7 +120,7 @@ export default function ProductDetail({
       {/* Related Products - only show if fetched from API */}
       {fetchedProduct?.related && fetchedProduct.related.length > 0 && (
         <ProductOfCategory
-          title="Related Products"
+          title="منتجات ذات صلة"
           products={fetchedProduct.related}
         />
       )}

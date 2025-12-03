@@ -38,22 +38,22 @@ export default function Footer() {
           {/* Column 3 — LINKS */}
           <div className="flex flex-col gap-2 text-end order-3 md:order-1">
             <Link href="/" className="hover:text-gray-300 transition">
-              Home page
+              الصفحة الرئيسية
             </Link>
             <Link href="/shipping" className="hover:text-gray-300 transition">
-              shipping policy
+              سياسة الشحن
             </Link>
             <Link href="/terms" className="hover:text-gray-300 transition">
-              Terms & Conditions
+              الشروط والأحكام
             </Link>
             <Link href="/refund" className="hover:text-gray-300 transition">
-              Refund Policy
+              سياسة الاسترجاع
             </Link>
             <Link href="/search" className="hover:text-gray-300 transition">
-              Search
+              بحث
             </Link>
             <Link href="/contact" className="hover:text-gray-300 transition">
-              contact
+              تواصل معنا
             </Link>
           </div>
 
@@ -77,7 +77,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white transition"
               >
-                WhatsApp: {footerData.contact_info.whatsapp}
+                واتساب: {footerData.contact_info.whatsapp}
               </Link>
             )}
 
@@ -145,13 +145,13 @@ export default function Footer() {
           {/* Email Subscribe */}
           <div className="max-w-md w-full">
             <h3 className="text-white text-lg mb-3 text-end">
-              Subscribe to our emails
+              اشترك في نشرتنا البريدية
             </h3>
 
             <div className="flex items-center border border-gray-600 flex-row-reverse overflow-hidden">
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="البريد الإلكتروني"
                 dir="ltr"
                 className="bg-transparent px-4 py-3 w-full text-white placeholder-gray-400 focus:outline-none"
               />

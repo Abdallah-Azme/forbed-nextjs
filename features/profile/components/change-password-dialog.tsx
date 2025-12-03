@@ -27,14 +27,12 @@ import { useState } from "react";
 
 const passwordSchema = z
   .object({
-    current_password: z.string().min(1, "Current password is required"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    password_confirmation: z
-      .string()
-      .min(1, "Password confirmation is required"),
+    current_password: z.string().min(1, "كلمة المرور الحالية مطلوبة"),
+    password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+    password_confirmation: z.string().min(1, "تأكيد كلمة المرور مطلوب"),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords do not match",
+    message: "كلمات المرور غير متطابقة",
     path: ["password_confirmation"],
   });
 
@@ -65,12 +63,12 @@ export default function ChangePasswordDialog({
   const { mutate: changePassword, isPending } = useMutation({
     mutationFn: accountService.updatePassword,
     onSuccess: () => {
-      toast.success("Password changed successfully!");
+      toast.success("تم تغيير كلمة المرور بنجاح!");
       onOpenChange(false);
       form.reset();
     },
     onError: (error: any) => {
-      const errorMessage = error.message || "Failed to change password";
+      const errorMessage = error.message || "فشل تغيير كلمة المرور";
       toast.error(errorMessage);
 
       // Handle field-specific errors
@@ -96,7 +94,7 @@ export default function ChangePasswordDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
+          <DialogTitle>تغيير كلمة المرور</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -107,12 +105,12 @@ export default function ChangePasswordDialog({
               name="current_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Current Password</FormLabel>
+                  <FormLabel>كلمة المرور الحالية</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showCurrentPassword ? "text" : "password"}
-                        placeholder="Enter current password"
+                        placeholder="أدخل كلمة المرور الحالية"
                         {...field}
                       />
                       <button
@@ -141,12 +139,12 @@ export default function ChangePasswordDialog({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>كلمة المرور الجديدة</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showNewPassword ? "text" : "password"}
-                        placeholder="Enter new password"
+                        placeholder="أدخل كلمة المرور الجديدة"
                         {...field}
                       />
                       <button
@@ -173,12 +171,12 @@ export default function ChangePasswordDialog({
               name="password_confirmation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormLabel>تأكيد كلمة المرور الجديدة</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Confirm new password"
+                        placeholder="تأكيد كلمة المرور الجديدة"
                         {...field}
                       />
                       <button
@@ -212,14 +210,14 @@ export default function ChangePasswordDialog({
                 }}
                 disabled={isPending}
               >
-                Cancel
+                إلغاء
               </Button>
               <Button
                 type="submit"
                 className="bg-orange-500 hover:bg-orange-600"
                 disabled={isPending}
               >
-                {isPending ? "Changing..." : "Change Password"}
+                {isPending ? "جاري التغيير..." : "تغيير كلمة المرور"}
               </Button>
             </div>
           </form>

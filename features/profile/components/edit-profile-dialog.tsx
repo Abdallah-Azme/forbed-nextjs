@@ -43,8 +43,8 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 const profileSchema = z.object({
-  full_name: z.string().min(3, "Full name must be at least 3 characters"),
-  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+  full_name: z.string().min(3, "الاسم الكامل يجب أن يكون 3 أحرف على الأقل"),
+  email: z.string().email("البريد الإلكتروني غير صالح").optional().or(z.literal("")),
   d_o_b: z.string().optional(),
   gender: z.enum(["male", "female"]),
   country_id: z.string().optional(),
@@ -86,12 +86,12 @@ export default function EditProfileDialog({
   const { mutate: updateProfile, isPending } = useMutation({
     mutationFn: accountService.updateAccount,
     onSuccess: () => {
-      toast.success("Profile updated successfully!");
+      toast.success("تم تحديث الملف الشخصي بنجاح!");
       queryClient.invalidateQueries({ queryKey: ["user-account"] });
       onOpenChange(false);
     },
     onError: (error: any) => {
-      const errorMessage = error.message || "Failed to update profile";
+      const errorMessage = error.message || "فشل تحديث الملف الشخصي";
       toast.error(errorMessage);
 
       // Handle field-specific errors
@@ -158,7 +158,7 @@ export default function EditProfileDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>تعديل الملف الشخصي</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -188,7 +188,7 @@ export default function EditProfileDialog({
                       <label className="cursor-pointer">
                         <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
                           <Upload className="size-4" />
-                          <span className="text-sm">Upload Photo</span>
+                          <span className="text-sm">تحميل صورة</span>
                         </div>
                         <input
                           type="file"
@@ -211,9 +211,9 @@ export default function EditProfileDialog({
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>الاسم الكامل</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your full name" {...field} />
+                    <Input placeholder="أدخل اسمك الكامل" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -226,11 +226,11 @@ export default function EditProfileDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>البريد الإلكتروني</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder="أدخل بريدك الإلكتروني"
                       {...field}
                     />
                   </FormControl>
@@ -245,23 +245,23 @@ export default function EditProfileDialog({
               name="d_o_b"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date of Birth</FormLabel>
+                  <FormLabel>تاريخ الميلاد</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full ps-3 text-start font-normal",
                             !selectedDate && "text-muted-foreground"
                           )}
                         >
                           {selectedDate ? (
                             format(selectedDate, "PPP")
                           ) : (
-                            <span>Pick a date</span>
+                            <span>اختر تاريخاً</span>
                           )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
@@ -288,19 +288,19 @@ export default function EditProfileDialog({
               name="gender"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gender</FormLabel>
+                  <FormLabel>النوع</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
+                      <SelectTrigger className="flex-row-reverse">
+                        <SelectValue placeholder="اختر النوع" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="male" className="flex-row-reverse justify-end">ذكر</SelectItem>
+                      <SelectItem value="female" className="flex-row-reverse justify-end">أنثى</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -316,19 +316,13 @@ export default function EditProfileDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isPending}
               >
-                Cancel
+                إلغاء
               </Button>
               <Button
                 type="submit"
                 className="bg-orange-500 hover:bg-orange-600"
                 disabled={isPending}
               >
-                {isPending ? "Saving..." : "Save Changes"}
+                {isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
               </Button>
             </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-}

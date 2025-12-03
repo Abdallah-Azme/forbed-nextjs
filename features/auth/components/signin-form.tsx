@@ -113,13 +113,13 @@ export default function SigninForm() {
                       <Input
                         placeholder="••••••••"
                         type={showPassword ? "text" : "password"}
-                        className="h-12 text-right pr-12"
+                        className="h-12 text-right ps-12"
                         {...field}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                       >
                         {showPassword ? (
                           <EyeOff className="h-5 w-5" />

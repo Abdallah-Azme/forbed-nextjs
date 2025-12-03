@@ -68,12 +68,12 @@ export default function Page() {
   const createOrderMutation = useMutation({
     mutationFn: orderService.createOrder,
     onSuccess: (data) => {
-      toast.success("Order placed successfully!");
+      toast.success("تم الطلب بنجاح!");
       clearCart();
       router.push(`/orders/${data.id}`); // Redirect to order details or success page
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to place order");
+      toast.error(error.response?.data?.message || "فشل في إتمام الطلب");
       console.error("Order creation error:", error);
     },
   });
@@ -86,12 +86,12 @@ export default function Page() {
     e.preventDefault();
 
     if (!selectedAddressId) {
-      toast.error("Please select an address");
+      toast.error("يرجى اختيار عنوان");
       return;
     }
 
     if (!paymentMethodId) {
-      toast.error("Please select a payment method");
+      toast.error("يرجى اختيار طريقة الدفع");
       return;
     }
 
@@ -105,9 +105,9 @@ export default function Page() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <h1 className="text-2xl font-bold">Your cart is empty</h1>
+        <h1 className="text-2xl font-bold">سلة التسوق فارغة</h1>
         <Link href="/">
-          <Button>Continue Shopping</Button>
+          <Button>مواصلة التسوق</Button>
         </Link>
       </div>
     );
@@ -127,7 +127,7 @@ export default function Page() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Right Column - Order Summary */}
-          <div className="lg:border-l lg:pl-8 order-1 lg:order-2">
+          <div className="lg:border-s lg:ps-8 order-1 lg:order-2">
             <div className="sticky top-8 space-y-6">
               {/* Products */}
               <div className="space-y-4">
@@ -137,15 +137,15 @@ export default function Page() {
                     className="flex items-center justify-between gap-4"
                   >
                     {/* Left: Name + Price */}
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 space-y-1 text-start">
                       <div className="text-sm font-semibold">
-                        E£{(product.price * product.quantity).toFixed(2)}
+                        {(product.price * product.quantity).toFixed(2)} ج.م
                       </div>
                     </div>
 
                     {/* Right: Image + Qty */}
                     <div className="relative flex items-center gap-3 shrink-0">
-                      <p className="text-sm font-medium line-clamp-2">
+                      <p className="text-sm font-medium line-clamp-2 text-start">
                         {product.name}
                       </p>
                       <div className="relative w-16 h-16 rounded-lg border-2 border-white bg-gray-100">
@@ -168,36 +168,35 @@ export default function Page() {
               {/* Summary */}
               <div className="space-y-2 pt-4">
                 <div className="flex justify-between text-sm">
-                  <span>E£{subtotal.toFixed(2)}</span>
-                  <span>Subtotal</span>
+                  <span>{subtotal.toFixed(2)} ج.م</span>
+                  <span>المجموع الفرعي</span>
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span>E£{shipping.toFixed(2)}</span>
-                  <span>Shipping</span>
+                  <span>{shipping.toFixed(2)} ج.م</span>
+                  <span>الشحن</span>
                 </div>
               </div>
 
               {/* Total */}
               <div className="flex justify-between items-center  ">
-                <div className="text-right">
-                  <span className="text-sm text-gray-500 mr-1">EGP</span>
+                <div className="text-start">
                   <span className="text-lg font-bold">
-                    E£{total.toFixed(2)}
+                    {total.toFixed(2)} ج.م
                   </span>
                 </div>
-                <span className="text-lg font-bold">Total</span>
+                <span className="text-lg font-bold">الإجمالي</span>
               </div>
             </div>
           </div>
 
           {/* Left Column - Form */}
-          <div className="space-y-8 text-end order-2 lg:order-1">
+          <div className="space-y-8 text-start order-2 lg:order-1">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Address Selection */}
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Shipping Address</h2>
+                  <h2 className="text-xl font-semibold">عنوان الشحن</h2>
                 </div>
 
                 {isLoadingAddresses ? (
@@ -212,12 +211,12 @@ export default function Page() {
                         onValueChange={setSelectedAddressId}
                         disabled={!addresses || addresses.length === 0}
                       >
-                        <SelectTrigger className="h-12 w-full text-right flex-row-reverse">
+                        <SelectTrigger className="h-12 w-full text-start flex-row-reverse">
                           <SelectValue
                             placeholder={
                               addresses && addresses.length > 0
-                                ? "Select an address"
-                                : "No addresses found"
+                                ? "اختر عنواناً"
+                                : "لا توجد عناوين"
                             }
                           />
                         </SelectTrigger>
@@ -228,7 +227,7 @@ export default function Page() {
                               value={addr.id.toString()}
                               className="flex-row-reverse"
                             >
-                              <div className="flex flex-col text-right">
+                              <div className="flex flex-col text-start">
                                 <span className="font-medium">{addr.type}</span>
                                 <span className="text-sm text-gray-500">
                                   {addr.address}, {addr.city}
@@ -254,7 +253,7 @@ export default function Page() {
 
               {/* Payment Method */}
               <div>
-                <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
+                <h2 className="text-xl font-semibold mb-4">طريقة الدفع</h2>
                 {isLoadingHomeData ? (
                   <div className="flex justify-center py-4">
                     <Loader2 className="animate-spin" />
@@ -294,7 +293,7 @@ export default function Page() {
                           </div>
                           <Label
                             htmlFor={`pay-${method.id}`}
-                            className="flex-1 cursor-pointer text-right font-medium"
+                            className="flex-1 cursor-pointer text-start font-medium"
                           >
                             {method.name}
                           </Label>
@@ -312,18 +311,18 @@ export default function Page() {
                 className="w-full bg-[#f7931d] hover:bg-[#f7931d] text-white rounded-lg h-12 text-base font-semibold"
               >
                 {createOrderMutation.isPending ? (
-                  <Loader2 className="animate-spin mr-2" />
+                  <Loader2 className="animate-spin ml-2" />
                 ) : null}
-                Pay now (E£{total.toFixed(2)})
+                ادفع الآن ({total.toFixed(2)} ج.م)
               </Button>
 
               {/* Footer Links */}
               <div className="flex  gap-4 justify-end text-sm text-orange-500 border-t pt-5">
                 <Link href="/refund-policy" className="hover:underline">
-                  Refund policy
+                  سياسة الاسترجاع
                 </Link>
                 <Link href="/terms-of-service" className="hover:underline">
-                  Terms of service
+                  شروط الخدمة
                 </Link>
               </div>
             </form>

@@ -67,7 +67,7 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h1 className="text-3xl font-bold mb-8">My Orders</h1>
+          <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
           <LoadingState type="skeleton" count={3} />
         </div>
       </div>
@@ -78,10 +78,10 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h1 className="text-3xl font-bold mb-8">My Orders</h1>
+          <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
           <ErrorState
-            title="Failed to load orders"
-            description="We couldn't load your orders. Please try again."
+            title="فشل تحميل الطلبات"
+            description="لم نتمكن من تحميل طلباتك. يرجى المحاولة مرة أخرى."
             onRetry={() => refetch()}
           />
         </div>
@@ -93,15 +93,15 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h1 className="text-3xl font-bold mb-8">My Orders</h1>
+          <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
           <EmptyState
             icon={Package}
-            title="No orders yet"
-            description="Looks like you haven't placed any orders yet."
+            title="لا توجد طلبات بعد"
+            description="يبدو أنك لم تقم بأي طلبات بعد."
             action={
               <Link href="/">
                 <Button className="bg-orange-500 hover:bg-orange-600">
-                  Start Shopping
+                  ابدأ التسوق
                 </Button>
               </Link>
             }
@@ -114,20 +114,18 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-5xl">
-        <h1 className="text-3xl font-bold mb-8">My Orders</h1>
+        <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
 
         {!ordersData?.data || ordersData.data.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 bg-white rounded-lg shadow-sm border">
             <div className="bg-orange-50 p-4 rounded-full mb-4">
               <Package className="w-12 h-12 text-orange-500" />
             </div>
-            <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
-            <p className="text-gray-500 mb-6">
-              Looks like you haven't placed any orders yet.
-            </p>
+            <h2 className="text-xl font-semibold mb-2">لا توجد طلبات بعد</h2>
+            <p className="text-gray-500 mb-6">يبدو أنك لم تقم بأي طلبات بعد.</p>
             <Link href="/">
               <Button className="bg-orange-500 hover:bg-orange-600">
-                Start Shopping
+                ابدأ التسوق
               </Button>
             </Link>
           </div>
@@ -155,29 +153,29 @@ export default function OrdersPage() {
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString("en-US", {
+                      {new Date(order.created_at).toLocaleDateString("ar-EG", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
                       })}
                       {" • "}
-                      {order.items?.length || order.item_count} items
+                      {order.items?.length || order.item_count} عناصر
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between md:justify-end gap-6">
                     <div className="text-right">
-                      <p className="text-sm text-gray-500">Total Amount</p>
+                      <p className="text-sm text-gray-500">الإجمالي</p>
                       <p className="text-lg font-bold text-orange-600">
-                        E£
                         {order.grand_total?.toFixed(2) ||
-                          order.total?.toFixed(2)}
+                          order.total?.toFixed(2)}{" "}
+                        ج.م
                       </p>
                     </div>
                     <Link href={`/orders/${order.id}`}>
                       <Button variant="outline" className="group">
-                        Details
-                        <ChevronRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                        التفاصيل
+                        <ChevronRight className="w-4 h-4 mr-2 rotate-180 transition-transform group-hover:-translate-x-1" />
                       </Button>
                     </Link>
                   </div>

@@ -60,12 +60,12 @@ function SearchContent() {
       <div className="container mx-auto px-4 py-8">
         <EmptyState
           icon={SearchIcon}
-          title="Start your search"
-          description="Enter a keyword to search for products."
+          title="ابدأ البحث"
+          description="أدخل كلمة مفتاحية للبحث عن المنتجات."
           action={
             <Link href="/">
               <Button className="bg-orange-500 hover:bg-orange-600">
-                Browse Products
+                تصفح المنتجات
               </Button>
             </Link>
           }
@@ -79,7 +79,7 @@ function SearchContent() {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-medium text-right mb-8">
-          Search Results for: "{keyword}"
+          نتائج البحث عن: "{keyword}"
         </h1>
         <LoadingState type="skeleton" count={4} />
       </div>
@@ -91,11 +91,11 @@ function SearchContent() {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-medium text-right mb-8">
-          Search Results for: "{keyword}"
+          نتائج البحث عن: "{keyword}"
         </h1>
         <ErrorState
-          title="Failed to search"
-          description="We couldn't complete your search. Please try again."
+          title="فشل البحث"
+          description="لم نتمكن من إكمال البحث. يرجى المحاولة مرة أخرى."
           onRetry={() => refetch()}
         />
       </div>
@@ -107,21 +107,21 @@ function SearchContent() {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-medium text-right mb-8">
-          Search Results for: "{keyword}"
+          نتائج البحث عن: "{keyword}"
         </h1>
         <EmptyState
           icon={SearchIcon}
-          title="No results found"
-          description={`We couldn't find any products matching "${keyword}". Try different keywords or browse our categories.`}
+          title="لا توجد نتائج"
+          description={`لم نتمكن من العثور على أي منتجات تطابق "${keyword}". جرب كلمات مفتاحية مختلفة أو تصفح فئاتنا.`}
           action={
             <div className="flex gap-3">
               <Link href="/">
                 <Button className="bg-orange-500 hover:bg-orange-600">
-                  Browse All Products
+                  تصفح جميع المنتجات
                 </Button>
               </Link>
               <Link href="/categories">
-                <Button variant="outline">View Categories</Button>
+                <Button variant="outline">عرض الفئات</Button>
               </Link>
             </div>
           }
@@ -135,7 +135,7 @@ function SearchContent() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-medium text-right mb-8">
-        Search Results for: "{keyword}"
+        نتائج البحث عن: "{keyword}"
       </h1>
 
       <FilterBar
@@ -152,13 +152,13 @@ function SearchContent() {
 
       {/* Pagination */}
       {products.meta.last_page > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-12" dir="ltr">
+        <div className="flex justify-center items-center gap-2 mt-12">
           <button
             onClick={() => handlePageChange(products.meta.current_page - 1)}
             disabled={products.meta.current_page === 1}
             className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Previous
+            السابق
           </button>
 
           <div className="flex gap-2">
@@ -185,7 +185,7 @@ function SearchContent() {
             disabled={products.meta.current_page === products.meta.last_page}
             className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Next
+            التالي
           </button>
         </div>
       )}
@@ -198,7 +198,7 @@ export default function SearchPage() {
     <React.Suspense
       fallback={
         <div className="container mx-auto px-4 py-8">
-          <LoadingState type="spinner" text="Loading search..." />
+          <LoadingState type="spinner" text="جاري البحث..." />
         </div>
       }
     >

@@ -35,13 +35,13 @@ import { toast } from "sonner";
 import { parsePhoneNumber } from "react-phone-number-input";
 
 const addressSchema = z.object({
-  lat: z.string().min(1, "Latitude is required"),
-  lng: z.string().min(1, "Longitude is required"),
-  address: z.string().min(1, "Address is required"),
-  city: z.string().min(1, "City is required"),
-  type: z.string().min(1, "Address type is required"),
-  description: z.string().min(1, "Description is required"),
-  phone: z.string().min(1, "Phone is required"),
+  lat: z.string().min(1, "خط العرض مطلوب"),
+  lng: z.string().min(1, "خط الطول مطلوب"),
+  address: z.string().min(1, "العنوان مطلوب"),
+  city: z.string().min(1, "المدينة مطلوبة"),
+  type: z.string().min(1, "نوع العنوان مطلوب"),
+  description: z.string().min(1, "الوصف مطلوب"),
+  phone: z.string().min(1, "رقم الهاتف مطلوب"),
 });
 
 type AddressFormData = z.infer<typeof addressSchema>;
@@ -78,26 +78,26 @@ export default function AddAddressDialog({
   const { mutate: createAddress, isPending: isCreating } = useMutation({
     mutationFn: addressService.createAddress,
     onSuccess: () => {
-      toast.success("Address added successfully!");
+      toast.success("تم إضافة العنوان بنجاح!");
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
       onOpenChange(false);
       form.reset();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to add address");
+      toast.error(error.message || "فشل إضافة العنوان");
     },
   });
 
   const { mutate: updateAddress, isPending: isUpdating } = useMutation({
     mutationFn: (data: any) => addressService.updateAddress(address.id, data),
     onSuccess: () => {
-      toast.success("Address updated successfully!");
+      toast.success("تم تحديث العنوان بنجاح!");
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
       onOpenChange(false);
       form.reset();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update address");
+      toast.error(error.message || "فشل تحديث العنوان");
     },
   });
 
@@ -137,7 +137,7 @@ export default function AddAddressDialog({
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by your browser");
+      toast.error("الموقع الجغرافي غير مدعوم من قبل المتصفح");
       return;
     }
 
@@ -146,11 +146,11 @@ export default function AddAddressDialog({
       (position) => {
         form.setValue("lat", position.coords.latitude.toString());
         form.setValue("lng", position.coords.longitude.toString());
-        toast.success("Location captured!");
+        toast.success("تم تحديد الموقع!");
         setIsGettingLocation(false);
       },
       (error) => {
-        toast.error("Failed to get location: " + error.message);
+        toast.error("فشل تحديد الموقع: " + error.message);
         setIsGettingLocation(false);
       }
     );
@@ -160,7 +160,7 @@ export default function AddAddressDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{address ? "Edit address" : "Add address"}</DialogTitle>
+          <DialogTitle>{address ? "تعديل العنوان" : "إضافة عنوان"}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -168,7 +168,7 @@ export default function AddAddressDialog({
             {/* Location Coordinates */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Location</label>
+                <label className="text-sm font-medium">الموقع</label>
                 <Button
                   type="button"
                   variant="outline"
@@ -177,8 +177,8 @@ export default function AddAddressDialog({
                   disabled={isGettingLocation}
                 >
                   {isGettingLocation
-                    ? "Getting location..."
-                    : "Use my location"}
+                    ? "جاري تحديد الموقع..."
+                    : "استخدم موقعي الحالي"}
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -188,7 +188,7 @@ export default function AddAddressDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Latitude" {...field} />
+                        <Input placeholder="خط العرض" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -200,7 +200,7 @@ export default function AddAddressDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Longitude" {...field} />
+                        <Input placeholder="خط الطول" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -215,20 +215,35 @@ export default function AddAddressDialog({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address Type</FormLabel>
+                  <FormLabel>نوع العنوان</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
+                      <SelectTrigger className="flex-row-reverse">
+                        <SelectValue placeholder="اختر النوع" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="home">Home</SelectItem>
-                      <SelectItem value="work">Work</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem
+                        value="home"
+                        className="flex-row-reverse justify-end"
+                      >
+                        المنزل
+                      </SelectItem>
+                      <SelectItem
+                        value="work"
+                        className="flex-row-reverse justify-end"
+                      >
+                        العمل
+                      </SelectItem>
+                      <SelectItem
+                        value="other"
+                        className="flex-row-reverse justify-end"
+                      >
+                        آخر
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -242,9 +257,9 @@ export default function AddAddressDialog({
               name="city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City</FormLabel>
+                  <FormLabel>المدينة</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter city" {...field} />
+                    <Input placeholder="أدخل المدينة" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -257,9 +272,9 @@ export default function AddAddressDialog({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>العنوان</FormLabel>
                   <FormControl>
-                    <Input placeholder="Street address" {...field} />
+                    <Input placeholder="اسم الشارع" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -272,10 +287,10 @@ export default function AddAddressDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>وصف إضافي</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Additional details (e.g., apartment number, building name)"
+                      placeholder="تفاصيل إضافية (رقم الشقة، اسم المبنى...)"
                       {...field}
                       rows={3}
                     />
@@ -291,10 +306,10 @@ export default function AddAddressDialog({
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>رقم الهاتف</FormLabel>
                   <div className="" dir="ltr">
                     <FormControl>
-                      <PhoneInput placeholder="Phone number" {...field} />
+                      <PhoneInput placeholder="رقم الهاتف" {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -310,7 +325,7 @@ export default function AddAddressDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isPending}
               >
-                Cancel
+                إلغاء
               </Button>
               <Button
                 type="submit"
@@ -319,11 +334,11 @@ export default function AddAddressDialog({
               >
                 {isPending
                   ? isEditMode
-                    ? "Updating..."
-                    : "Saving..."
+                    ? "جاري التحديث..."
+                    : "جاري الحفظ..."
                   : isEditMode
-                  ? "Update"
-                  : "Save"}
+                  ? "تحديث"
+                  : "حفظ"}
               </Button>
             </div>
           </form>

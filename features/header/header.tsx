@@ -66,12 +66,12 @@ export default function Header() {
 
   const navLinks = [
     { label: "الرئيسية", href: "/" },
-    { label: "Shop", href: "/shop" },
-    { label: "Orders", href: "/orders" },
+    { label: "المتجر", href: "/shop" },
+    { label: "الطلبات", href: "/orders" },
     ...(categories.length > 0
       ? [
           {
-            label: "Categories",
+            label: "الفئات",
             items: categories,
           },
         ]
@@ -104,8 +104,8 @@ export default function Header() {
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="Search"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg"
+                placeholder="ابحث..."
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg text-right"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -333,24 +333,30 @@ export default function Header() {
                     </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/profile" className="cursor-pointer">
-                        <User className="size-4 mr-2" />
-                        Profile
+                      <Link
+                        href="/profile"
+                        className="cursor-pointer flex-row-reverse"
+                      >
+                        <User className="size-4 ms-2" />
+                        الملف الشخصي
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/settings" className="cursor-pointer">
-                        <Settings className="size-4 mr-2" />
-                        Settings
+                      <Link
+                        href="/settings"
+                        className="cursor-pointer flex-row-reverse"
+                      >
+                        <Settings className="size-4 ms-2" />
+                        الإعدادات
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="cursor-pointer text-red-600 focus:text-red-600"
+                      className="cursor-pointer text-red-600 focus:text-red-600 flex-row-reverse"
                     >
-                      <LogOut className="size-4 mr-2" />
-                      Sign out
+                      <LogOut className="size-4 ms-2" />
+                      تسجيل الخروج
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
