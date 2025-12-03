@@ -44,7 +44,11 @@ import Image from "next/image";
 
 const profileSchema = z.object({
   full_name: z.string().min(3, "الاسم الكامل يجب أن يكون 3 أحرف على الأقل"),
-  email: z.string().email("البريد الإلكتروني غير صالح").optional().or(z.literal("")),
+  email: z
+    .string()
+    .email("البريد الإلكتروني غير صالح")
+    .optional()
+    .or(z.literal("")),
   d_o_b: z.string().optional(),
   gender: z.enum(["male", "female"]),
   country_id: z.string().optional(),
@@ -299,8 +303,18 @@ export default function EditProfileDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="male" className="flex-row-reverse justify-end">ذكر</SelectItem>
-                      <SelectItem value="female" className="flex-row-reverse justify-end">أنثى</SelectItem>
+                      <SelectItem
+                        value="male"
+                        className="flex-row-reverse justify-end"
+                      >
+                        ذكر
+                      </SelectItem>
+                      <SelectItem
+                        value="female"
+                        className="flex-row-reverse justify-end"
+                      >
+                        أنثى
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -326,3 +340,9 @@ export default function EditProfileDialog({
                 {isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
               </Button>
             </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
