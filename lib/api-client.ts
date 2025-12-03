@@ -20,6 +20,11 @@ class ApiClient {
   private getHeaders(includeAuth = true): HeadersInit {
     const headers: HeadersInit = {
       Accept: "application/json",
+      "X-Front-URL":
+        typeof window !== "undefined"
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_SITE_URL ||
+            "https://forbed-nextjs.vercel.app",
     };
 
     if (includeAuth) {
@@ -258,6 +263,10 @@ class ApiClient {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        "X-Front-URL":
+          typeof window !== "undefined"
+            ? window.location.origin
+            : process.env.NEXT_PUBLIC_SITE_URL || "https://forbed.com",
       },
       body: data ? JSON.stringify(data) : undefined,
     });
