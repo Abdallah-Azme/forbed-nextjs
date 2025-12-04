@@ -28,7 +28,6 @@ export default function SessionSync() {
 
         // 3. Mismatch detected: Server thinks logged in, Client thinks logged out
         if (hasServerSession) {
-          console.log("Zombie session detected - clearing server session...");
           await deleteSession();
 
           // 4. Refresh to clear middleware state and allow access to public pages

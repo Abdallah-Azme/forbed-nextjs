@@ -13,14 +13,33 @@ import { useQuery } from "@tanstack/react-query";
 import { homeService } from "@/services/content.service";
 import Image from "next/image";
 import { API_CONFIG } from "@/config/api.config";
+import NewsletterForm from "./newsletter-form";
+
+import { settingsService } from "@/services/settings.service";
 
 export default function Footer() {
-  const { data: footerData, isLoading } = useQuery({
+  const { data: footerData, isLoading: isFooterLoading } = useQuery({
     queryKey: ["footer-data"],
     queryFn: () => homeService.getFooterData(),
   });
 
-  if (isLoading) {
+  const { data: pages = [], isLoading: isPagesLoading } = useQuery({
+    queryKey: ["pages"],
+    queryFn: () => homeService.getPages(),
+  });
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => settingsService.getSettings(),
+  });
+
+  // Helper to map API keys to routes
+  const getPageRoute = (key: string) => {
+    // All dynamic pages now use the /pages/[slug] route
+    return `/pages/${key}`;
+  };
+
+  if (isFooterLoading || isPagesLoading) {
     return (
       <footer className="bg-black text-white pt-10 pb-6 font-sans overflow-x-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-16 flex items-center justify-center py-20">
@@ -40,18 +59,15 @@ export default function Footer() {
             <Link href="/" className="hover:text-gray-300 transition">
               الصفحة الرئيسية
             </Link>
-            <Link href="/shipping" className="hover:text-gray-300 transition">
-              سياسة الشحن
-            </Link>
-            <Link href="/terms" className="hover:text-gray-300 transition">
-              الشروط والأحكام
-            </Link>
-            <Link href="/refund" className="hover:text-gray-300 transition">
-              سياسة الاسترجاع
-            </Link>
-            <Link href="/search" className="hover:text-gray-300 transition">
-              بحث
-            </Link>
+            {pages.map((page) => (
+              <Link
+                key={page.key}
+                href={getPageRoute(page.key)}
+                className="hover:text-gray-300 transition"
+              >
+                {page.text}
+              </Link>
+            ))}
             <Link href="/contact" className="hover:text-gray-300 transition">
               تواصل معنا
             </Link>
@@ -94,7 +110,7 @@ export default function Footer() {
           {/* Column 1 — ADDRESS */}
           <div className="flex flex-col gap-3 text-end order-1 md:order-3">
             <h3 className="font-semibold text-lg flex items-center gap-2 justify-end">
-              مقر فورد الرئيسي
+              مقر {settings?.site_info?.title || "الشركة"} الرئيسي
               <span className="text-pink-500">📍</span>
             </h3>
 
@@ -143,26 +159,7 @@ export default function Footer() {
           </div>
 
           {/* Email Subscribe */}
-          <div className="max-w-md w-full">
-            <h3 className="text-white text-lg mb-3 text-end">
-              اشترك في نشرتنا البريدية
-            </h3>
-
-            <div className="flex items-center border border-gray-600 flex-row-reverse overflow-hidden">
-              <input
-                type="email"
-                placeholder="البريد الإلكتروني"
-                dir="ltr"
-                className="bg-transparent px-4 py-3 w-full text-white placeholder-gray-400 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="px-4 py-3 hover:bg-white/20 transition"
-              >
-                →
-              </button>
-            </div>
-          </div>
+          <NewsletterForm />
         </div>
 
         {/* COPYRIGHT */}

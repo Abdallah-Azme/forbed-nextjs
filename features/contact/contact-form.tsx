@@ -67,7 +67,6 @@ export default function ContactForm() {
   });
 
   function onSubmit(values: z.infer<typeof contactSchema>) {
-    console.log({ values });
     submitMutation.mutate({
       full_name: values.full_name,
       email: values.email,

@@ -55,7 +55,6 @@ export default function SigninForm() {
     } catch (error) {
       // If parsing fails, it might be an email or invalid phone
       // We'll send it as is, and let the backend handle it
-      console.log("Not a phone number or invalid format:", error);
     }
 
     login({

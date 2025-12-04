@@ -14,7 +14,6 @@ export default function AdBar() {
     queryKey: ["socials"],
     queryFn: homeService.getSocials,
   });
-  console.log(socials);
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}

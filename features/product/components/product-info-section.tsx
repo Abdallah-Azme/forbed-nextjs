@@ -24,14 +24,39 @@ export default function ProductInfoSection({
   isAddingToCart,
 }: ProductInfoSectionProps) {
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
+  // Initialize with the first specification ID if available
+  const [selectedSpecId, setSelectedSpecId] = useState<string>(
+    product.specifications && product.specifications.length > 0
+      ? String(product.specifications[0].id)
+      : ""
+  );
 
   const increase = () => setQuantity((prev) => prev + 1);
   const decrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   const handleAddToCart = (redirect: boolean) => {
-    onAddToCart(redirect, quantity, selectedSize || undefined);
+    onAddToCart(redirect, quantity, selectedSpecId || undefined);
   };
+
+  // Find the selected specification object to get its price
+  const selectedSpec = product.specifications?.find(
+    (s) => String(s.id) === selectedSpecId
+  );
+
+  // Determine the price to display:
+  // If a spec is selected and has a price, use it.
+  // Otherwise fallback to the product's main price.
+  const currentPrice =
+    selectedSpec?.price || product.price.price_after_discount;
+
+  // For the "before discount" price, we might not have specific data per spec in the provided snippet,
+  // so we'll stick to the main product's before-discount price if we are showing the main price,
+  // OR if the spec price is different, we might just show the spec price.
+  // However, usually specs override the main price.
+  // Let's assume if a spec is selected, that's the final price.
+  // If the product has an offer, we might want to show the original price too, but the spec object provided
+  // only has "price": 15000. It doesn't seem to have a separate "before discount" price.
+  // So if a spec is selected, we'll just show its price.
 
   // ✨ Animation Variants
   const containerVariants: Variants = {
@@ -114,38 +139,54 @@ export default function ProductInfoSection({
           </h1>
           <div className="flex items-center justify-start gap-3">
             <p className="text-xl font-bold text-gray-900">
-              {product.price.price_after_discount.toLocaleString()} ج.م
+              {currentPrice.toLocaleString()} ج.م
             </p>
-            {product.price.has_offer && (
+            {/* Show old price only if no spec is selected (using main product offer) OR if we had spec-specific old price logic */}
+            {!selectedSpec && product.price.has_offer && (
               <p className="text-sm text-gray-500 line-through">
                 {product.price.price_before_discount.toLocaleString()} ج.م
               </p>
             )}
           </div>
-          {product.price.has_offer && (
+          {!selectedSpec && product.price.has_offer && (
             <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-600">
               وفر {product.price.discount.toLocaleString()} ج.م
             </span>
           )}
         </div>
 
-        {/* Specifications / Size Selector (if applicable) */}
+        {/* Specifications / Size Selector */}
         {product.specifications && product.specifications.length > 0 && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
             transition={{ delay: 0.2 }}
-            className="space-y-2 w-full"
+            className="space-y-3 w-full"
           >
-            <p className="text-sm text-gray-700 text-start">المواصفات</p>
-            <div className="flex flex-col gap-2 items-start">
-              {product.specifications.map((spec) => (
-                <div key={spec.id} className="flex gap-2 text-sm">
-                  <span className="text-gray-500">{spec.key}:</span>
-                  <span className="font-medium">{spec.value}</span>
-                </div>
-              ))}
+            <p className="text-sm text-gray-700 text-start font-medium">
+              المقاس (سم)
+            </p>
+            <div className="flex flex-wrap gap-3 items-start">
+              {product.specifications.map((spec) => {
+                const isSelected = String(spec.id) === selectedSpecId;
+                return (
+                  <button
+                    key={spec.id}
+                    onClick={() => setSelectedSpecId(String(spec.id))}
+                    className={`
+                      px-4 py-2 text-sm border transition-all duration-200
+                      ${
+                        isSelected
+                          ? "border-black bg-black text-white"
+                          : "border-gray-300 text-gray-700 hover:border-gray-900"
+                      }
+                    `}
+                  >
+                    {spec.value}
+                  </button>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -200,7 +241,7 @@ export default function ProductInfoSection({
             onClick={() => handleAddToCart(false)}
             className="w-full h-12 rounded-none border-gray-900 text-gray-900 hover:bg-gray-50 font-normal"
             disabled={
-              (product.price.start_from && !selectedSize) || isAddingToCart
+              (product.price.start_from && !selectedSpecId) || isAddingToCart
             }
           >
             {isAddingToCart ? (
@@ -211,6 +252,7 @@ export default function ProductInfoSection({
           <Button
             onClick={() => handleAddToCart(true)}
             className="w-full h-12 rounded-none bg-black text-white hover:bg-gray-800 font-normal"
+            disabled={product.price.start_from && !selectedSpecId}
           >
             اشترِ الآن
           </Button>

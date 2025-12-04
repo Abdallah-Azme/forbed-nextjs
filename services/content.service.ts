@@ -1,5 +1,11 @@
 import { apiClient } from "@/lib/api-client";
-import type { Blog, HomeData, FooterData } from "@/types/api";
+import type {
+  Blog,
+  HomeData,
+  FooterData,
+  PageDetails,
+  PageDetailsResponse,
+} from "@/types/api";
 
 /**
  * Blog Service
@@ -57,9 +63,33 @@ export const homeService = {
       message: string | null;
       status: string;
     }>("/general/pages/socials");
-    console.log("Full API Response:", response);
-    console.log("Response.data:", response.data);
     return Array.isArray(response.data) ? response.data : [];
+  },
+
+  /**
+   * Get dynamic pages
+   */
+  async getPages(): Promise<{ key: string; text: string }[]> {
+    const response = await apiClient.get<{
+      data: { key: string; text: string }[];
+      message: string | null;
+      status: string;
+    }>("/general/pages/pages");
+    return Array.isArray(response.data) ? response.data : [];
+  },
+
+  /**
+   * Get dynamic page details
+   */
+  async getPageDetails(id: string): Promise<PageDetails | null> {
+    const response = await apiClient.get<PageDetails[]>(
+      `/general/pages/page/${id}`
+    );
+
+    // apiClient already unwraps the response
+    // response.data is directly the array [{ id, title, content, image }]
+    const pageData = response.data;
+    return Array.isArray(pageData) && pageData.length > 0 ? pageData[0] : null;
   },
 };
 
@@ -79,5 +109,15 @@ export const contactService = {
     content: string;
   }): Promise<any> {
     await apiClient.post("/general/pages/contact", data);
+  },
+
+  /**
+   * Subscribe to newsletter
+   */
+  async subscribeToNewsletter(email: string): Promise<any> {
+    await apiClient.post("/general/pages/newsletter", {
+      email,
+      front_link: window.location.origin,
+    });
   },
 };

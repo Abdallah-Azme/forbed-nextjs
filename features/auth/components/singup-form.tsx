@@ -53,7 +53,6 @@ export default function SignupForm() {
   });
 
   function onSubmit(values: z.infer<typeof signupSchema>) {
-    console.log({ values });
     let phone = values.phone;
     let phone_code = "";
 
@@ -64,9 +63,7 @@ export default function SignupForm() {
         phone = phoneNumber.nationalNumber;
         phone_code = phoneNumber.countryCallingCode;
       }
-    } catch (error) {
-      console.log("Invalid phone number format:", error);
-    }
+    } catch (error) {}
 
     register(
       {

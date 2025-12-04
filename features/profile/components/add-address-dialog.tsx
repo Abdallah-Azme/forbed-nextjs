@@ -113,9 +113,7 @@ export default function AddAddressDialog({
         phone = phoneNumber.nationalNumber;
         phone_code = phoneNumber.countryCallingCode;
       }
-    } catch (error) {
-      console.log("Phone parsing error:", error);
-    }
+    } catch (error) {}
 
     const payload = {
       lat: values.lat,

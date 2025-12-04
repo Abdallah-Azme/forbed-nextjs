@@ -539,6 +539,30 @@ export interface SocialsResponse {
   status: string;
 }
 
+export interface PageLink {
+  key: string;
+  text: string;
+}
+
+export interface PagesResponse {
+  data: PageLink[];
+  message: string | null;
+  status: string;
+}
+
+export interface PageDetails {
+  id: number;
+  title: string;
+  content: string;
+  image: string;
+}
+
+export interface PageDetailsResponse {
+  data: PageDetails[];
+  message: string | null;
+  status: string;
+}
+
 /**
  * Account Update Types
  */

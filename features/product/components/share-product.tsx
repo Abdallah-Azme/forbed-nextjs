@@ -15,9 +15,7 @@ export default function ShareProduct() {
           text: "شاهد هذا المنتج الرائع:",
           url: productUrl,
         });
-      } catch (err) {
-        console.log("Share canceled or failed", err);
-      }
+      } catch (err) {}
     } else {
       alert("المشاركة غير مدعومة على هذا المتصفح.");
     }
