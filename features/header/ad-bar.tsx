@@ -4,8 +4,17 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Facebook, Instagram, MoveRight } from "lucide-react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { homeService } from "@/services/content.service";
+import Image from "next/image";
+import ImageFallback from "@/components/image-fallback";
 
 export default function AdBar() {
+  const { data: socials = [], isLoading } = useQuery({
+    queryKey: ["socials"],
+    queryFn: homeService.getSocials,
+  });
+  console.log(socials);
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -45,17 +54,30 @@ export default function AdBar() {
               },
             }}
           >
-            {[Instagram, Facebook].map((Icon, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <button className="text-white cursor-pointer">
-                  <Icon className="w-5 h-5" />
-                </button>
-              </motion.div>
-            ))}
+            {!isLoading &&
+              socials.map((social) => (
+                <motion.div
+                  key={social.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link
+                    href={social.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white cursor-pointer block"
+                    aria-label={social.title}
+                  >
+                    <ImageFallback
+                      src={social.icon}
+                      alt={social.title}
+                      width={20}
+                      height={20}
+                      className="w-5 h-5 object-contain"
+                    />
+                  </Link>
+                </motion.div>
+              ))}
           </motion.div>
         </div>
       </div>

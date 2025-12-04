@@ -526,6 +526,19 @@ export interface FooterData {
   }[];
 }
 
+export interface SocialLink {
+  id: number;
+  link: string;
+  icon: string;
+  title: string;
+}
+
+export interface SocialsResponse {
+  data: SocialLink[];
+  message: string | null;
+  status: string;
+}
+
 /**
  * Account Update Types
  */
@@ -561,4 +574,47 @@ export interface NotificationSettingsRequest {
   times_notify?: boolean;
   mail_notify?: boolean;
   sms_notify?: boolean;
+}
+
+/**
+ * Contact Form Types
+ */
+
+export interface ContactFormData {
+  full_name: string;
+  email: string;
+  phone: string;
+  content: string;
+}
+
+/**
+ * Settings Types
+ */
+
+export interface SettingItem {
+  key: string;
+  value: string | SiteInfo;
+}
+
+export interface SiteInfo {
+  title: string;
+  description: string;
+  keywords: string;
+  short_description: string;
+}
+
+export interface Settings {
+  phones: string;
+  whatsapp: string;
+  email: string;
+  tax: string;
+  logo: string;
+  fav: string;
+  site_info: SiteInfo;
+}
+
+export interface SettingsResponse {
+  data: SettingItem[];
+  message: string | null;
+  status: string;
 }

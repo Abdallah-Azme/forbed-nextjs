@@ -20,6 +20,10 @@ export default function Page() {
   const categoryId = params.categoryId as string;
   const page = searchParams.get("page") || "1";
 
+  // State hooks must be called before any conditional returns
+  const [sortBy, setSortBy] = useState("best-selling");
+  const [priceRange, setPriceRange] = useState("all");
+
   const {
     data: categoryDetails,
     isLoading,
@@ -75,9 +79,6 @@ export default function Page() {
   }
 
   const { category, products } = categoryDetails;
-
-  const [sortBy, setSortBy] = useState("best-selling");
-  const [priceRange, setPriceRange] = useState("all");
 
   return (
     <div className="container mx-auto px-4 py-8">

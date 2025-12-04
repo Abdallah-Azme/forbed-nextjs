@@ -167,7 +167,7 @@ export default function Footer() {
 
         {/* COPYRIGHT */}
         <div className="text-end text-gray-500 text-sm mt-10 border-t border-white/10 pt-4">
-          © {new Date().getFullYear()}, forbed
+          © {new Date().getFullYear()}, Rich House
         </div>
       </div>
     </footer>

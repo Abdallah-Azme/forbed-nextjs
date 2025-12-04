@@ -45,4 +45,39 @@ export const homeService = {
     const response = await apiClient.get<FooterData>("/client/footer");
     return response.data;
   },
+
+  /**
+   * Get social media links
+   */
+  async getSocials(): Promise<
+    { id: number; link: string; icon: string; title: string }[]
+  > {
+    const response = await apiClient.get<{
+      data: { id: number; link: string; icon: string; title: string }[];
+      message: string | null;
+      status: string;
+    }>("/general/pages/socials");
+    console.log("Full API Response:", response);
+    console.log("Response.data:", response.data);
+    return Array.isArray(response.data) ? response.data : [];
+  },
+};
+
+/**
+ * Contact Service
+ * Handles contact form submissions
+ */
+
+export const contactService = {
+  /**
+   * Submit contact form
+   */
+  async submitContactForm(data: {
+    full_name: string;
+    email: string;
+    phone: string;
+    content: string;
+  }): Promise<any> {
+    await apiClient.post("/general/pages/contact", data);
+  },
 };

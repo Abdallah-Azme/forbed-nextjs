@@ -13,6 +13,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import {
   ChevronDown,
   ChevronLeft,
+  ChevronRight,
   Menu,
   MoveRight,
   Search,
@@ -31,6 +32,7 @@ import { useLogout } from "@/hooks/use-auth";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { categoryService } from "@/services/category.service";
+import { settingsService } from "@/services/settings.service";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,6 +47,12 @@ export default function Header() {
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoryService.getCategories(),
+  });
+
+  // Fetch settings
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => settingsService.getSettings(),
   });
 
   useEffect(() => {
@@ -66,7 +74,7 @@ export default function Header() {
 
   const navLinks = [
     { label: "الرئيسية", href: "/" },
-    { label: "المتجر", href: "/shop" },
+    // { label: "المتجر", href: "/shop" },
     { label: "الطلبات", href: "/orders" },
     ...(categories.length > 0
       ? [
@@ -226,7 +234,7 @@ export default function Header() {
                           {/* Subcategories in mobile menu */}
                           {item.subcategories &&
                             item.subcategories.length > 0 && (
-                              <div className="mr-4 space-y-2 border-r pr-4 mt-1">
+                              <div className="ms-4 space-y-2 border-s ps-4 mt-1">
                                 {item.subcategories.map(
                                   (sub: any, subIdx: number) => (
                                     <Link
@@ -373,6 +381,7 @@ export default function Header() {
             </div>
 
             <Logo
+              logoUrl={settings?.logo}
               className={cn(
                 "shrink-0 transition-all duration-300 block lg:hidden ",
                 isScrolled ? "size-[75px]" : "size-[100px]"
@@ -411,7 +420,7 @@ export default function Header() {
                               {typeof item === "string" ? item : item.name}
                               {item.subcategories &&
                                 item.subcategories.length > 0 && (
-                                  <ChevronLeft className="w-4 h-4" />
+                                  <ChevronRight className="w-4 h-4" />
                                 )}
                             </Link>
                           </DropdownMenuItem>
@@ -419,7 +428,7 @@ export default function Header() {
                           {/* Nested Dropdown for Subcategories */}
                           {item.subcategories &&
                             item.subcategories.length > 0 && (
-                              <div className="absolute right-full top-0 hidden group-hover/item:block min-w-[200px] bg-white border shadow-md rounded-md p-1 mr-1">
+                              <div className="absolute left-full top-0 hidden group-hover/item:block min-w-[200px] bg-white border shadow-md rounded-md p-1 ms-1">
                                 {item.subcategories.map(
                                   (sub: any, subIdx: number) => (
                                     <Link
@@ -451,6 +460,7 @@ export default function Header() {
 
             {/* --- Logo --- */}
             <Logo
+              logoUrl={settings?.logo}
               className={cn(
                 "shrink-0 transition-all duration-300 hidden lg:block ",
                 isScrolled ? "size-[75px]" : "size-[100px]"
