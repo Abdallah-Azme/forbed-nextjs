@@ -28,6 +28,14 @@ export const blogService = {
     const response = await apiClient.get<Blog>(`/client/blogs/${blogId}`);
     return response.data;
   },
+
+  /**
+   * Get blogs for dropdown menu (limited to 10 items)
+   */
+  async getBlogsForDropdown(): Promise<Blog[]> {
+    const response = await apiClient.get<Blog[]>("/client/blogs?per_page=10");
+    return response.data;
+  },
 };
 
 /**

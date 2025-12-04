@@ -33,6 +33,7 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { categoryService } from "@/services/category.service";
 import { settingsService } from "@/services/settings.service";
+import { blogService } from "@/services/content.service";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,6 +54,12 @@ export default function Header() {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: () => settingsService.getSettings(),
+  });
+
+  // Fetch blogs for dropdown
+  const { data: blogs = [] } = useQuery({
+    queryKey: ["blogs-dropdown"],
+    queryFn: () => blogService.getBlogsForDropdown(),
   });
 
   useEffect(() => {
@@ -85,6 +92,15 @@ export default function Header() {
         ]
       : []),
     { label: "تواصل معنا", href: "/contact" },
+    ...(blogs.length > 0
+      ? [
+          {
+            label: "اعرف اكثر",
+            href: "/blogs",
+            items: blogs,
+          },
+        ]
+      : []),
   ];
 
   const handleSubmenuClick = (label: string) => {
@@ -224,12 +240,16 @@ export default function Header() {
                             href={
                               typeof item === "string"
                                 ? "#"
-                                : `/categories/${item.slug}`
+                                : item.name
+                                ? `/categories/${item.slug}`
+                                : `/blogs/${item.slug}`
                             }
                             onClick={() => setIsMenuOpen(false)}
                             className="block text-gray-600 hover:text-gray-900 py-2 font-medium"
                           >
-                            {typeof item === "string" ? item : item.name}
+                            {typeof item === "string"
+                              ? item
+                              : item.name || item.title}
                           </Link>
                           {/* Subcategories in mobile menu */}
                           {item.subcategories &&
@@ -349,16 +369,6 @@ export default function Header() {
                         الملف الشخصي
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href="/settings"
-                        className="cursor-pointer flex-row-reverse"
-                      >
-                        <Settings className="size-4 ms-2" />
-                        الإعدادات
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleLogout}
                       className="cursor-pointer text-red-600 focus:text-red-600 flex-row-reverse"
@@ -394,10 +404,20 @@ export default function Header() {
                 link.items ? (
                   <DropdownMenu key={index}>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-1  hover:underline cursor-pointer transition-colors">
-                        {link.label}
-                        <ChevronDown className="w-4 h-4" />
-                      </button>
+                      {link.href ? (
+                        <Link
+                          href={link.href}
+                          className="flex items-center gap-1 hover:underline cursor-pointer transition-colors"
+                        >
+                          {link.label}
+                          <ChevronDown className="w-4 h-4" />
+                        </Link>
+                      ) : (
+                        <button className="flex items-center gap-1  hover:underline cursor-pointer transition-colors">
+                          {link.label}
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                      )}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
@@ -413,11 +433,15 @@ export default function Header() {
                               href={
                                 typeof item === "string"
                                   ? "#"
-                                  : `/categories/${item.slug}`
+                                  : item.name
+                                  ? `/categories/${item.slug}`
+                                  : `/blogs/${item.slug}`
                               }
                               className="flex items-center justify-between w-full"
                             >
-                              {typeof item === "string" ? item : item.name}
+                              {typeof item === "string"
+                                ? item
+                                : item.name || item.title}
                               {item.subcategories &&
                                 item.subcategories.length > 0 && (
                                   <ChevronRight className="w-4 h-4" />

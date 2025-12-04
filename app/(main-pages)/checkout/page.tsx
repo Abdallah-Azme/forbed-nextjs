@@ -21,6 +21,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { addressService } from "@/services/address.service";
 import { homeService } from "@/services/content.service";
 import { orderService } from "@/services/order.service";
+import { cartService } from "@/services/cart.service";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import AddAddressDialog from "@/features/profile/components/add-address-dialog";
@@ -31,6 +32,12 @@ export default function Page() {
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [isAddAddressDialogOpen, setIsAddAddressDialogOpen] = useState(false);
   const [paymentMethodId, setPaymentMethodId] = useState<string>("");
+
+  // Fetch Cart Data
+  const { data: cartData, isLoading: isLoadingCart } = useQuery({
+    queryKey: ["cart"],
+    queryFn: () => cartService.getCart(),
+  });
 
   // Fetch Addresses
   const { data: addresses, isLoading: isLoadingAddresses } = useQuery({
@@ -78,9 +85,12 @@ export default function Page() {
     },
   });
 
-  const subtotal = getTotalPrice();
-  const shipping = 70; // This should ideally come from API based on address
-  const total = subtotal + shipping;
+  // Get price data from cart API
+  const subtotal = cartData?.price?.price || getTotalPrice();
+  const vat = cartData?.price?.vat || 0;
+  const discount = cartData?.price?.discount || 0;
+  const shipping = cartData?.price?.shipping || 0;
+  const total = cartData?.price?.total || subtotal + shipping;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,13 +183,25 @@ export default function Page() {
                 </div>
 
                 <div className="flex justify-between text-sm">
+                  <span>{vat.toFixed(2)} ج.م</span>
+                  <span>ضريبة القيمة المضافة</span>
+                </div>
+
+                {discount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>-{discount.toFixed(2)} ج.م</span>
+                    <span>الخصم</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-sm">
                   <span>{shipping.toFixed(2)} ج.م</span>
                   <span>الشحن</span>
                 </div>
               </div>
 
               {/* Total */}
-              <div className="flex justify-between items-center  ">
+              <div className="flex justify-between items-center border-t pt-4">
                 <div className="text-start">
                   <span className="text-lg font-bold">
                     {total.toFixed(2)} ج.م
@@ -187,6 +209,14 @@ export default function Page() {
                 </div>
                 <span className="text-lg font-bold">الإجمالي</span>
               </div>
+
+              {/* Delivery Time */}
+              {cartData?.delivery_time && (
+                <div className="flex justify-between text-sm text-gray-600 pt-2">
+                  <span>{cartData.delivery_time} أيام</span>
+                  <span>وقت التوصيل المتوقع</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -318,10 +348,13 @@ export default function Page() {
 
               {/* Footer Links */}
               <div className="flex  gap-4 justify-end text-sm text-orange-500 border-t pt-5">
-                <Link href="/refund-policy" className="hover:underline">
+                <Link href="/pages/cancel_terms" className="hover:underline">
                   سياسة الاسترجاع
                 </Link>
-                <Link href="/terms-of-service" className="hover:underline">
+                <Link
+                  href="/pages/service_condition"
+                  className="hover:underline"
+                >
                   شروط الخدمة
                 </Link>
               </div>

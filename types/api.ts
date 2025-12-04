@@ -258,17 +258,40 @@ export interface Brand {
  */
 
 export interface Cart {
-  id: number;
-  user_id: number;
+  item_count: number;
   item: {
     items: CartItem[];
+    links: {
+      first: string;
+      last: string;
+      prev: string | null;
+      next: string | null;
+    };
+    meta: {
+      current_page: number;
+      from: number;
+      last_page: number;
+      links: {
+        url: string | null;
+        label: string;
+        page: number | null;
+        active: boolean;
+      }[];
+      path: string;
+      per_page: number;
+      to: number;
+      total: number;
+    };
   };
-  subtotal: number;
-  discount: number;
-  total: number;
-  coupon?: Coupon;
-  created_at: string;
-  updated_at: string;
+  price: {
+    price: number;
+    vat: number;
+    discount: number;
+    shipping: number;
+    total: number;
+  };
+  delivery_time: number;
+  default_address: Address | null;
 }
 
 export interface CartItem {

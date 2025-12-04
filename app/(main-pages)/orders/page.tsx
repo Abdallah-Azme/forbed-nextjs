@@ -153,11 +153,23 @@ export default function OrdersPage() {
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString("ar-EG", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      {(() => {
+                        try {
+                          const date = new Date(order.created_at);
+                          // Check if date is valid
+                          if (isNaN(date.getTime())) {
+                            // If invalid, display the raw string
+                            return order.created_at;
+                          }
+                          return date.toLocaleDateString("ar-EG", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          });
+                        } catch {
+                          return order.created_at;
+                        }
+                      })()}
                       {" • "}
                       {order.items?.length || order.item_count} عناصر
                     </div>
