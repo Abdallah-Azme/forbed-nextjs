@@ -130,9 +130,9 @@ export default function PaymentSection({
                 key={branch.id}
                 href={branch.map_link}
                 target="_blank"
-                className="flex items-start gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow group"
+                className="flex flex-col items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow group"
               >
-                <div className="shrink-0 relative size-16 rounded-full overflow-hidden bg-gray-100">
+                <div className="shrink-0 relative size-40 rounded-sm overflow-hidden bg-gray-100">
                   <ImageFallback
                     src={branch.icon}
                     alt={branch.title}
@@ -140,7 +140,7 @@ export default function PaymentSection({
                     className="object-cover"
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 text-start">
                   <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
                     {branch.title}
                   </h3>

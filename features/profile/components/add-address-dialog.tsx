@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,7 +40,8 @@ const addressSchema = z.object({
   address: z.string().min(1, "العنوان مطلوب"),
   city: z.string().min(1, "المدينة مطلوبة"),
   type: z.string().min(1, "نوع العنوان مطلوب"),
-  description: z.string().min(1, "الوصف مطلوب"),
+  description: z.string().optional(),
+  phone_code: z.string().min(1, "كود الدولة مطلوب"),
   phone: z.string().min(1, "رقم الهاتف مطلوب"),
 });
 
@@ -57,24 +58,65 @@ export default function AddAddressDialog({
   onOpenChange,
   address,
 }: AddAddressDialogProps) {
-  console.log({ address });
   const queryClient = useQueryClient();
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   const form = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      lat: address?.lat?.toString() || "",
-      lng: address?.lng?.toString() || "",
-      address: address?.address || "",
-      city: address?.city || "",
-      type: (address?.type as "home" | "work" | "other") || "home",
-      description: address?.description || "",
-      phone: address?.phone || "",
+      lat: "",
+      lng: "",
+      address: "",
+      city: "",
+      type: "home",
+      description: "",
+      phone_code: "966",
+      phone: "",
     },
   });
 
   const isEditMode = !!address?.id;
+
+  // Reset form when address changes or dialog opens
+  useEffect(() => {
+    if (open && address) {
+      // For edit mode: convert to E.164 format for react-phone-number-input
+      let phoneValue = "";
+      if (address.phone) {
+        // If phone already has +, use as is
+        if (address.phone.startsWith("+")) {
+          phoneValue = address.phone;
+        } else {
+          // Otherwise, construct E.164 format: +[country_code][number]
+          const countryCode = address.phone_code || "966";
+          phoneValue = `+${countryCode}${address.phone}`;
+        }
+      }
+
+      form.reset({
+        lat: address?.lat?.toString() || "",
+        lng: address?.lng?.toString() || "",
+        address: address?.address || "",
+        city: address?.city || "",
+        type: (address?.type as "home" | "work" | "other") || "home",
+        description: address?.description || "",
+        phone_code: address?.phone_code || "966",
+        phone: phoneValue,
+      });
+    } else if (open && !address) {
+      // For create mode: reset to empty values
+      form.reset({
+        lat: "",
+        lng: "",
+        address: "",
+        city: "",
+        type: "home",
+        description: "",
+        phone_code: "966",
+        phone: "",
+      });
+    }
+  }, [open, address, form]);
 
   const { mutate: createAddress, isPending: isCreating } = useMutation({
     mutationFn: addressService.createAddress,
@@ -105,8 +147,9 @@ export default function AddAddressDialog({
   const isPending = isCreating || isUpdating;
 
   function onSubmit(values: AddressFormData) {
-    let phone = values.phone;
-    let phone_code = "";
+    // Parse the E.164 phone number to extract national number and country code
+    let phone = values.phone || "";
+    let phone_code = "966";
 
     try {
       const phoneNumber = parsePhoneNumber(values.phone);
@@ -114,7 +157,14 @@ export default function AddAddressDialog({
         phone = phoneNumber.nationalNumber;
         phone_code = phoneNumber.countryCallingCode;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Phone parsing error:", error);
+      // If parsing fails, try to extract manually
+      if (values.phone.startsWith("+")) {
+        phone_code = values.phone.substring(1, 4); // Extract country code
+        phone = values.phone.substring(4); // Extract national number
+      }
+    }
 
     const payload = {
       lat: values.lat,
@@ -122,8 +172,8 @@ export default function AddAddressDialog({
       address: values.address,
       city: values.city,
       type: values.type as "home" | "work" | "other",
-      description: values.description,
-      phone_code: phone_code || "20",
+      description: values.description || "",
+      phone_code: phone_code,
       phone: phone,
     };
 
@@ -308,7 +358,11 @@ export default function AddAddressDialog({
                   <FormLabel>رقم الهاتف</FormLabel>
                   <div className="" dir="ltr">
                     <FormControl>
-                      <PhoneInput placeholder="رقم الهاتف" {...field} />
+                      <PhoneInput
+                        placeholder="رقم الهاتف"
+                        {...field}
+                        {...({ country: "SA" } as any)}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />

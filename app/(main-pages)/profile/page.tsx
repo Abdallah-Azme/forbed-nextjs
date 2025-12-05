@@ -239,7 +239,7 @@ export default function ProfilePage() {
                       </p>
                       <p>{address.city}</p>
                       <p className="flex items-center gap-1">
-                        <span dir="ltr">+{address.phone_code}</span>
+                        <span>+{address.phone_code}</span>
                         <span>{address.phone}</span>
                       </p>
                     </div>

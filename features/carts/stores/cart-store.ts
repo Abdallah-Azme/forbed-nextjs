@@ -107,10 +107,6 @@ export const useCartStore = create<CartStore>()(
 
           // SYNC LOGIC: If backend has no items but localStorage has items, sync local to backend
           if (cartItems.length === 0 && localItems.length > 0) {
-            console.log(
-              "Backend cart is empty but local cart has items. Syncing local cart to backend..."
-            );
-
             // Sync each local item to the backend
             for (const item of localItems) {
               try {
@@ -157,9 +153,7 @@ export const useCartStore = create<CartStore>()(
               toast.success("تم مزامنة السلة بنجاح");
             } else {
               // Sync failed or backend still empty, clear local storage
-              console.log(
-                "Backend cart is still empty after sync. Clearing local storage..."
-              );
+
               set({ items: [] });
             }
 
