@@ -5,6 +5,18 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value;
   const { pathname } = request.nextUrl;
 
+  // Extract client IP address
+  const clientIp =
+    request.headers.get("x-real-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown";
+
+  // Extract X-Forwarded-For
+  const forwardedFor = request.headers.get("x-forwarded-for") || clientIp;
+
+  // Extract User-Agent
+  const userAgent = request.headers.get("user-agent") || "unknown";
+
   // Auth routes that logged-in users shouldn't access
   const authRoutes = ["/signin", "/signup", "/verify", "/forget-password"];
 
@@ -16,7 +28,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.next();
+  // Create response and add tracking headers
+  const response = NextResponse.next();
+
+  // Add headers to response so client can access them
+  response.headers.set("x-client-ip", clientIp);
+  response.headers.set("x-forwarded-for", forwardedFor);
+  response.headers.set("x-user-agent", userAgent);
+
+  return response;
 }
 
 export const config = {

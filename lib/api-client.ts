@@ -34,6 +34,23 @@ class ApiClient {
       }
     }
 
+    // Add tracking headers
+    if (typeof window !== "undefined") {
+      const clientIp = sessionStorage.getItem("x-client-ip");
+      const forwardedFor = sessionStorage.getItem("x-forwarded-for");
+      const userAgent = sessionStorage.getItem("x-user-agent");
+
+      if (clientIp) {
+        headers["REMOTE_ADDR"] = clientIp;
+      }
+      if (forwardedFor) {
+        headers["X-Forwarded-For"] = forwardedFor;
+      }
+      if (userAgent) {
+        headers["User-Agent"] = userAgent;
+      }
+    }
+
     return headers;
   }
 
@@ -259,16 +276,35 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
 
+    const headers: HeadersInit = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Front-URL":
+        typeof window !== "undefined"
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_SITE_URL || "https://forbed.com",
+    };
+
+    // Add tracking headers
+    if (typeof window !== "undefined") {
+      const clientIp = sessionStorage.getItem("x-client-ip");
+      const forwardedFor = sessionStorage.getItem("x-forwarded-for");
+      const userAgent = sessionStorage.getItem("x-user-agent");
+
+      if (clientIp) {
+        headers["REMOTE_ADDR"] = clientIp;
+      }
+      if (forwardedFor) {
+        headers["X-Forwarded-For"] = forwardedFor;
+      }
+      if (userAgent) {
+        headers["User-Agent"] = userAgent;
+      }
+    }
+
     const response = await fetch(url, {
       method,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "X-Front-URL":
-          typeof window !== "undefined"
-            ? window.location.origin
-            : process.env.NEXT_PUBLIC_SITE_URL || "https://forbed.com",
-      },
+      headers,
       body: data ? JSON.stringify(data) : undefined,
     });
 
