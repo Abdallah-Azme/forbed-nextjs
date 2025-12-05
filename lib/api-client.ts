@@ -62,7 +62,6 @@ class ApiClient {
     const isJson = contentType?.includes("application/json");
 
     if (!response.ok) {
-      // Handle 401 Unauthorized - clear tokens and redirect to sign-in
       if (response.status === 401) {
         await this.handle401Error();
       }
@@ -90,7 +89,7 @@ class ApiClient {
 
   /**
    * Handle 401 Unauthorized errors
-   * Clears tokens, session, and redirects to sign-in
+   * Clears tokens, session, cart, and redirects to sign-in
    */
   private async handle401Error(): Promise<void> {
     // Only run on client side
@@ -102,6 +101,9 @@ class ApiClient {
     // Clear user data
     const { userManager } = await import("@/lib/utils/auth");
     userManager.removeUser();
+
+    // Clear cart from localStorage to prevent previous user's cart from showing
+    localStorage.removeItem("cart-storage");
 
     // Clear session cookie (server action)
     const { deleteSession } = await import("@/app/actions/auth");
