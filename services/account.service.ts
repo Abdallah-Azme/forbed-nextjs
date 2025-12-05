@@ -23,6 +23,25 @@ export const accountService = {
   },
 
   /**
+   * Upload attachment (image)
+   */
+  async uploadAttachment(file: File): Promise<{
+    path: string;
+    url: string;
+    thumbnail: string | null;
+  }> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await apiClient.postFormData<{
+      path: string;
+      url: string;
+      thumbnail: string | null;
+    }>("/general/attachment", formData);
+    return response.data;
+  },
+
+  /**
    * Update account profile
    */
   async updateAccount(data: UpdateAccountRequest): Promise<User> {
@@ -34,8 +53,8 @@ export const accountService = {
     if (data.country_id) formData.append("country_id", data.country_id);
     if (data.gender) formData.append("gender", data.gender);
 
-    // Handle image upload
-    if (data.image instanceof File) {
+    // Handle image - now expects a path string instead of File
+    if (data.image) {
       formData.append("image", data.image);
     }
 

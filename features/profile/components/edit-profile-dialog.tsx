@@ -37,7 +37,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Upload } from "lucide-react";
+import { CalendarIcon, Upload, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -75,6 +75,8 @@ export default function EditProfileDialog({
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     user.d_o_b ? new Date(user.d_o_b) : undefined
   );
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -113,7 +115,7 @@ export default function EditProfileDialog({
     },
   });
 
-  function onSubmit(values: ProfileFormData) {
+  async function onSubmit(values: ProfileFormData) {
     const formData: any = {
       full_name: values.full_name,
       gender: values.gender,
@@ -131,8 +133,20 @@ export default function EditProfileDialog({
       formData.country_id = values.country_id;
     }
 
-    if (values.image instanceof File) {
-      formData.image = values.image;
+    // Upload image first if a new one is selected
+    if (selectedImageFile) {
+      try {
+        setIsUploadingImage(true);
+        const uploadResult = await accountService.uploadAttachment(
+          selectedImageFile
+        );
+        formData.image = uploadResult.path; // Use the path from upload response
+        setIsUploadingImage(false);
+      } catch (error: any) {
+        setIsUploadingImage(false);
+        toast.error(error.message || "فشل رفع الصورة");
+        return;
+      }
     }
 
     updateProfile(formData);
@@ -141,7 +155,7 @@ export default function EditProfileDialog({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      form.setValue("image", file);
+      setSelectedImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -328,16 +342,25 @@ export default function EditProfileDialog({
                 type="button"
                 variant="ghost"
                 onClick={() => onOpenChange(false)}
-                disabled={isPending}
+                disabled={isPending || isUploadingImage}
               >
                 إلغاء
               </Button>
               <Button
                 type="submit"
                 className="bg-orange-500 hover:bg-orange-600"
-                disabled={isPending}
+                disabled={isPending || isUploadingImage}
               >
-                {isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
+                {isUploadingImage ? (
+                  <>
+                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    جاري رفع الصورة...
+                  </>
+                ) : isPending ? (
+                  "جاري الحفظ..."
+                ) : (
+                  "حفظ التغييرات"
+                )}
               </Button>
             </div>
           </form>

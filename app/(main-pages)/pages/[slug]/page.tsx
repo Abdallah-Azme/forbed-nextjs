@@ -8,7 +8,6 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-console.log({ slug });
   let page;
   try {
     page = await homeService.getPageDetails(slug);
@@ -16,7 +15,6 @@ console.log({ slug });
     // If API returns null or error, show empty state
     page = null;
   }
-  console.log({ page });
   // If no page data, show empty state
   if (!page) {
     return (

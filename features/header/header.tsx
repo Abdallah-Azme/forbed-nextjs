@@ -34,6 +34,7 @@ import { useQuery } from "@tanstack/react-query";
 import { categoryService } from "@/services/category.service";
 import { settingsService } from "@/services/settings.service";
 import { blogService } from "@/services/content.service";
+import { accountService } from "@/services/account.service";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,8 +42,15 @@ export default function Header() {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const { mutate: logout } = useLogout();
+
+  // Fetch user account data (synced with profile updates)
+  const { data: user } = useQuery({
+    queryKey: ["user-account"],
+    queryFn: accountService.getAccount,
+    retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -61,12 +69,6 @@ export default function Header() {
     queryKey: ["blogs-dropdown"],
     queryFn: () => blogService.getBlogsForDropdown(),
   });
-
-  useEffect(() => {
-    // Get user data on mount
-    const userData = userManager.getUser();
-    setUser(userData);
-  }, []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrolled = latest > 50;
