@@ -91,7 +91,7 @@ class ApiClient {
     await deleteSession();
 
     // Redirect to sign-in page
-    window.location.href = "/signin";
+    // window.location.href = "/signin";
   }
 
   /**
