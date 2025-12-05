@@ -88,6 +88,7 @@ class ApiClient {
 
     // Clear session cookie (server action)
     const { deleteSession } = await import("@/app/actions/auth");
+
     await deleteSession();
 
     // Redirect to sign-in page
