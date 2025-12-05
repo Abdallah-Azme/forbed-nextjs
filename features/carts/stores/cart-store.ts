@@ -94,7 +94,7 @@ export const useCartStore = create<CartStore>()(
         }
       },
       fetchServerCart: async () => {
-        const { checkAuth } = get();
+        const { checkAuth, items: localItems } = get();
         if (!checkAuth()) return;
 
         set({ isLoading: true });
@@ -105,31 +105,99 @@ export const useCartStore = create<CartStore>()(
           // API returns items nested in 'item' object
           const cartItems = serverCart.item?.items || [];
 
-          const mappedItems: CartItem[] = cartItems.map((item) => {
-            // Helper to safely get price
-            let price = 0;
-            if (typeof item.price === "number") {
-              price = item.price;
-            } else if (item.product?.price) {
-              price =
-                item.product.price.price_after_discount ||
-                item.product.price.price_before_discount ||
-                0;
+          // SYNC LOGIC: If backend has no items but localStorage has items, sync local to backend
+          if (cartItems.length === 0 && localItems.length > 0) {
+            console.log(
+              "Backend cart is empty but local cart has items. Syncing local cart to backend..."
+            );
+
+            // Sync each local item to the backend
+            for (const item of localItems) {
+              try {
+                await cartService.addToCart({
+                  product_id: item.id,
+                  quantity: item.quantity,
+                });
+              } catch (error) {
+                console.error(
+                  `Failed to sync item ${item.id} to backend:`,
+                  error
+                );
+              }
             }
 
-            return {
-              id: item.product.id.toString(),
-              name: item.product.name,
-              price: Number(price) || 0, // Ensure it's always a number
-              image: item.product.thumbnail, // API uses 'thumbnail', local store uses 'image'
-              quantity: item.quantity,
-              addedAt: Date.now(),
-            };
-          });
+            // After syncing, fetch the updated cart from backend
+            const updatedServerCart = await cartService.getCart();
+            const updatedCartItems = updatedServerCart.item?.items || [];
 
-          set({ items: mappedItems });
+            if (updatedCartItems.length > 0) {
+              // Successfully synced, map the updated items
+              const mappedItems: CartItem[] = updatedCartItems.map((item) => {
+                let price = 0;
+                if (typeof item.price === "number") {
+                  price = item.price;
+                } else if (item.product?.price) {
+                  price =
+                    item.product.price.price_after_discount ||
+                    item.product.price.price_before_discount ||
+                    0;
+                }
+
+                return {
+                  id: item.product.id.toString(),
+                  name: item.product.name,
+                  price: Number(price) || 0,
+                  image: item.product.thumbnail,
+                  quantity: item.quantity,
+                  addedAt: Date.now(),
+                };
+              });
+
+              set({ items: mappedItems });
+              toast.success("تم مزامنة السلة بنجاح");
+            } else {
+              // Sync failed or backend still empty, clear local storage
+              console.log(
+                "Backend cart is still empty after sync. Clearing local storage..."
+              );
+              set({ items: [] });
+            }
+
+            return;
+          }
+
+          // NORMAL FLOW: Backend has items, map them to local format
+          if (cartItems.length > 0) {
+            const mappedItems: CartItem[] = cartItems.map((item) => {
+              // Helper to safely get price
+              let price = 0;
+              if (typeof item.price === "number") {
+                price = item.price;
+              } else if (item.product?.price) {
+                price =
+                  item.product.price.price_after_discount ||
+                  item.product.price.price_before_discount ||
+                  0;
+              }
+
+              return {
+                id: item.product.id.toString(),
+                name: item.product.name,
+                price: Number(price) || 0, // Ensure it's always a number
+                image: item.product.thumbnail, // API uses 'thumbnail', local store uses 'image'
+                quantity: item.quantity,
+                addedAt: Date.now(),
+              };
+            });
+
+            set({ items: mappedItems });
+          } else {
+            // Backend is empty and local is also empty, just clear to be safe
+            set({ items: [] });
+          }
         } catch (error) {
           console.error("Failed to fetch cart:", error);
+          toast.error("فشل في تحميل السلة");
         } finally {
           set({ isLoading: false });
         }

@@ -25,6 +25,7 @@ import { cartService } from "@/services/cart.service";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import AddAddressDialog from "@/features/profile/components/add-address-dialog";
+import ImageFallback from "@/components/image-fallback";
 
 export default function Page() {
   const router = useRouter();
@@ -159,7 +160,7 @@ export default function Page() {
                         {product.name}
                       </p>
                       <div className="relative w-16 h-16 rounded-lg border-2 border-white bg-gray-100">
-                        <Image
+                        <ImageFallback
                           src={product.image}
                           alt={product.name}
                           fill
@@ -312,7 +313,7 @@ export default function Page() {
                             />
                             {method.image && (
                               <div className="relative w-8 h-8">
-                                <Image
+                                <ImageFallback
                                   src={method.image}
                                   alt={method.name}
                                   fill

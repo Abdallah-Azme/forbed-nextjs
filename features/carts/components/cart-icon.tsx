@@ -10,6 +10,7 @@ import { ShoppingBag, Plus, Minus, Trash2, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "../stores/cart-store";
+import ImageFallback from "@/components/image-fallback";
 
 export default function CartIcon() {
   const {
@@ -80,7 +81,7 @@ export default function CartIcon() {
                   <div className="flex gap-3">
                     {/* Product Image */}
                     <div className="relative w-16 h-16  shrink-0 rounded-md overflow-hidden bg-gray-100">
-                      <Image
+                      <ImageFallback
                         src={item.image}
                         alt={item.name}
                         fill

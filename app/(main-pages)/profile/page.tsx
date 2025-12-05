@@ -25,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import ImageFallback from "@/components/image-fallback";
 
 export default function ProfilePage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -112,7 +113,7 @@ export default function ProfilePage() {
               <div className="flex items-center gap-4">
                 <div className="relative size-20 rounded-full overflow-hidden bg-gray-200">
                   {user.image ? (
-                    <Image
+                    <ImageFallback
                       src={user.image}
                       alt={user.full_name || "المستخدم"}
                       fill

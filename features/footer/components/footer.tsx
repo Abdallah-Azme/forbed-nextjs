@@ -16,6 +16,7 @@ import { API_CONFIG } from "@/config/api.config";
 import NewsletterForm from "./newsletter-form";
 
 import { settingsService } from "@/services/settings.service";
+import ImageFallback from "@/components/image-fallback";
 
 export default function Footer() {
   const { data: footerData, isLoading: isFooterLoading } = useQuery({
@@ -137,7 +138,7 @@ export default function Footer() {
               >
                 {social.icon ? (
                   <div className="relative w-6 h-6">
-                    <Image
+                    <ImageFallback
                       src={
                         social.icon.startsWith("http")
                           ? social.icon

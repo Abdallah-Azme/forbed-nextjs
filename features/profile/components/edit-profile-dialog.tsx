@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import ImageFallback from "@/components/image-fallback";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +17,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -26,21 +30,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { accountService } from "@/services/account.service";
-import { toast } from "sonner";
-import { User } from "@/types/api";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon, Upload, Loader2 } from "lucide-react";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { accountService } from "@/services/account.service";
+import { User } from "@/types/api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { CalendarIcon, Loader2, Upload } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const profileSchema = z.object({
   full_name: z.string().min(3, "الاسم الكامل يجب أن يكون 3 أحرف على الأقل"),
@@ -185,7 +185,7 @@ export default function EditProfileDialog({
             <div className="flex flex-col items-center gap-4">
               <div className="relative size-24 rounded-full overflow-hidden bg-gray-200">
                 {imagePreview ? (
-                  <Image
+                  <ImageFallback
                     src={imagePreview}
                     alt="Profile"
                     fill

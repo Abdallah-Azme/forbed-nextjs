@@ -1,24 +1,24 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import ImageFallback from "@/components/image-fallback";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
+import { LoadingState } from "@/components/ui/loading-state";
+import { Separator } from "@/components/ui/separator";
 import { orderService } from "@/services/order.service";
-import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
-  MapPin,
-  Phone,
   CreditCard,
+  MapPin,
   Package,
+  Phone,
   Receipt,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { LoadingState } from "@/components/ui/loading-state";
-import { ErrorState } from "@/components/ui/error-state";
-import { EmptyState } from "@/components/ui/empty-state";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -152,7 +152,7 @@ export default function OrderDetailsPage() {
                   <div key={item.id} className="p-6 flex gap-4">
                     <div className="relative w-20 h-20 bg-gray-100 rounded-md overflow-hidden shrink-0 border">
                       {item.thumbnail ? (
-                        <Image
+                        <ImageFallback
                           src={item.thumbnail}
                           alt={item.name}
                           fill

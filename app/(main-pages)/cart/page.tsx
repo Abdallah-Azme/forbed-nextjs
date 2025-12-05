@@ -7,6 +7,7 @@ import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/empty-state";
+import ImageFallback from "@/components/image-fallback";
 
 export default function CartPage() {
   const {
@@ -73,7 +74,7 @@ export default function CartPage() {
                   <div className="lg:col-span-8 flex gap-4 sm:gap-8">
                     {/* Product Image */}
                     <div className="relative w-24 h-24 lg:w-32 lg:h-32 shrink-0 overflow-hidden bg-gray-100">
-                      <Image
+                      <ImageFallback
                         src={item.image}
                         alt={item.name}
                         fill
@@ -190,27 +191,29 @@ export default function CartPage() {
           </>
         )}
         {/* Cart Summary */}
-        <div className="mt-8 lg:mt-12 flex w-fit ms-auto">
-          <div className="w-full lg:w-96 space-y-6">
-            {/* Total */}
-            <div className="flex justify-between gap-2 items-center">
-              <span>الإجمالي التقديري</span>
-              <span>{total.toFixed(2)} ج.م</span>
+        {!!(items.length > 0) && (
+          <div className="mt-8 lg:mt-12 flex w-fit ms-auto">
+            <div className="w-full lg:w-96 space-y-6">
+              {/* Total */}
+              <div className="flex justify-between gap-2 items-center">
+                <span>الإجمالي التقديري</span>
+                <span>{total.toFixed(2)} ج.م</span>
+              </div>
+
+              {/* Info Text */}
+              <p className="text-xs text-[#121212] text-start">
+                يتم حساب الضرائب والخصومات والشحن عند الدفع
+              </p>
+
+              {/* Checkout Button */}
+              <Link href="/checkout">
+                <button className="w-full bg-black text-white rounded-none h-14 text-base font-semibold transition-transform duration-200 hover:-translate-y-1.5">
+                  إتمام الشراء
+                </button>
+              </Link>
             </div>
-
-            {/* Info Text */}
-            <p className="text-xs text-[#121212] text-start">
-              يتم حساب الضرائب والخصومات والشحن عند الدفع
-            </p>
-
-            {/* Checkout Button */}
-            <Link href="/checkout">
-              <button className="w-full bg-black text-white rounded-none h-14 text-base font-semibold transition-transform duration-200 hover:-translate-y-1.5">
-                إتمام الشراء
-              </button>
-            </Link>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

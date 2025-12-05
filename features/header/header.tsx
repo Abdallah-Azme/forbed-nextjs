@@ -35,6 +35,7 @@ import { categoryService } from "@/services/category.service";
 import { settingsService } from "@/services/settings.service";
 import { blogService } from "@/services/content.service";
 import { accountService } from "@/services/account.service";
+import ImageFallback from "@/components/image-fallback";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -123,7 +124,7 @@ export default function Header() {
           opacity: isSearchOpen ? 1 : 0,
         }}
         transition={{ duration: 0.3 }}
-        className="overflow-hidden bg-white border-b"
+        className="overflow-hidden  "
       >
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
@@ -322,7 +323,7 @@ export default function Header() {
                     <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                       <div className="relative size-8 rounded-full overflow-hidden bg-gray-200">
                         {user.image ? (
-                          <Image
+                          <ImageFallback
                             src={user.image}
                             alt={user.full_name || "User"}
                             fill
@@ -342,7 +343,7 @@ export default function Header() {
                       <div className="flex items-center gap-3">
                         <div className="relative size-10 rounded-full overflow-hidden bg-gray-200">
                           {user.image ? (
-                            <Image
+                            <ImageFallback
                               src={user.image}
                               alt={user.full_name || "User"}
                               fill
@@ -356,7 +357,9 @@ export default function Header() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">
-                            {user.email || user.phone_complete_form}
+                            {user.full_name ||
+                              user.email ||
+                              user.phone_complete_form}
                           </p>
                         </div>
                       </div>

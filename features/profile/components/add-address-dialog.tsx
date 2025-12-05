@@ -57,6 +57,7 @@ export default function AddAddressDialog({
   onOpenChange,
   address,
 }: AddAddressDialogProps) {
+  console.log({ address });
   const queryClient = useQueryClient();
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
