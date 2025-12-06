@@ -67,7 +67,7 @@ export default function HeroBanner({ sliders = [] }: HeroBannerProps) {
 
                 {/* Optional Overlay Text - Only if title or description exists */}
                 {(slider.title || slider.description) && (
-                  <div className="absolute inset-0 bg-black/20 pointer-events-none flex flex-col items-center justify-center text-center text-white px-4">
+                  <div className="absolute inset-0 bg-linear-to-b from-white/20 via-black/60 to-black/60 pointer-events-none flex flex-col items-center justify-center text-center text-white px-4">
                     {slider.title && (
                       <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 drop-shadow-lg">
                         {slider.title}

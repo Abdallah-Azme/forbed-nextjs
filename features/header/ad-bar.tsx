@@ -32,7 +32,7 @@ export default function AdBar() {
             className="text-center sm:text-right"
           >
             <Link
-              href="/collections"
+              href="/categories"
               className="hover:underline text-xs flex items-center gap-2 font-medium tracking-wide"
             >
               <MoveRight className="text-[14px]" />
