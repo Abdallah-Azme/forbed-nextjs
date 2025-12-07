@@ -1,41 +1,40 @@
 "use client";
 
+import ImageFallback from "@/components/image-fallback";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import { useLogout } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import { accountService } from "@/services/account.service";
+import { categoryService } from "@/services/category.service";
+import { blogService } from "@/services/content.service";
+import { settingsService } from "@/services/settings.service";
+import { useQuery } from "@tanstack/react-query";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Languages,
+  LogOut,
   Menu,
   MoveRight,
   Search,
   User,
   X,
-  LogOut,
-  Settings,
 } from "lucide-react";
+import { useLocale } from "next-intl";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import CartIcon from "../carts/components/cart-icon";
 import AdBar from "./ad-bar";
 import Logo from "./logo";
-import { userManager } from "@/lib/utils/auth";
-import { useLogout } from "@/hooks/use-auth";
-import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
-import { categoryService } from "@/services/category.service";
-import { settingsService } from "@/services/settings.service";
-import { blogService } from "@/services/content.service";
-import { accountService } from "@/services/account.service";
-import ImageFallback from "@/components/image-fallback";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,6 +43,13 @@ export default function Header() {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
   const { mutate: logout } = useLogout();
+  const locale = useLocale();
+
+  const toggleLanguage = () => {
+    const newLocale = locale === "ar" ? "en" : "ar";
+    document.cookie = `locale=${newLocale}; path=/; max-age=31536000`;
+    window.location.reload();
+  };
 
   // Fetch user account data (synced with profile updates)
   const { data: user } = useQuery({
@@ -309,6 +315,19 @@ export default function Header() {
           <div className="flex items-center justify-between">
             {/* --- Header Icons --- */}
             <div className="flex items-center gap-3">
+              <button
+                onClick={toggleLanguage}
+                className="text-[#848484] hover:underline cursor-pointer flex items-center gap-1"
+                title={
+                  locale === "ar" ? "Switch to English" : "التبديل للعربية"
+                }
+              >
+                <Languages className="size-6" />
+                <span className="text-xs font-medium uppercase">
+                  {locale === "ar" ? "EN" : "AR"}
+                </span>
+              </button>
+
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className="text-[#848484] hover:underline cursor-pointer"

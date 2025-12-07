@@ -34,7 +34,7 @@ export function useAddToCart() {
       toast.success("Added to cart!");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to add to cart");
+      // toast.error(error.message || "Failed to add to cart");
     },
   });
 }

@@ -29,7 +29,8 @@ export default async function RootLayout({
   return (
     <html
       lang={l}
-      dir={l === "ar" ? "rtl" : "ltr"}
+      // dir={l === "ar" ? "rtl" : "ltr"}
+      dir="rtl"
       className="overflow-x-hidden"
     >
       <body className={`${assistant.className} antialiased overflow-x-hidden`}>

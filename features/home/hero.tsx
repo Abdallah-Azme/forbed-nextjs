@@ -20,7 +20,6 @@ interface HeroBannerProps {
 }
 
 export default function HeroBanner({ sliders = [] }: HeroBannerProps) {
-  const dir = useLocale() === "ar" ? "rtl" : "ltr";
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true })
   );
@@ -38,7 +37,6 @@ export default function HeroBanner({ sliders = [] }: HeroBannerProps) {
         className="w-full"
         opts={{
           loop: true,
-          direction: dir,
         }}
       >
         <CarouselContent className="ml-0">

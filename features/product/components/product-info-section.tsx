@@ -241,7 +241,11 @@ export default function ProductInfoSection({
             onClick={() => handleAddToCart(false)}
             className="w-full h-12 rounded-none border-gray-900 text-gray-900 hover:bg-gray-50 font-normal"
             disabled={
-              (product.price.start_from && !selectedSpecId) || isAddingToCart
+              (product.specifications &&
+                product.specifications.length > 0 &&
+                product.price.start_from &&
+                !selectedSpecId) ||
+              isAddingToCart
             }
           >
             {isAddingToCart ? (
@@ -252,7 +256,12 @@ export default function ProductInfoSection({
           <Button
             onClick={() => handleAddToCart(true)}
             className="w-full h-12 rounded-none bg-black text-white hover:bg-gray-800 font-normal"
-            disabled={product.price.start_from && !selectedSpecId}
+            disabled={
+              product.specifications &&
+              product.specifications.length > 0 &&
+              product.price.start_from &&
+              !selectedSpecId
+            }
           >
             اشترِ الآن
           </Button>

@@ -191,7 +191,7 @@ export const useCartStore = create<CartStore>()(
           }
         } catch (error) {
           console.error("Failed to fetch cart:", error);
-          toast.error("فشل في تحميل السلة");
+          // toast.error("فشل في تحميل السلة");
         } finally {
           set({ isLoading: false });
         }
@@ -241,8 +241,8 @@ export const useCartStore = create<CartStore>()(
             }
           }
         } catch (error) {
-          console.error("Failed to add to cart:", error);
-          toast.error("Failed to add to cart");
+          // console.error("Failed to add to cart:", error);
+          // toast.error("Failed to add to cart");
         } finally {
           set({ isLoading: false });
         }
