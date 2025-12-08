@@ -13,8 +13,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 function SearchContent() {
+  const t = useTranslations("Search");
   const searchParams = useSearchParams();
   const router = useRouter();
   const keyword = searchParams.get("keyword") || "";
@@ -25,6 +27,7 @@ function SearchContent() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
   const filters = React.useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const params: any = { keyword, page: parseInt(page) };
 
     // Sort
@@ -82,8 +85,8 @@ function SearchContent() {
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="ابحث..."
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg text-right"
+                  placeholder={t("placeholder")}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg "
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
@@ -109,8 +112,8 @@ function SearchContent() {
         <div className="container mx-auto px-4 py-8">
           <EmptyState
             icon={SearchIcon}
-            title="ابدأ البحث"
-            description="أدخل كلمة مفتاحية للبحث عن المنتجات."
+            title={t("startSearch")}
+            description={t("startSearchDesc")}
             action={
               <div className="flex gap-3">
                 <Button
@@ -118,10 +121,10 @@ function SearchContent() {
                   className="bg-orange-500 hover:bg-orange-600"
                 >
                   <SearchIcon className="w-5 h-5 ml-2" />
-                  ابدأ البحث
+                  {t("startSearch")}
                 </Button>
                 <Link href="/">
-                  <Button variant="outline">تصفح المنتجات</Button>
+                  <Button variant="outline">{t("browseProducts")}</Button>
                 </Link>
               </div>
             }
@@ -135,8 +138,8 @@ function SearchContent() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-medium text-right mb-8">
-          نتائج البحث عن: "{keyword}"
+        <h1 className="text-3xl font-medium  mb-8">
+          {t("resultsFor")} &quot;{keyword}&quot;
         </h1>
         <LoadingState type="skeleton" count={4} />
       </div>
@@ -147,12 +150,12 @@ function SearchContent() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-medium text-right mb-8">
-          نتائج البحث عن: "{keyword}"
+        <h1 className="text-3xl font-medium  mb-8">
+          {t("resultsFor")} &quot;{keyword}&quot;
         </h1>
         <ErrorState
-          title="فشل البحث"
-          description="لم نتمكن من إكمال البحث. يرجى المحاولة مرة أخرى."
+          title={t("failed")}
+          description={t("failedDesc")}
           onRetry={() => refetch()}
         />
       </div>
@@ -163,22 +166,22 @@ function SearchContent() {
   if (!results || !results.products || results.products.data.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-medium text-right mb-8">
-          نتائج البحث عن: "{keyword}"
+        <h1 className="text-3xl font-medium  mb-8">
+          {t("resultsFor")} &quot;{keyword}&quot;
         </h1>
         <EmptyState
           icon={SearchIcon}
-          title="لا توجد نتائج"
-          description={`لم نتمكن من العثور على أي منتجات تطابق "${keyword}". جرب كلمات مفتاحية مختلفة أو تصفح فئاتنا.`}
+          title={t("noResults")}
+          description={t("noResultsDesc", { keyword })}
           action={
             <div className="flex gap-3">
               <Link href="/">
                 <Button className="bg-orange-500 hover:bg-orange-600">
-                  تصفح جميع المنتجات
+                  {t("browseAll")}
                 </Button>
               </Link>
               <Link href="/categories">
-                <Button variant="outline">عرض الفئات</Button>
+                <Button variant="outline">{t("viewCategories")}</Button>
               </Link>
             </div>
           }
@@ -206,9 +209,9 @@ function SearchContent() {
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="ابحث..."
+                placeholder={t("placeholder")}
                 defaultValue={keyword}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg text-right"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg "
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -234,15 +237,15 @@ function SearchContent() {
       <div className="container mx-auto px-4 py-8">
         {/* Header with Search Button */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-medium text-right">
-            نتائج البحث عن: "{keyword}"
+          <h1 className="text-3xl font-medium ">
+            {t("resultsFor")} &quot;{keyword}&quot;
           </h1>
           <button
             onClick={() => setIsSearchOpen(true)}
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <SearchIcon className="w-5 h-5" />
-            <span>بحث جديد</span>
+            <span>{t("newSearch")}</span>
           </button>
         </div>
 
@@ -266,7 +269,7 @@ function SearchContent() {
               disabled={products.meta.current_page === 1}
               className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              السابق
+              {t("previous")}
             </button>
 
             <div className="flex gap-2">
@@ -293,7 +296,7 @@ function SearchContent() {
               disabled={products.meta.current_page === products.meta.last_page}
               className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              التالي
+              {t("next")}
             </button>
           </div>
         )}

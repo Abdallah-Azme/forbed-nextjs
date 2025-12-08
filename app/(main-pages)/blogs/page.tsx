@@ -8,10 +8,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import ImageFallback from "@/components/image-fallback";
 import { Blog } from "@/types/api";
+import { useTranslations } from "next-intl";
 
 const ITEMS_PER_PAGE = 12;
 
 export default function BlogsPage() {
+  const t = useTranslations("Blogs");
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: blogs = [], isLoading } = useQuery({
@@ -44,21 +46,21 @@ export default function BlogsPage() {
         {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            المقالات
+            {t("title")}
           </h1>
-          <p className="text-gray-600 text-lg">اكتشف أحدث المقالات والأخبار</p>
+          <p className="text-gray-600 text-lg">{t("subtitle")}</p>
         </div>
 
         {/* Blog Grid */}
         {currentBlogs.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">No blogs found</p>
+            <p className="text-gray-500 text-lg">{t("noBlogs")}</p>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
               {currentBlogs.map((blog, index) => (
-                <BlogCard key={index} blog={blog} index={index} />
+                <BlogCard key={index} blog={blog} index={index} t={t} />
               ))}
             </div>
 
@@ -74,7 +76,7 @@ export default function BlogsPage() {
                   disabled={currentPage === 1}
                   className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Previous
+                  {t("previous")}
                 </button>
 
                 {/* Page Numbers */}
@@ -102,7 +104,7 @@ export default function BlogsPage() {
                   disabled={currentPage === totalPages}
                   className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Next
+                  {t("next")}
                 </button>
               </div>
             )}
@@ -113,7 +115,16 @@ export default function BlogsPage() {
   );
 }
 
-function BlogCard({ blog, index }: { blog: Blog; index: number }) {
+function BlogCard({
+  blog,
+  index,
+  t,
+}: {
+  blog: Blog;
+  index: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  t: any;
+}) {
   const cardVariants = {
     hidden: { opacity: 0, y: 50, rotateX: -10 },
     visible: {
@@ -153,19 +164,19 @@ function BlogCard({ blog, index }: { blog: Blog; index: number }) {
         </div>
 
         <div className="p-4 space-y-3 flex-1 flex flex-col">
-          <h3 className="font-semibold text-lg leading-snug text-right group-hover:underline transition-all duration-200 line-clamp-2">
+          <h3 className="font-semibold text-lg leading-snug  group-hover:underline transition-all duration-200 line-clamp-2">
             {blog.title}
           </h3>
-          <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 text-right flex-1">
+          <p className="text-sm text-gray-600 leading-relaxed line-clamp-3  flex-1">
             {blog.text}
           </p>
 
           <div className="pt-4 mt-auto border-t flex items-center justify-between text-xs text-gray-500">
             <span className="text-orange-600 group-hover:text-orange-700 font-medium">
-              اقرأ المزيد
+              {t("readMore")}
             </span>
             <span className="flex items-center gap-1">
-              {blog.visitors} مشاهدة
+              {blog.visitors} {t("views")}
             </span>
           </div>
         </div>

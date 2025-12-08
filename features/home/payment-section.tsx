@@ -13,6 +13,7 @@ import {
 import HeaderSection from "@/components/header-section";
 import { HomeBranch, HomePaymentMethod } from "@/types/api";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface PaymentSectionProps {
   paymentMethods?: HomePaymentMethod[];
@@ -23,6 +24,7 @@ export default function PaymentSection({
   paymentMethods = [],
   branches = [],
 }: PaymentSectionProps) {
+  const t = useTranslations("HomePage");
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -44,7 +46,7 @@ export default function PaymentSection({
       {paymentMethods.length > 0 && (
         <div className="container mx-auto px-4">
           <div className=" my-5 ">
-            <HeaderSection title={"Payment Method"} />
+            <HeaderSection title={t("paymentMethod")} />
           </div>
           {/* MOBILE CAROUSEL - Shows 2.15 items */}
           <div className="lg:hidden">
@@ -121,7 +123,7 @@ export default function PaymentSection({
       {branches.length > 0 && (
         <div className="container mx-auto px-4">
           <div className=" my-5 ">
-            <HeaderSection title={"Our Branches"} />
+            <HeaderSection title={t("ourBranches")} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

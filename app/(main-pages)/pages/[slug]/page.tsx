@@ -1,6 +1,7 @@
 import { homeService } from "@/services/content.service";
 import ImageFallback from "@/components/image-fallback";
 import ShareButton from "@/components/share-button";
+import { getTranslations } from "next-intl/server";
 
 export default async function Page({
   params,
@@ -8,6 +9,7 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const t = await getTranslations("DynamicPage");
   let page;
   try {
     page = await homeService.getPageDetails(slug);
@@ -22,11 +24,9 @@ export default async function Page({
         <div className="text-center space-y-4">
           <div className="text-6xl mb-4">📄</div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            لا يوجد محتوى لهذه الصفحة حالياً
+            {t("noContent")}
           </h1>
-          <p className="text-gray-500">
-            المحتوى غير متوفر في الوقت الحالي. يرجى المحاولة مرة أخرى لاحقاً.
-          </p>
+          <p className="text-gray-500">{t("noContentDesc")}</p>
         </div>
       </main>
     );
@@ -52,7 +52,7 @@ export default async function Page({
           {page.title}
         </h1>
         <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
-          <span className="uppercase tracking-wider">SEPTEMBER 14, 2024</span>
+          {/* <span className="uppercase tracking-wider">SEPTEMBER 14, 2024</span> */}
           <ShareButton />
         </div>
       </div>

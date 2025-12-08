@@ -8,7 +8,7 @@ export default function HeaderSection({ title }: { title: string }) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ ease: easeOut }}
       viewport={{ once: true }}
-      className="text-3xl font-bold w-fit ms-auto"
+      className="text-3xl font-bold w-fit  "
     >
       {title}
     </motion.h2>

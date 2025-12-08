@@ -29,7 +29,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 import CartIcon from "../carts/components/cart-icon";
@@ -44,6 +44,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { mutate: logout } = useLogout();
   const locale = useLocale();
+  const t = useTranslations("Header");
 
   const toggleLanguage = () => {
     const newLocale = locale === "ar" ? "en" : "ar";
@@ -89,22 +90,22 @@ export default function Header() {
   };
 
   const navLinks = [
-    { label: "الرئيسية", href: "/" },
+    { label: t("home"), href: "/" },
     // { label: "المتجر", href: "/shop" },
-    { label: "الطلبات", href: "/orders" },
+    { label: t("orders"), href: "/orders" },
     ...(categories.length > 0
       ? [
           {
-            label: "الفئات",
+            label: t("categories"),
             items: categories,
           },
         ]
       : []),
-    { label: "تواصل معنا", href: "/contact" },
+    { label: t("contact"), href: "/contact" },
     ...(blogs.length > 0
       ? [
           {
-            label: "اعرف اكثر",
+            label: t("learnMore"),
             href: "/blogs",
             items: blogs,
           },
@@ -137,8 +138,8 @@ export default function Header() {
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="ابحث..."
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg text-right"
+                placeholder={t("searchPlaceholder")}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg  "
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -235,7 +236,7 @@ export default function Header() {
                     className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-6"
                   >
                     <ChevronLeft className="w-5 h-5" />
-                    <span>رجوع</span>
+                    <span>{t("back")}</span>
                   </button>
                   <h3 className="text-xl font-semibold mb-4">
                     {activeSubmenu}
@@ -319,7 +320,7 @@ export default function Header() {
                 onClick={toggleLanguage}
                 className="text-[#848484] hover:underline cursor-pointer flex items-center gap-1"
                 title={
-                  locale === "ar" ? "Switch to English" : "التبديل للعربية"
+                  locale === "ar" ? t("switchToEnglish") : t("switchToArabic")
                 }
               >
                 <Languages className="size-6" />
@@ -390,7 +391,7 @@ export default function Header() {
                         className="cursor-pointer flex-row-reverse"
                       >
                         <User className="size-4 ms-2" />
-                        الملف الشخصي
+                        {t("profile")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -398,7 +399,7 @@ export default function Header() {
                       className="cursor-pointer text-red-600 focus:text-red-600 flex-row-reverse"
                     >
                       <LogOut className="size-4 ms-2" />
-                      تسجيل الخروج
+                      {t("logout")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -445,7 +446,7 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="text-right bg-white border shadow-md min-w-[200px]"
+                      className="bg-white border shadow-md min-w-[200px]"
                     >
                       {link.items.map((item: any, idx) => (
                         <div key={idx} className="relative group/item">

@@ -21,17 +21,21 @@ import Link from "next/link";
 import Logo from "@/features/header/logo";
 import { useLogin } from "@/hooks/use-auth";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { useTranslations } from "next-intl";
 
 import { parsePhoneNumber } from "react-phone-number-input";
 
-const formSchema = z.object({
-  auth: z.string().min(1, "البريد الإلكتروني أو رقم الهاتف مطلوب"),
-  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
-});
+// Schema moved inside component
 
 export default function SigninForm() {
+  const t = useTranslations("Auth");
   const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending } = useLogin();
+
+  const formSchema = z.object({
+    auth: z.string().min(1, t("authRequired")),
+    password: z.string().min(6, t("passwordLength")),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,7 +56,7 @@ export default function SigninForm() {
         auth = phoneNumber.nationalNumber;
         phone_code = phoneNumber.countryCallingCode;
       }
-    } catch (error) {
+    } catch {
       // If parsing fails, it might be an email or invalid phone
       // We'll send it as is, and let the backend handle it
     }
@@ -70,7 +74,7 @@ export default function SigninForm() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full bg-white shadow-sm rounded-xl border px-10 py-12 text-right"
+        className="w-full bg-white shadow-sm rounded-xl border px-10 py-12"
       >
         <div className="mx-auto w-fit">
           <Logo className="max-w-[300px]" />
@@ -85,12 +89,12 @@ export default function SigninForm() {
               name="auth"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>رقم الهاتف</FormLabel>
+                  <FormLabel>{t("phoneLabel")}</FormLabel>
                   <FormControl>
                     <div className="" dir={"ltr"}>
                       <PhoneInput
-                        placeholder="رقم الهاتف"
-                        className="h-12 text-right"
+                        placeholder={t("phoneLabel")}
+                        className="h-12  "
                         {...field}
                       />
                     </div>
@@ -106,13 +110,13 @@ export default function SigninForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>كلمة المرور</FormLabel>
+                  <FormLabel>{t("passwordLabel")}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         placeholder="••••••••"
                         type={showPassword ? "text" : "password"}
-                        className="h-12 text-right ps-12"
+                        className="h-12   ps-12"
                         {...field}
                       />
                       <button
@@ -139,13 +143,13 @@ export default function SigninForm() {
               disabled={isPending}
               className="w-full h-12 text-base bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isPending ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+              {isPending ? t("loggingIn") : t("login")}
             </Button>
 
             <div className="text-center text-sm text-gray-600 ">
-              ليس لديك حساب؟{" "}
+              {t("noAccount")}{" "}
               <Link href="/signup" className="text-blue-600 hover:underline">
-                سجل الآن
+                {t("registerNow")}
               </Link>
             </div>
           </form>

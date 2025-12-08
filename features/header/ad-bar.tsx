@@ -1,15 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Facebook, Instagram, MoveRight } from "lucide-react";
+import { MoveRight } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { homeService } from "@/services/content.service";
-import Image from "next/image";
 import ImageFallback from "@/components/image-fallback";
+import { useTranslations } from "next-intl";
 
 export default function AdBar() {
+  const t = useTranslations("Header");
   const { data: socials = [], isLoading } = useQuery({
     queryKey: ["socials"],
     queryFn: homeService.getSocials,
@@ -36,7 +36,7 @@ export default function AdBar() {
               className="hover:underline text-xs flex items-center gap-2 font-medium tracking-wide"
             >
               <MoveRight className="text-[14px]" />
-              خصومات تصل إلى %20
+              {t("promoText")}
             </Link>
           </motion.div>
 

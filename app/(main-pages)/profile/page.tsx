@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Pencil, Plus, MapPin, Trash2, Key } from "lucide-react";
-import { userManager } from "@/lib/utils/auth";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import AddAddressDialog from "@/features/profile/components/add-address-dialog";
 import EditProfileDialog from "@/features/profile/components/edit-profile-dialog";
 import ChangePasswordDialog from "@/features/profile/components/change-password-dialog";
@@ -26,8 +24,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import ImageFallback from "@/components/image-fallback";
+import { useTranslations } from "next-intl";
 
 export default function ProfilePage() {
+  const t = useTranslations("Profile");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -58,12 +58,12 @@ export default function ProfilePage() {
   const { mutate: deleteAddress, isPending: isDeletingAddress } = useMutation({
     mutationFn: (addressId: string) => addressService.deleteAddress(addressId),
     onSuccess: () => {
-      toast.success("تم حذف العنوان بنجاح!");
+      toast.success(t("deleteSuccess"));
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
       setAddressToDelete(null);
     },
     onError: (error: any) => {
-      toast.error(error.message || "فشل حذف العنوان");
+      toast.error(error.message || t("deleteFailed"));
     },
   });
 
@@ -77,7 +77,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
-          <LoadingState type="spinner" text="جاري تحميل الملف الشخصي..." />
+          <LoadingState type="spinner" text={t("loading")} />
         </div>
       </div>
     );
@@ -88,8 +88,8 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           <ErrorState
-            title="فشل تحميل الملف الشخصي"
-            description="لم نتمكن من تحميل معلومات ملفك الشخصي. يرجى المحاولة مرة أخرى."
+            title={t("failed")}
+            description={t("failedDesc")}
             onRetry={() => refetchUser()}
           />
         </div>
@@ -105,7 +105,7 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold mb-8">الملف الشخصي</h1>
+          <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
 
           {/* User Info Section */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -115,7 +115,7 @@ export default function ProfilePage() {
                   {user.image ? (
                     <ImageFallback
                       src={user.image}
-                      alt={user.full_name || "المستخدم"}
+                      alt={user.full_name || t("user")}
                       fill
                       className="object-cover"
                     />
@@ -127,7 +127,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold">
-                    {user.full_name || "المستخدم"}
+                    {user.full_name || t("user")}
                   </h2>
                   <p className="text-gray-600">
                     {user.email || user.phone_complete_form}
@@ -140,7 +140,7 @@ export default function ProfilePage() {
               <div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-gray-700">
-                    الاسم
+                    {t("name")}
                   </label>
                   <button
                     className="text-orange-600 hover:text-orange-700 flex items-center gap-1 text-sm"
@@ -150,21 +150,21 @@ export default function ProfilePage() {
                   </button>
                 </div>
                 <p className="mt-1 text-gray-900">
-                  {user.full_name || "غير محدد"}
+                  {user.full_name || t("notDefined")}
                 </p>
               </div>
 
               <div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-gray-700">
-                    البريد الإلكتروني
+                    {t("email")}
                   </label>
                   <button
                     className="text-orange-600 hover:text-orange-700 flex items-center gap-1 text-sm"
                     onClick={() => setIsChangePasswordOpen(true)}
                   >
                     <Key className="size-3" />
-                    <span>تغيير كلمة المرور</span>
+                    <span>{t("changePassword")}</span>
                   </button>
                 </div>
                 <p className="mt-1 text-gray-900">
@@ -177,7 +177,7 @@ export default function ProfilePage() {
           {/* Addresses Section */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">العناوين</h3>
+              <h3 className="text-lg font-semibold">{t("addresses")}</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -185,14 +185,14 @@ export default function ProfilePage() {
                 onClick={() => setIsAddDialogOpen(true)}
               >
                 <Plus className="size-4 ml-1" />
-                إضافة
+                {t("add")}
               </Button>
             </div>
 
             {/* Address Cards */}
             {isLoadingAddresses ? (
               <div className="flex items-center justify-center py-12">
-                <p className="text-gray-500">جاري تحميل العناوين...</p>
+                <p className="text-gray-500">{t("loadingAddresses")}</p>
               </div>
             ) : addresses && addresses.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -251,7 +251,7 @@ export default function ProfilePage() {
                 <div className="rounded-full bg-gray-100 p-4 mb-3">
                   <MapPin className="size-6 text-gray-400" />
                 </div>
-                <p className="text-gray-500 text-sm">لم يتم إضافة عناوين</p>
+                <p className="text-gray-500 text-sm">{t("noAddresses")}</p>
               </div>
             )}
           </div>
@@ -294,22 +294,21 @@ export default function ProfilePage() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>حذف العنوان</AlertDialogTitle>
+              <AlertDialogTitle>{t("deleteAddress")}</AlertDialogTitle>
               <AlertDialogDescription>
-                هل أنت متأكد أنك تريد حذف هذا العنوان؟ لا يمكن التراجع عن هذا
-                الإجراء.
+                {t("deleteAddressConfirm")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isDeletingAddress}>
-                إلغاء
+                {t("cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteAddress}
                 disabled={isDeletingAddress}
                 className="bg-red-600 hover:bg-red-700"
               >
-                {isDeletingAddress ? "جاري الحذف..." : "حذف"}
+                {isDeletingAddress ? t("deleting") : t("delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ImageFallback from "@/components/image-fallback";
+import { useTranslations } from "next-intl";
 import HeaderSection from "@/components/header-section";
 import Link from "next/link";
 import * as React from "react";
@@ -25,6 +26,7 @@ interface BlogSectionProps {
 }
 
 export function BlogSection({ blogs = [] }: BlogSectionProps) {
+  const t = useTranslations("HomePage");
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -43,7 +45,7 @@ export function BlogSection({ blogs = [] }: BlogSectionProps) {
   return (
     <section className="container mx-auto py-2 px-4 space-y-8">
       <div className=" my-5 ">
-        <HeaderSection title="المقالات" />
+        <HeaderSection title={t("blogsTitle")} />
       </div>
 
       {/* MOBILE CAROUSEL */}
@@ -89,7 +91,7 @@ export function BlogSection({ blogs = [] }: BlogSectionProps) {
 
       <div className="mx-auto w-fit my-5 hidden lg:block">
         <MainLink href="/blogs" className="px-[30px] py-[10px]">
-          View all
+          {t("viewAll")}
         </MainLink>
       </div>
     </section>
@@ -136,10 +138,10 @@ function BlogCard({ blog, index }: { blog: Blog; index: number }) {
         </div>
 
         <div className="p-4 space-y-3">
-          <h3 className="font-semibold text-lg leading-snug text-right group-hover:underline transition-all duration-200 line-clamp-2">
+          <h3 className="font-semibold text-lg leading-snug   group-hover:underline transition-all duration-200 line-clamp-2">
             {blog.title}
           </h3>
-          <p className="text-sm min-h-[70px] text-gray-600 leading-relaxed line-clamp-3 text-right">
+          <p className="text-sm min-h-[70px] text-gray-600 leading-relaxed line-clamp-3">
             {blog.text}
           </p>
         </div>

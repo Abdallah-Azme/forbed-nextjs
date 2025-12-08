@@ -53,8 +53,8 @@ function Carousel({
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
   const locale = useLocale();
-  // const direction = locale === "ar" ? "rtl" : "ltr";
-  const direction = "rtl";
+  const direction = locale === "ar" ? "rtl" : "ltr";
+  // const direction = "rtl";
   const [carouselRef, api] = useEmblaCarousel(
     { direction, ...opts, axis: orientation === "horizontal" ? "x" : "y" },
     plugins

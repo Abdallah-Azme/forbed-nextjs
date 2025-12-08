@@ -23,12 +23,17 @@ import {
 } from "@/components/ui/input-otp";
 import Logo from "@/features/header/logo";
 import { useVerifyOtp, useResendOtp } from "@/hooks/use-auth";
+import { useTranslations } from "next-intl";
 
-const otpSchema = z.object({
-  code: z.string().min(4, "رمز التحقق يجب أن يكون 4 أرقام"),
-});
+// Schema moved inside component to support i18n
 
 export default function OtpForm() {
+  const t = useTranslations("Auth");
+
+  const otpSchema = z.object({
+    code: z.string().min(4, t("otpRequired")),
+  });
+
   const searchParams = useSearchParams();
   const phone = searchParams.get("phone");
   const phoneCode = searchParams.get("code") || "20"; // Default or from params
@@ -81,9 +86,7 @@ export default function OtpForm() {
   if (!phone) {
     return (
       <div className="text-center p-10">
-        <p className="text-red-500">
-          رقم الهاتف غير موجود. يرجى إعادة التسجيل.
-        </p>
+        <p className="text-red-500">{t("phoneNotFound")}</p>
       </div>
     );
   }
@@ -94,7 +97,7 @@ export default function OtpForm() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full bg-white shadow-sm rounded-xl border px-10 py-12 text-right"
+        className="w-full bg-white shadow-sm rounded-xl border px-10 py-12  "
       >
         <div className="mx-auto w-fit mb-6">
           <Logo className="max-w-[200px]" />
@@ -102,10 +105,10 @@ export default function OtpForm() {
 
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            تفعيل الحساب
+            {t("activateAccount")}
           </h2>
           <p className="text-gray-600">
-            تم إرسال رمز التحقق إلى الرقم{" "}
+            {t("otpSent")}
             <span dir="ltr">
               {phoneCode} {phone}
             </span>
@@ -120,7 +123,9 @@ export default function OtpForm() {
               name="code"
               render={({ field }) => (
                 <FormItem className="flex flex-col items-center justify-center">
-                  <FormLabel className="sr-only">رمز التحقق</FormLabel>
+                  <FormLabel className="sr-only">
+                    {t("verificationCode")}
+                  </FormLabel>
                   <FormControl>
                     <InputOTP maxLength={4} {...field}>
                       <InputOTPGroup className="gap-2" dir="ltr">
@@ -153,11 +158,11 @@ export default function OtpForm() {
               disabled={isVerifying}
               className="w-full h-12 text-base bg-gray-900 hover:bg-gray-800 text-white rounded-lg disabled:opacity-50"
             >
-              {isVerifying ? "جاري التحقق..." : "تفعيل الحساب"}
+              {isVerifying ? t("verifying") : t("activateAccount")}
             </Button>
 
             <div className="text-center text-sm">
-              <span className="text-gray-600">لم يصلك الرمز؟ </span>
+              <span className="text-gray-600">{t("didntReceiveCode")} </span>
               <button
                 type="button"
                 onClick={handleResend}
@@ -165,10 +170,10 @@ export default function OtpForm() {
                 className="text-blue-600 hover:underline font-medium disabled:opacity-50 disabled:no-underline disabled:text-gray-400"
               >
                 {isResending
-                  ? "جاري الإرسال..."
+                  ? t("sending")
                   : countdown > 0
-                  ? `إعادة الإرسال خلال ${countdown} ثانية`
-                  : "إعادة إرسال الرمز"}
+                  ? t("resendIn", { countdown })
+                  : t("resendCode")}
               </button>
             </div>
           </form>

@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/features/carts/stores/cart-store";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/empty-state";
 import ImageFallback from "@/components/image-fallback";
+import { useTranslations } from "next-intl";
 
 export default function CartPage() {
+  const t = useTranslations("Cart");
   const {
     items,
     getTotalPrice,
@@ -35,21 +36,23 @@ export default function CartPage() {
             href="/"
             className="text-sm underline hover:text-gray-600 transition-colors"
           >
-            مواصلة التسوق
+            {t("continueShopping")}
           </Link>
-          <h1 className="text-3xl lg:text-4xl text-[#121212]">سلة التسوق</h1>
+          <h1 className="text-3xl lg:text-4xl text-[#121212]">
+            {t("shoppingCart")}
+          </h1>
         </div>
 
         {items.length === 0 ? (
           /* Empty Cart State */
           <EmptyState
             icon={ShoppingCart}
-            title="سلة التسوق فارغة"
-            description="أضف بعض المنتجات إلى سلتك للبدء."
+            title={t("emptyCart")}
+            description={t("cartEmptyDescription")}
             action={
               <Link href="/">
                 <Button className="bg-orange-500 hover:bg-orange-600">
-                  ابدأ التسوق
+                  {t("startShopping")}
                 </Button>
               </Link>
             }
@@ -58,9 +61,9 @@ export default function CartPage() {
           <>
             {/* Table Header - Desktop Only */}
             <div className="hidden lg:grid lg:grid-cols-12 gap-4 pb-4 border-b text-sm text-gray-500 uppercase tracking-wider">
-              <div className="col-span-8 text-start">المنتج</div>
-              <div className="col-span-2 text-center">الكمية</div>
-              <div className="col-span-2 text-end">الإجمالي</div>
+              <div className="col-span-8 text-start">{t("product")}</div>
+              <div className="col-span-2 text-center">{t("quantity")}</div>
+              <div className="col-span-2 text-end">{t("total")}</div>
             </div>
 
             {/* Cart Items */}
@@ -192,23 +195,25 @@ export default function CartPage() {
         )}
         {/* Cart Summary */}
         {!!(items.length > 0) && (
-          <div className="mt-8 lg:mt-12 flex w-fit ms-auto">
+          <div className="mt-8 lg:mt-12 flex w-fit  ">
             <div className="w-full lg:w-96 space-y-6">
               {/* Total */}
               <div className="flex justify-between gap-2 items-center">
-                <span>الإجمالي التقديري</span>
-                <span>{total.toFixed(2)} ج.م</span>
+                <span>{t("estimatedTotal")}</span>
+                <span>
+                  {total.toFixed(2)} {t("currency")}
+                </span>
               </div>
 
               {/* Info Text */}
               <p className="text-xs text-[#121212] text-start">
-                يتم حساب الضرائب والخصومات والشحن عند الدفع
+                {t("taxShippingNote")}
               </p>
 
               {/* Checkout Button */}
               <Link href="/checkout">
                 <button className="w-full bg-black text-white rounded-none h-14 text-base font-semibold transition-transform duration-200 hover:-translate-y-1.5">
-                  إتمام الشراء
+                  {t("checkout")}
                 </button>
               </Link>
             </div>

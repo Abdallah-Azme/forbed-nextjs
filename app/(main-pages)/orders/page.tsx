@@ -17,8 +17,12 @@ import { Badge } from "@/components/ui/badge";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useTranslations } from "next-intl";
 
 export default function OrdersPage() {
+  const t = useTranslations("Orders");
+  const tCart = useTranslations("Cart");
+  const tHome = useTranslations("HomePage");
   const {
     data: ordersData,
     isLoading,
@@ -67,7 +71,7 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
+          <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
           <LoadingState type="skeleton" count={3} />
         </div>
       </div>
@@ -78,10 +82,10 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
+          <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
           <ErrorState
-            title="فشل تحميل الطلبات"
-            description="لم نتمكن من تحميل طلباتك. يرجى المحاولة مرة أخرى."
+            title={t("failed")}
+            description={t("failedDesc")}
             onRetry={() => refetch()}
           />
         </div>
@@ -93,15 +97,15 @@ export default function OrdersPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
+          <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
           <EmptyState
             icon={Package}
-            title="لا توجد طلبات بعد"
-            description="يبدو أنك لم تقم بأي طلبات بعد."
+            title={t("noOrders")}
+            description={t("noOrdersDesc")}
             action={
               <Link href="/">
                 <Button className="bg-orange-500 hover:bg-orange-600">
-                  ابدأ التسوق
+                  {tCart("startShopping")}
                 </Button>
               </Link>
             }
@@ -114,18 +118,18 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-5xl">
-        <h1 className="text-3xl font-bold mb-8">طلباتي</h1>
+        <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
 
         {!ordersData?.data || ordersData.data.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 bg-white rounded-lg shadow-sm border">
             <div className="bg-orange-50 p-4 rounded-full mb-4">
               <Package className="w-12 h-12 text-orange-500" />
             </div>
-            <h2 className="text-xl font-semibold mb-2">لا توجد طلبات بعد</h2>
-            <p className="text-gray-500 mb-6">يبدو أنك لم تقم بأي طلبات بعد.</p>
+            <h2 className="text-xl font-semibold mb-2">{t("noOrders")}</h2>
+            <p className="text-gray-500 mb-6">{t("noOrdersDesc")}</p>
             <Link href="/">
               <Button className="bg-orange-500 hover:bg-orange-600">
-                ابدأ التسوق
+                {tCart("startShopping")}
               </Button>
             </Link>
           </div>
@@ -171,22 +175,22 @@ export default function OrdersPage() {
                         }
                       })()}
                       {" • "}
-                      {order.items?.length || order.item_count} عناصر
+                      {order.items?.length || order.item_count} {tCart("items")}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between md:justify-end gap-6">
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">الإجمالي</p>
+                    <div className=" ">
+                      <p className="text-sm text-gray-500">{t("total")}</p>
                       <p className="text-lg font-bold text-orange-600">
                         {order.grand_total?.toFixed(2) ||
                           order.total?.toFixed(2)}{" "}
-                        ج.م
+                        {tHome("currency")}
                       </p>
                     </div>
                     <Link href={`/orders/${order.id}`}>
                       <Button variant="outline" className="group">
-                        التفاصيل
+                        {t("details")}
                         <ChevronRight className="w-4 h-4 mr-2 rotate-180 transition-transform group-hover:-translate-x-1" />
                       </Button>
                     </Link>

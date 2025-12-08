@@ -14,6 +14,7 @@ import { LoadingState } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface ProductDetailProps {
   productId?: string;
@@ -24,6 +25,7 @@ export default function ProductDetail({
   productId,
   productData,
 }: ProductDetailProps) {
+  const t = useTranslations("Product");
   const router = useRouter();
   const { addToCart, isLoading: isAddingToCart } = useCartStore();
 
@@ -71,7 +73,7 @@ export default function ProductDetail({
       specification_id
     );
 
-    toast.success("تمت الإضافة إلى السلة");
+    toast.success(t("addedToCart"));
 
     if (redirect) {
       router.push("/cart");
@@ -79,14 +81,14 @@ export default function ProductDetail({
   };
 
   if (isLoading) {
-    return <LoadingState type="spinner" text="جاري تحميل تفاصيل المنتج..." />;
+    return <LoadingState type="spinner" text={t("loadingDetails")} />;
   }
 
   if (error) {
     return (
       <ErrorState
-        title="فشل تحميل المنتج"
-        description="لم نتمكن من تحميل هذا المنتج. قد يكون تم حذفه أو غير متاح حالياً."
+        title={t("failedToLoad")}
+        description={t("failedDescription")}
         onRetry={() => refetch()}
       />
     );
@@ -96,12 +98,12 @@ export default function ProductDetail({
     return (
       <EmptyState
         icon={PackageX}
-        title="المنتج غير موجود"
-        description="المنتج الذي تبحث عنه غير موجود أو تم حذفه."
+        title={t("notFound")}
+        description={t("notFoundDescription")}
         action={
           <Link href="/">
             <Button className="bg-orange-500 hover:bg-orange-600">
-              تصفح المنتجات
+              {t("browseProducts")}
             </Button>
           </Link>
         }
@@ -120,7 +122,7 @@ export default function ProductDetail({
       {/* Related Products - only show if fetched from API */}
       {fetchedProduct?.related && fetchedProduct.related.length > 0 && (
         <ProductOfCategory
-          title="منتجات ذات صلة"
+          title={t("relatedProducts")}
           products={fetchedProduct.related}
         />
       )}

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useQuery } from "@tanstack/react-query";
 import CategoriesCollection from "@/features/category/components/category-collection";
 import { BlogSection } from "@/features/home/blogs";
@@ -12,6 +14,7 @@ import { Loader2 } from "lucide-react";
 import ProductDetail from "@/features/product/components/product-details";
 
 export default function Home() {
+  const t = useTranslations("HomePage");
   const {
     data: homeData,
     isLoading,
@@ -41,7 +44,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen items-center justify-center ">
       <HeroBanner sliders={homeData?.sliders} />
       <CategoriesCollection
-        title="Collections"
+        title={t("collections")}
         categories={homeData?.categories}
       />
       <FeaturesSection services={homeData?.services} />
@@ -49,13 +52,13 @@ export default function Home() {
       {/* New Products */}
       <ProductOfCategory
         main
-        title="New Arrivals"
+        title={t("newArrivals")}
         products={homeData?.new_products}
       />
 
       {/* Random Products */}
       <ProductOfCategory
-        title="Recommended for You"
+        title={t("recommended")}
         products={homeData?.random_products}
       />
 

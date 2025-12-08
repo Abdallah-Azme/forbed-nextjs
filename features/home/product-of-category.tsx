@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import ImageFallback from "@/components/image-fallback";
+import { useTranslations } from "next-intl";
 import {
   Carousel,
   CarouselApi,
@@ -26,6 +27,7 @@ export default function ProductOfCategory({
   number?: number;
   products?: HomeProduct[];
 }) {
+  const t = useTranslations("HomePage");
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -45,7 +47,7 @@ export default function ProductOfCategory({
     <section className="py-4  w-full overflow-hidden">
       <div className="container mx-auto px-4">
         <div className=" my-5 ">
-          <HeaderSection title={title || "New Arrival Products"} />
+          <HeaderSection title={title || t("newArrivalProducts")} />
         </div>
 
         {/* MOBILE CAROUSEL - Shows 2.15 cards */}
@@ -100,7 +102,7 @@ export default function ProductOfCategory({
                 : "bg-white border border-black text-black px-[30px] py-[10px]"
             }
           >
-            View all
+            {t("viewAll")}
           </MainLink>
         </div>
       </div>
@@ -109,6 +111,7 @@ export default function ProductOfCategory({
 }
 
 function ProductCard({ product }: { product: HomeProduct }) {
+  const t = useTranslations("HomePage");
   const isSoldOut = product.stock <= 0;
 
   return (
@@ -125,17 +128,17 @@ function ProductCard({ product }: { product: HomeProduct }) {
         />
         {isSoldOut && (
           <div className="absolute bottom-2 left-2 bg-[#f7931d] text-white px-4 py-1 text-xs rounded-full">
-            Sold out
+            {t("soldOut")}
           </div>
         )}
         {product.is_new && !isSoldOut && (
           <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 text-[10px] rounded">
-            NEW
+            {t("new")}
           </div>
         )}
         {product.price.has_offer && !isSoldOut && (
           <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-[10px] rounded">
-            SALE
+            {t("sale")}
           </div>
         )}
       </div>
@@ -143,21 +146,23 @@ function ProductCard({ product }: { product: HomeProduct }) {
         <h3 className="font-semibold text-sm mb-1 line-clamp-2 min-h-[40px]">
           {product.name}
         </h3>
-        <p className="text-gray-400 text-xs mb-1">FORBED</p>
+        <p className="text-gray-400 text-xs mb-1">Rich House</p>
 
         <div className="flex flex-col items-end gap-1">
           {product.price.start_from && (
-            <span className="text-xs text-gray-500">Starts from</span>
+            <span className="text-xs text-gray-500">{t("startsFrom")}</span>
           )}
 
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <span className="text-gray-800 font-bold text-sm">
-              LE {product.price.price_after_discount.toLocaleString()}
+              {t("currency")}{" "}
+              {product.price.price_after_discount.toLocaleString()}
             </span>
 
             {product.price.has_offer && (
               <span className="text-gray-400 text-xs line-through">
-                LE {product.price.price_before_discount.toLocaleString()}
+                {t("currency")}{" "}
+                {product.price.price_before_discount.toLocaleString()}
               </span>
             )}
           </div>

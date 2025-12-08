@@ -23,24 +23,24 @@ import { Input } from "@/components/ui/input";
 import { parsePhoneNumber } from "react-phone-number-input";
 
 import { useRouter } from "next/navigation";
-
-const signupSchema = z
-  .object({
-    full_name: z.string().min(3, "الاسم الكامل يجب أن يكون 3 أحرف على الأقل"),
-    phone: z.string().min(6, "رقم الهاتف غير صالح"),
-    password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
-    password_confirmation: z
-      .string()
-      .min(6, "تأكيد كلمة المرور يجب أن يكون 6 أحرف على الأقل"),
-  })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "كلمة المرور غير متطابقة",
-    path: ["password_confirmation"],
-  });
+import { useTranslations } from "next-intl";
 
 export default function SignupForm() {
+  const t = useTranslations("Auth");
   const router = useRouter();
   const { mutate: register, isPending } = useRegister();
+
+  const signupSchema = z
+    .object({
+      full_name: z.string().min(3, t("fullNameLength")),
+      phone: z.string().min(6, t("invalidPhone")),
+      password: z.string().min(6, t("passwordLength")),
+      password_confirmation: z.string().min(6, t("confirmPasswordLength")),
+    })
+    .refine((data) => data.password === data.password_confirmation, {
+      message: t("passwordsMismatch"),
+      path: ["password_confirmation"],
+    });
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -77,6 +77,7 @@ export default function SignupForm() {
         onSuccess: (data) => {
           if (data?.status === "fail" && data?.messages) {
             Object.keys(data.messages).forEach((key) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               form.setError(key as any, {
                 type: "server",
                 message: data.messages[key][0],
@@ -89,10 +90,12 @@ export default function SignupForm() {
             `/verify?phone=${phone}&code=${encodeURIComponent(phone_code)}`
           );
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onError: (error: any) => {
           if (error?.response?.data?.messages) {
             const messages = error.response.data.messages;
             Object.keys(messages).forEach((key) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               form.setError(key as any, {
                 type: "server",
                 message: messages[key][0],
@@ -110,7 +113,7 @@ export default function SignupForm() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full bg-white shadow-sm rounded-xl border px-10 py-12 text-right"
+        className="w-full bg-white shadow-sm rounded-xl border px-10 py-12"
       >
         <div className="mx-auto w-fit">
           <Logo className="max-w-[300px]" />
@@ -125,12 +128,12 @@ export default function SignupForm() {
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>الاسم الكامل</FormLabel>
+                  <FormLabel>{t("fullNameLabel")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="الاسم الكامل"
+                      placeholder={t("fullNameLabel")}
                       {...field}
-                      className="h-12 text-right"
+                      className="h-12"
                     />
                   </FormControl>
                   <FormMessage />
@@ -144,13 +147,13 @@ export default function SignupForm() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>رقم الهاتف</FormLabel>
+                  <FormLabel>{t("phoneLabel")}</FormLabel>
                   <FormControl>
                     <div dir="ltr" className="">
                       <PhoneInput
                         defaultCountry="EG"
                         placeholder="10xxxxxxxx"
-                        className="h-12 text-right"
+                        className="h-12"
                         {...field}
                       />
                     </div>
@@ -166,12 +169,12 @@ export default function SignupForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>كلمة المرور</FormLabel>
+                  <FormLabel>{t("passwordLabel")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       placeholder="********"
-                      className="h-12 text-right"
+                      className="h-12"
                       {...field}
                     />
                   </FormControl>
@@ -186,12 +189,12 @@ export default function SignupForm() {
               name="password_confirmation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>تأكيد كلمة المرور</FormLabel>
+                  <FormLabel>{t("confirmPasswordLabel")}</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       placeholder="********"
-                      className="h-12 text-right"
+                      className="h-12"
                       {...field}
                     />
                   </FormControl>
@@ -200,9 +203,7 @@ export default function SignupForm() {
               )}
             />
 
-            <div className="text-sm text-gray-600 text-right">
-              سيتم إرسال رمز التحقق (OTP) إلى رقم هاتفك
-            </div>
+            <div className="text-sm text-gray-600">{t("otpNotice")}</div>
 
             {/* Submit Button */}
             <Button
@@ -210,13 +211,13 @@ export default function SignupForm() {
               disabled={isPending}
               className="w-full h-12 text-base bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isPending ? "جاري الإرسال..." : "إنشاء حساب"}
+              {isPending ? t("creatingAccount") : t("createAccount")}
             </Button>
 
             <div className="text-center text-sm text-gray-600">
-              لديك حساب بالفعل؟{" "}
+              {t("hasAccount")}{" "}
               <Link href="/signin" className="text-blue-600 hover:underline">
-                تسجيل الدخول
+                {t("login")}
               </Link>
             </div>
           </form>

@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -13,9 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Image from "next/image";
+
 import Link from "next/link";
-import { Info, Loader2, Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useCartStore } from "@/features/carts/stores/cart-store";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addressService } from "@/services/address.service";
@@ -26,8 +24,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import AddAddressDialog from "@/features/profile/components/add-address-dialog";
 import ImageFallback from "@/components/image-fallback";
+import { useTranslations } from "next-intl";
 
 export default function Page() {
+  const t = useTranslations("Checkout");
+  const tCart = useTranslations("Cart");
+  const tHome = useTranslations("HomePage");
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
@@ -35,7 +37,7 @@ export default function Page() {
   const [paymentMethodId, setPaymentMethodId] = useState<string>("");
 
   // Fetch Cart Data
-  const { data: cartData, isLoading: isLoadingCart } = useQuery({
+  const { data: cartData } = useQuery({
     queryKey: ["cart"],
     queryFn: () => cartService.getCart(),
   });
@@ -76,12 +78,13 @@ export default function Page() {
   const createOrderMutation = useMutation({
     mutationFn: orderService.createOrder,
     onSuccess: (data) => {
-      toast.success("تم الطلب بنجاح!");
-      clearCart();
+      toast.success(t("success"));
       router.push(`/orders/${data.id}`); // Redirect to order details or success page
+      clearCart();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "فشل في إتمام الطلب");
+      toast.error(error.response?.data?.message || t("failed"));
       console.error("Order creation error:", error);
     },
   });
@@ -97,12 +100,12 @@ export default function Page() {
     e.preventDefault();
 
     if (!selectedAddressId) {
-      toast.error("يرجى اختيار عنوان");
+      toast.error(t("selectAddress"));
       return;
     }
 
     if (!paymentMethodId) {
-      toast.error("يرجى اختيار طريقة الدفع");
+      toast.error(t("selectPayment"));
       return;
     }
 
@@ -116,9 +119,9 @@ export default function Page() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <h1 className="text-2xl font-bold">سلة التسوق فارغة</h1>
+        <h1 className="text-2xl font-bold">{tCart("emptyCart")}</h1>
         <Link href="/">
-          <Button>مواصلة التسوق</Button>
+          <Button>{tCart("continueShopping")}</Button>
         </Link>
       </div>
     );
@@ -150,7 +153,8 @@ export default function Page() {
                     {/* Left: Name + Price */}
                     <div className="flex-1 space-y-1 text-start">
                       <div className="text-sm font-semibold">
-                        {(product.price * product.quantity).toFixed(2)} ج.م
+                        {(product.price * product.quantity).toFixed(2)}{" "}
+                        {tHome("currency")}
                       </div>
                     </div>
 
@@ -179,25 +183,33 @@ export default function Page() {
               {/* Summary */}
               <div className="space-y-2 pt-4">
                 <div className="flex justify-between text-sm">
-                  <span>{subtotal.toFixed(2)} ج.م</span>
-                  <span>المجموع الفرعي</span>
+                  <span>
+                    {subtotal.toFixed(2)} {tHome("currency")}
+                  </span>
+                  <span>{t("subtotal")}</span>
                 </div>
 
                 <div className="flex justify-between text-sm">
-                  <span>{vat.toFixed(2)} ج.م</span>
-                  <span>ضريبة القيمة المضافة</span>
+                  <span>
+                    {vat.toFixed(2)} {tHome("currency")}
+                  </span>
+                  <span>{t("vat")}</span>
                 </div>
 
                 {discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>-{discount.toFixed(2)} ج.م</span>
-                    <span>الخصم</span>
+                    <span>
+                      -{discount.toFixed(2)} {tHome("currency")}
+                    </span>
+                    <span>{t("discount")}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-sm">
-                  <span>{shipping.toFixed(2)} ج.م</span>
-                  <span>الشحن</span>
+                  <span>
+                    {shipping.toFixed(2)} {tHome("currency")}
+                  </span>
+                  <span>{t("shipping")}</span>
                 </div>
               </div>
 
@@ -205,17 +217,19 @@ export default function Page() {
               <div className="flex justify-between items-center border-t pt-4">
                 <div className="text-start">
                   <span className="text-lg font-bold">
-                    {total.toFixed(2)} ج.م
+                    {total.toFixed(2)} {tHome("currency")}
                   </span>
                 </div>
-                <span className="text-lg font-bold">الإجمالي</span>
+                <span className="text-lg font-bold">{t("total")}</span>
               </div>
 
               {/* Delivery Time */}
               {cartData?.delivery_time && (
                 <div className="flex justify-between text-sm text-gray-600 pt-2">
-                  <span>{cartData.delivery_time} أيام</span>
-                  <span>وقت التوصيل المتوقع</span>
+                  <span>
+                    {cartData.delivery_time} {t("days")}
+                  </span>
+                  <span>{t("estimatedDelivery")}</span>
                 </div>
               )}
             </div>
@@ -227,7 +241,9 @@ export default function Page() {
               {/* Address Selection */}
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">عنوان الشحن</h2>
+                  <h2 className="text-xl font-semibold">
+                    {t("shippingAddress")}
+                  </h2>
                 </div>
 
                 {isLoadingAddresses ? (
@@ -246,8 +262,8 @@ export default function Page() {
                           <SelectValue
                             placeholder={
                               addresses && addresses.length > 0
-                                ? "اختر عنواناً"
-                                : "لا توجد عناوين"
+                                ? t("selectAddressPlaceholder")
+                                : t("noAddresses")
                             }
                           />
                         </SelectTrigger>
@@ -284,7 +300,9 @@ export default function Page() {
 
               {/* Payment Method */}
               <div>
-                <h2 className="text-xl font-semibold mb-4">طريقة الدفع</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  {t("paymentMethod")}
+                </h2>
                 {isLoadingHomeData ? (
                   <div className="flex justify-center py-4">
                     <Loader2 className="animate-spin" />
@@ -344,19 +362,19 @@ export default function Page() {
                 {createOrderMutation.isPending ? (
                   <Loader2 className="animate-spin ml-2" />
                 ) : null}
-                ادفع الآن ({total.toFixed(2)} ج.م)
+                {t("payNow")} ({total.toFixed(2)} {tHome("currency")})
               </Button>
 
               {/* Footer Links */}
               <div className="flex  gap-4 justify-end text-sm text-orange-500 border-t pt-5">
                 <Link href="/pages/cancel_terms" className="hover:underline">
-                  سياسة الاسترجاع
+                  {t("refundPolicy")}
                 </Link>
                 <Link
                   href="/pages/service_condition"
                   className="hover:underline"
                 >
-                  شروط الخدمة
+                  {t("termsOfService")}
                 </Link>
               </div>
             </form>

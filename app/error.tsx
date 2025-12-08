@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function Error({
   error,
@@ -11,6 +12,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("Error");
+
   useEffect(() => {
     // Log the error to an error reporting service
     console.error("Global error boundary caught:", error);
@@ -25,17 +28,12 @@ export default function Error({
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Oops! Something went wrong
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">{t("title")}</h1>
 
-        <p className="text-gray-600 mb-8">
-          We apologize for the inconvenience. An unexpected error has occurred.
-          Please try again or return to the homepage.
-        </p>
+        <p className="text-gray-600 mb-8">{t("description")}</p>
 
         {process.env.NODE_ENV === "development" && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg  ">
             <p className="text-sm font-mono text-red-800 break-all">
               {error.message}
             </p>
@@ -48,14 +46,14 @@ export default function Error({
             className="bg-orange-500 hover:bg-orange-600 text-white"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Try Again
+            {t("tryAgain")}
           </Button>
           <Button
             variant="outline"
             onClick={() => (window.location.href = "/")}
           >
             <Home className="w-4 h-4 mr-2" />
-            Go to Homepage
+            {t("goToHomepage")}
           </Button>
         </div>
       </div>

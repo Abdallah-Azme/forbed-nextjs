@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Minus, Plus, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { ProductDetails } from "@/types/api";
+import { useTranslations } from "next-intl";
 
 interface ProductInfoSectionProps {
   product: ProductDetails;
@@ -23,6 +24,7 @@ export default function ProductInfoSection({
   onAddToCart,
   isAddingToCart,
 }: ProductInfoSectionProps) {
+  const t = useTranslations("Product");
   const [quantity, setQuantity] = useState(1);
   // Initialize with the first specification ID if available
   const [selectedSpecId, setSelectedSpecId] = useState<string>(
@@ -133,24 +135,28 @@ export default function ProductInfoSection({
         className="w-full lg:w-1/2 space-y-6 flex flex-col items-start"
       >
         <div className="space-y-3 w-full text-start">
-          <p className="text-xs text-gray-500 tracking-wider">فوربد</p>
+          <p className="text-xs text-gray-500 tracking-wider">
+            {t("brandName")}
+          </p>
           <h1 className="text-3xl md:text-4xl font-normal leading-relaxed">
             {product.name}
           </h1>
           <div className="flex items-center justify-start gap-3">
             <p className="text-xl font-bold text-gray-900">
-              {currentPrice.toLocaleString()} ج.م
+              {t("currency")} {currentPrice.toLocaleString()}
             </p>
             {/* Show old price only if no spec is selected (using main product offer) OR if we had spec-specific old price logic */}
             {!selectedSpec && product.price.has_offer && (
               <p className="text-sm text-gray-500 line-through">
-                {product.price.price_before_discount.toLocaleString()} ج.م
+                {t("currency")}{" "}
+                {product.price.price_before_discount.toLocaleString()}
               </p>
             )}
           </div>
           {!selectedSpec && product.price.has_offer && (
             <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-600">
-              وفر {product.price.discount.toLocaleString()} ج.م
+              {t("save")} {t("currency")}{" "}
+              {product.price.discount.toLocaleString()}
             </span>
           )}
         </div>
@@ -165,7 +171,7 @@ export default function ProductInfoSection({
             className="space-y-3 w-full"
           >
             <p className="text-sm text-gray-700 text-start font-medium">
-              المقاس (سم)
+              {t("size")}
             </p>
             <div className="flex flex-wrap gap-3 items-start">
               {product.specifications.map((spec) => {
@@ -199,7 +205,7 @@ export default function ProductInfoSection({
           transition={{ delay: 0.25 }}
           className="space-y-2 w-full flex flex-col items-start"
         >
-          <p className="text-sm text-gray-700 text-start">الكمية</p>
+          <p className="text-sm text-gray-700 text-start">{t("quantity")}</p>
           <div className="flex items-center w-40 h-12 border border-black rounded-none overflow-hidden">
             <Button
               variant="ghost"
@@ -251,7 +257,7 @@ export default function ProductInfoSection({
             {isAddingToCart ? (
               <Loader2 className="h-4 w-4 animate-spin ml-2" />
             ) : null}
-            أضف إلى السلة
+            {t("addToCart")}
           </Button>
           <Button
             onClick={() => handleAddToCart(true)}
@@ -263,7 +269,7 @@ export default function ProductInfoSection({
               !selectedSpecId
             }
           >
-            اشترِ الآن
+            {t("buyNow")}
           </Button>
         </motion.div>
 

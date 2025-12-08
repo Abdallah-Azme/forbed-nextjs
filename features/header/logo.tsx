@@ -18,7 +18,7 @@ export default function Logo({
     <Link href="/" className={cn("shrink-0")}>
       <ImageFallback
         src={url || logoUrl || "/pages/home/forbed-logo.png"}
-        alt="Forbed"
+        alt="Rich House"
         width={100}
         height={80}
         className={cn("w-full h-full object-contain", className)}

@@ -22,14 +22,11 @@ export function CategoryProductCard({ product }: { product: HomeProduct }) {
         )}
       </div>
       <div className="p-4 text-start" dir="ltr">
-        <h3
-          className="font-medium text-sm mb-1 line-clamp-2 text-right"
-          dir="rtl"
-        >
+        <h3 className="font-medium text-sm mb-1 line-clamp-2  " dir="rtl">
           {product.name}
         </h3>
         <p className="text-gray-400 text-[10px] uppercase tracking-wider mb-2">
-          FORBED
+          Rich House
         </p>
         <div className="flex flex-col gap-1">
           {product.price.has_offer && (

@@ -82,7 +82,7 @@ export default function Page() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-medium text-right mb-8">{category.name}</h1>
+      <h1 className="text-3xl font-medium mb-8">{category.name}</h1>
 
       <FilterBar
         count={products.meta.total}

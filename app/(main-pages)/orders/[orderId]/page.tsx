@@ -19,8 +19,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function OrderDetailsPage() {
+  const t = useTranslations("Orders");
+  const tCheckout = useTranslations("Checkout");
+  const tHome = useTranslations("HomePage");
+  const tProfile = useTranslations("Profile");
   const params = useParams();
   const router = useRouter();
   const orderId = params.orderId as string;
@@ -40,7 +45,7 @@ export default function OrderDetailsPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <LoadingState type="spinner" text="جاري تحميل تفاصيل الطلب..." />
+          <LoadingState type="spinner" text={t("loadingDetails")} />
         </div>
       </div>
     );
@@ -51,8 +56,8 @@ export default function OrderDetailsPage() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-5xl">
           <ErrorState
-            title="فشل تحميل الطلب"
-            description="لم نتمكن من تحميل هذا الطلب. يرجى المحاولة مرة أخرى."
+            title={t("failedDetails")}
+            description={t("failedDetailsDesc")}
             onRetry={() => refetch()}
           />
         </div>
@@ -66,12 +71,12 @@ export default function OrderDetailsPage() {
         <div className="container mx-auto px-4 max-w-5xl">
           <EmptyState
             icon={Receipt}
-            title="الطلب غير موجود"
-            description="الطلب الذي تبحث عنه غير موجود أو تم حذفه."
+            title={t("notFound")}
+            description={t("notFoundDesc")}
             action={
               <Link href="/orders">
                 <Button className="bg-orange-500 hover:bg-orange-600">
-                  عرض كل الطلبات
+                  {t("viewAll")}
                 </Button>
               </Link>
             }
@@ -113,7 +118,7 @@ export default function OrderDetailsPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-3">
-              طلب رقم {order.order_number}
+              {t("orderNumber")} {order.order_number}
               <Badge
                 variant="outline"
                 className={`text-sm font-medium ${getStatusColor(
@@ -124,7 +129,7 @@ export default function OrderDetailsPage() {
               </Badge>
             </h1>
             <p className="text-gray-500 text-sm mt-1">
-              تم الطلب في{" "}
+              {t("orderedOn")}{" "}
               {new Date(order.created_at).toLocaleDateString("ar-EG", {
                 weekday: "long",
                 year: "numeric",
@@ -144,7 +149,7 @@ export default function OrderDetailsPage() {
               <div className="p-6 border-b">
                 <h2 className="font-semibold flex items-center gap-2">
                   <Package className="w-5 h-5 text-orange-500" />
-                  عناصر الطلب ({order.items.length})
+                  {t("orderItems")} ({order.items.length})
                 </h2>
               </div>
               <div className="divide-y">
@@ -172,21 +177,22 @@ export default function OrderDetailsPage() {
                           </h3>
                           {item.brand && (
                             <p className="text-sm text-gray-500">
-                              الماركة: {item.brand.name}
+                              {t("brand")} {item.brand.name}
                             </p>
                           )}
                         </div>
                         <p className="font-semibold">
-                          {item.price.toFixed(2)} ج.م
+                          {item.price.toFixed(2)} {tHome("currency")}
                         </p>
                       </div>
                       <div className="mt-2 flex items-center justify-between text-sm">
                         <span className="text-gray-500">
-                          الكمية: {item.quantity}
+                          {tCheckout("quantity")}: {item.quantity}
                         </span>
                         <span className="font-medium text-gray-900">
-                          الإجمالي: {(item.price * item.quantity).toFixed(2)}{" "}
-                          ج.م
+                          {tCheckout("total")}:{" "}
+                          {(item.price * item.quantity).toFixed(2)}{" "}
+                          {tHome("currency")}
                         </span>
                       </div>
                     </div>
@@ -200,31 +206,39 @@ export default function OrderDetailsPage() {
           <div className="space-y-6">
             {/* Order Summary */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="font-semibold mb-4">ملخص الطلب</h2>
+              <h2 className="font-semibold mb-4">{t("summary")}</h2>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-gray-600">
-                  <span>المجموع الفرعي</span>
-                  <span>{order.total.toFixed(2)} ج.م</span>
+                  <span>{tCheckout("subtotal")}</span>
+                  <span>
+                    {order.total.toFixed(2)} {tHome("currency")}
+                  </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>الشحن</span>
-                  <span>{order.shipping_cost.toFixed(2)} ج.م</span>
+                  <span>{tCheckout("shipping")}</span>
+                  <span>
+                    {order.shipping_cost.toFixed(2)} {tHome("currency")}
+                  </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>ضريبة القيمة المضافة</span>
-                  <span>{order.vat.toFixed(2)} ج.م</span>
+                  <span>{tCheckout("vat")}</span>
+                  <span>
+                    {order.vat.toFixed(2)} {tHome("currency")}
+                  </span>
                 </div>
                 {order.discount > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>الخصم</span>
-                    <span>-{order.discount.toFixed(2)} ج.م</span>
+                    <span>{tCheckout("discount")}</span>
+                    <span>
+                      -{order.discount.toFixed(2)} {tHome("currency")}
+                    </span>
                   </div>
                 )}
                 <Separator />
                 <div className="flex justify-between font-bold text-lg pt-2">
-                  <span>الإجمالي</span>
+                  <span>{tCheckout("total")}</span>
                   <span className="text-orange-600">
-                    {order.grand_total.toFixed(2)} ج.م
+                    {order.grand_total.toFixed(2)} {tHome("currency")}
                   </span>
                 </div>
               </div>
@@ -234,16 +248,16 @@ export default function OrderDetailsPage() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="font-semibold mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-gray-500" />
-                عنوان الشحن
+                {tCheckout("shippingAddress")}
               </h2>
               {order.address ? (
                 <div className="text-sm text-gray-600 space-y-1">
                   <p className="font-medium text-gray-900">
                     {order.address.type === "home"
-                      ? "المنزل"
+                      ? tProfile("home")
                       : order.address.type === "work"
-                      ? "العمل"
-                      : "آخر"}
+                      ? tProfile("work")
+                      : tProfile("other")}
                   </p>
                   <p>{order.address.address}</p>
                   <p>{order.address.city}</p>
@@ -255,7 +269,7 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">لا توجد معلومات عنوان</p>
+                <p className="text-sm text-gray-500">{t("noAddressInfo")}</p>
               )}
             </div>
 
@@ -263,7 +277,7 @@ export default function OrderDetailsPage() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="font-semibold mb-4 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-gray-500" />
-                طريقة الدفع
+                {tCheckout("paymentMethod")}
               </h2>
               <div className="text-sm text-gray-600">
                 {order.payment_method ? (
@@ -271,7 +285,7 @@ export default function OrderDetailsPage() {
                     <span>{order.payment_method.name}</span>
                   </div>
                 ) : (
-                  <span>الدفع عند الاستلام</span>
+                  <span>{t("cod")}</span>
                 )}
               </div>
             </div>

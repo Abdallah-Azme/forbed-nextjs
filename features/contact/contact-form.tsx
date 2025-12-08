@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,15 +23,16 @@ import { contactService } from "@/services/content.service";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-const contactSchema = z.object({
-  full_name: z.string().min(3, "الاسم الكامل يجب أن يكون 3 أحرف على الأقل"),
-  email: z.string().email("البريد الإلكتروني غير صالح"),
-  phone: z.string().min(6, "رقم الهاتف غير صالح"),
-  content: z.string().min(10, "الرسالة يجب أن تكون 10 أحرف على الأقل"),
-});
-
 export default function ContactForm() {
+  const t = useTranslations("Contact");
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const contactSchema = z.object({
+    full_name: z.string().min(3, t("validation.nameLength")),
+    email: z.string().email(t("validation.emailInvalid")),
+    phone: z.string().min(6, t("validation.phoneInvalid")),
+    content: z.string().min(10, t("validation.contentLength")),
+  });
 
   const form = useForm<z.infer<typeof contactSchema>>({
     resolver: zodResolver(contactSchema),
@@ -46,7 +48,7 @@ export default function ContactForm() {
     mutationFn: contactService.submitContactForm,
     onSuccess: () => {
       setIsSuccess(true);
-      toast.success("تم إرسال رسالتك بنجاح");
+      toast.success(t("successToast"));
       form.reset();
       setTimeout(() => setIsSuccess(false), 5000);
     },
@@ -61,7 +63,7 @@ export default function ContactForm() {
           });
         });
       } else {
-        toast.error(error?.message || "حدث خطأ أثناء إرسال الرسالة");
+        toast.error(error?.message || t("error"));
       }
     },
   });
@@ -78,7 +80,7 @@ export default function ContactForm() {
   return (
     <div className="w-full max-w-4xl mx-auto py-10 px-4">
       <h1 className="text-3xl md:text-4xl font-normal text-gray-900 mb-8">
-        contact
+        {t("title")}
       </h1>
 
       {isSuccess && (
@@ -87,7 +89,7 @@ export default function ContactForm() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 p-4 bg-green-50 border border-green-500 text-green-800 text-center"
         >
-          تم إرسال رسالتك بنجاح! سنتواصل معك قريباً
+          {t("success")}
         </motion.div>
       )}
 
@@ -103,9 +105,9 @@ export default function ContactForm() {
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="Name"
+                      placeholder={t("name")}
                       {...field}
-                      className="h-14 border-black border-2 rounded-none bg-white text-left placeholder:text-gray-400"
+                      className="h-14 border-black border-2 rounded-none bg-white  placeholder:text-gray-400"
                     />
                   </FormControl>
                   <FormMessage />
@@ -122,9 +124,9 @@ export default function ContactForm() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="Email"
+                      placeholder={t("email")}
                       {...field}
-                      className="h-14 border-black border-2 rounded-none bg-white text-left placeholder:text-gray-400"
+                      className="h-14 border-black border-2 rounded-none bg-white  placeholder:text-gray-400"
                     />
                   </FormControl>
                   <FormMessage />
@@ -141,12 +143,12 @@ export default function ContactForm() {
               <FormItem>
                 <FormControl>
                   <PhoneInput
-                    placeholder="Phone number"
+                    placeholder={t("phone")}
                     value={field.value}
                     onChange={field.onChange}
-                    defaultCountry="PS"
+                    defaultCountry="EG"
                     international
-                    className="h-14 border-black border-2 rounded-none bg-white text-left placeholder:text-gray-400 [&>input]:h-full [&>input]:border-0 [&>input]:outline-none [&>input]:bg-transparent [&>input]:px-3 [&>.PhoneInputCountry]:px-3 [&>.PhoneInputCountry]:border-r [&>.PhoneInputCountry]:border-gray-300"
+                    className="h-14 border-black border-2 rounded-none bg-white  placeholder:text-gray-400 [&>input]:h-full [&>input]:border-0 [&>input]:outline-none [&>input]:bg-transparent [&>input]:px-3 [&>.PhoneInputCountry]:px-3 [&>.PhoneInputCountry]:border-r [&>.PhoneInputCountry]:border-gray-300"
                   />
                 </FormControl>
                 <FormMessage />
@@ -162,8 +164,8 @@ export default function ContactForm() {
               <FormItem>
                 <FormControl>
                   <Textarea
-                    placeholder="Comment"
-                    className="min-h-[150px] border-black border-2 rounded-none bg-white text-left placeholder:text-gray-400 resize-none"
+                    placeholder={t("comment")}
+                    className="min-h-[150px] border-black border-2 rounded-none bg-white  placeholder:text-gray-400 resize-none"
                     {...field}
                   />
                 </FormControl>
@@ -178,7 +180,7 @@ export default function ContactForm() {
             disabled={submitMutation.isPending}
             className="h-14 px-12 bg-black hover:bg-gray-800 text-white rounded-none font-normal text-base disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitMutation.isPending ? "Sending..." : "Send"}
+            {submitMutation.isPending ? t("sending") : t("send")}
           </Button>
         </form>
       </Form>

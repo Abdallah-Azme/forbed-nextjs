@@ -1,9 +1,11 @@
 import CategoriesCollection from "@/features/category/components/category-collection";
 import { categoryService } from "@/services/category.service";
 import { Category, HomeCategory } from "@/types/api";
+import { getTranslations } from "next-intl/server";
 
 export default async function Page() {
   const categories = await categoryService.getCategories();
+  const t = await getTranslations("Categories");
 
   // Helper to map Category to HomeCategory (handling optional image)
   const mapToHomeCategory = (cats: Category[]): HomeCategory[] => {
@@ -20,7 +22,7 @@ export default async function Page() {
       {/* Show ALL categories in one main collection */}
       {categories.length > 0 && (
         <CategoriesCollection
-          title="جميع الفئات"
+          title={t("title")}
           secondary
           categories={mapToHomeCategory(categories)}
         />
@@ -41,7 +43,7 @@ export default async function Page() {
       {/* Fallback if no categories found */}
       {categories.length === 0 && (
         <div className="text-center py-10 text-gray-500">
-          لا توجد فئات متاحة حالياً
+          {t("noCategories")}
         </div>
       )}
     </main>
