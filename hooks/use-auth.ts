@@ -212,7 +212,6 @@ export function useLogout() {
       userManager.removeUser();
       queryClient.clear();
 
-      toast.error(error.message || t("logoutFailed"));
       router.push("/signin");
     },
   });
