@@ -346,5 +346,15 @@
     "addAddress": "إضافة عنوان",
     "editAddress": "تعديل العنوان",
     "emailAddress": "البريد الإلكتروني"
+  },
+  "Cart": {
+    "shoppingCart": "سلة التسوق",
+    "currency": "ج.م",
+    "emptyCart": "السلة فارغة",
+    "viewCart": "عرض السلة"
+  },
+  "Checkout": {
+    "total": "الإجمالي",
+    "quantity": "الكمية"
   }
 }

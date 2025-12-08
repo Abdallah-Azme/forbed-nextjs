@@ -346,5 +346,15 @@
     "addAddress": "Add Address",
     "editAddress": "Edit Address",
     "emailAddress": "Email Address"
+  },
+  "Cart": {
+    "shoppingCart": "Shopping Cart",
+    "currency": "EGP",
+    "emptyCart": "Your cart is empty",
+    "viewCart": "View Cart"
+  },
+  "Checkout": {
+    "total": "Total",
+    "quantity": "Quantity"
   }
 }

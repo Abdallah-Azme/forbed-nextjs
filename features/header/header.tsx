@@ -91,8 +91,8 @@ export default function Header() {
 
   const navLinks = [
     { label: t("home"), href: "/" },
-    // { label: "المتجر", href: "/shop" },
-    { label: t("orders"), href: "/orders" },
+    // Only show orders link if user is logged in
+    ...(user ? [{ label: t("orders"), href: "/orders" }] : []),
     ...(categories.length > 0
       ? [
           {
