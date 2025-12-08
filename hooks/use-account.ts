@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { accountService } from "@/services/account.service";
 import type {
   UpdateAccountRequest,
@@ -33,16 +34,17 @@ export function useAccount() {
  */
 export function useUpdateAccount() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: UpdateAccountRequest) =>
       accountService.updateAccount(data),
     onSuccess: (data) => {
       queryClient.setQueryData(["account"], data);
-      toast.success("Profile updated successfully!");
+      toast.success(t("profileUpdated"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update profile");
+      toast.error(error.message || t("profileUpdateFailed"));
     },
   });
 }
@@ -51,14 +53,16 @@ export function useUpdateAccount() {
  * Update password
  */
 export function useUpdatePassword() {
+  const t = useTranslations("Toast");
+
   return useMutation({
     mutationFn: (data: UpdatePasswordRequest) =>
       accountService.updatePassword(data),
     onSuccess: (data) => {
-      toast.success(data.message || "Password updated successfully!");
+      toast.success(data.message || t("passwordUpdated"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update password");
+      toast.error(error.message || t("passwordUpdateFailed"));
     },
   });
 }
@@ -67,13 +71,15 @@ export function useUpdatePassword() {
  * Update email
  */
 export function useUpdateEmail() {
+  const t = useTranslations("Toast");
+
   return useMutation({
     mutationFn: (data: UpdateEmailRequest) => accountService.updateEmail(data),
     onSuccess: (data) => {
-      toast.success(data.message || "Verification email sent!");
+      toast.success(data.message || t("emailSent"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update email");
+      toast.error(error.message || t("emailUpdateFailed"));
     },
   });
 }
@@ -83,15 +89,16 @@ export function useUpdateEmail() {
  */
 export function useVerifyNewEmail() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (code: string) => accountService.verifyNewEmail(code),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["account"] });
-      toast.success(data.message || "Email verified successfully!");
+      toast.success(data.message || t("emailVerified"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Email verification failed");
+      toast.error(error.message || t("emailVerificationFailed"));
     },
   });
 }
@@ -100,13 +107,15 @@ export function useVerifyNewEmail() {
  * Update phone
  */
 export function useUpdatePhone() {
+  const t = useTranslations("Toast");
+
   return useMutation({
     mutationFn: (data: UpdatePhoneRequest) => accountService.updatePhone(data),
     onSuccess: (data) => {
-      toast.success(data.message || "Verification code sent!");
+      toast.success(data.message || t("verificationCodeSent"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update phone");
+      toast.error(error.message || t("phoneUpdateFailed"));
     },
   });
 }
@@ -116,15 +125,16 @@ export function useUpdatePhone() {
  */
 export function useVerifyNewPhone() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (code: string) => accountService.verifyNewPhone(code),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["account"] });
-      toast.success(data.message || "Phone verified successfully!");
+      toast.success(data.message || t("phoneVerified"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Phone verification failed");
+      toast.error(error.message || t("phoneVerificationFailed"));
     },
   });
 }
@@ -135,16 +145,17 @@ export function useVerifyNewPhone() {
 export function useDeleteAccount() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: () => accountService.deleteAccount(),
     onSuccess: (data) => {
       queryClient.clear();
-      toast.success(data.message || "Account deleted successfully");
+      toast.success(data.message || t("accountDeleted"));
       router.push("/");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete account");
+      toast.error(error.message || t("accountDeleteFailed"));
     },
   });
 }
@@ -154,16 +165,17 @@ export function useDeleteAccount() {
  */
 export function useNotificationSettings() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: NotificationSettingsRequest) =>
       accountService.updateNotificationSettings(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["account"] });
-      toast.success(data.message || "Settings updated successfully!");
+      toast.success(data.message || t("settingsUpdated"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update settings");
+      toast.error(error.message || t("settingsUpdateFailed"));
     },
   });
 }
@@ -173,15 +185,16 @@ export function useNotificationSettings() {
  */
 export function useSwitchTheme() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (themeId: string) => accountService.switchTheme(themeId),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["account"] });
-      toast.success(data.message || "Theme updated!");
+      toast.success(data.message || t("themeUpdated"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update theme");
+      toast.error(error.message || t("themeUpdateFailed"));
     },
   });
 }

@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { authService } from "@/services/auth.service";
 import { tokenManager, userManager } from "@/lib/utils/auth";
 import { createSession, deleteSession } from "@/app/actions/auth";
@@ -25,6 +26,7 @@ import type {
 export function useLogin() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: LoginRequest) => authService.login(data),
@@ -38,7 +40,7 @@ export function useLogin() {
       await createSession(data.token);
 
       // Show success message
-      toast.success("Login successful!");
+      toast.success(t("loginSuccess"));
 
       // Sync local cart to server
       const { useCartStore } = await import(
@@ -54,7 +56,7 @@ export function useLogin() {
       router.push("/");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Login failed. Please try again.");
+      toast.error(error.message || t("loginFailed"));
     },
   });
 }
@@ -65,6 +67,7 @@ export function useLogin() {
 export function useSocialLogin() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: SocialLoginRequest) => authService.socialLogin(data),
@@ -77,7 +80,7 @@ export function useSocialLogin() {
       await createSession(data.token);
 
       // Show success message
-      toast.success("Login successful!");
+      toast.success(t("loginSuccess"));
 
       // Sync local cart to server
       const { useCartStore } = await import(
@@ -93,7 +96,7 @@ export function useSocialLogin() {
       router.push("/");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Social login failed. Please try again.");
+      toast.error(error.message || t("socialLoginFailed"));
     },
   });
 }
@@ -102,22 +105,22 @@ export function useSocialLogin() {
  * Register hook
  */
 export function useRegister() {
+  const t = useTranslations("Toast");
+
   return useMutation({
     mutationFn: (data: RegisterRequest) => authService.register(data),
     onSuccess: (data: any) => {
       // The API returns { data: null, message: "...", status: "success" }
       // So 'data' here is that full object.
       if (data.status === "success") {
-        toast.success(
-          data.message || "Registration successful! Please verify your OTP."
-        );
+        toast.success(data.message || t("registrationSuccessOtp"));
       } else {
         // Fallback if status is not success but no error was thrown
-        toast.success(data.message || "Registration successful!");
+        toast.success(data.message || t("registrationSuccess"));
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || "Registration failed. Please try again.");
+      toast.error(error.message || t("registrationFailed"));
     },
   });
 }
@@ -128,6 +131,7 @@ export function useRegister() {
 export function useVerifyOtp() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: VerifyOtpRequest) => authService.verifyOtp(data),
@@ -139,7 +143,7 @@ export function useVerifyOtp() {
       tokenManager.setToken(data.token);
       userManager.setUser(data);
 
-      toast.success("Verification successful!");
+      toast.success(t("verificationSuccess"));
 
       // Sync local cart to server
       // Import dynamically to avoid circular dependencies
@@ -153,7 +157,7 @@ export function useVerifyOtp() {
       router.push("/");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Verification failed. Please try again.");
+      toast.error(error.message || t("verificationFailed"));
     },
   });
 }
@@ -162,14 +166,16 @@ export function useVerifyOtp() {
  * Resend OTP hook
  */
 export function useResendOtp() {
+  const t = useTranslations("Toast");
+
   return useMutation({
     mutationFn: (params: { auth: string; phone_code?: string }) =>
       authService.resendOtp(params.auth, params.phone_code),
     onSuccess: (data) => {
-      toast.success(data.message || "OTP sent successfully!");
+      toast.success(data.message || t("otpSent"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to send OTP. Please try again.");
+      toast.error(error.message || t("otpSendFailed"));
     },
   });
 }
@@ -180,6 +186,7 @@ export function useResendOtp() {
 export function useLogout() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (params?: { deviceToken?: string; type?: string }) =>
@@ -195,7 +202,7 @@ export function useLogout() {
       // Clear all queries
       queryClient.clear();
 
-      toast.success("Logged out successfully!");
+      toast.success(t("logoutSuccess"));
       router.push("/signin");
     },
     onError: async (error: any) => {
@@ -205,7 +212,7 @@ export function useLogout() {
       userManager.removeUser();
       queryClient.clear();
 
-      toast.error(error.message || "Logout failed.");
+      toast.error(error.message || t("logoutFailed"));
       router.push("/signin");
     },
   });
@@ -215,14 +222,16 @@ export function useLogout() {
  * Forget password hook
  */
 export function useForgetPassword() {
+  const t = useTranslations("Toast");
+
   return useMutation({
     mutationFn: (params: { auth: string; phoneCode?: string }) =>
       authService.forgetPassword(params.auth, params.phoneCode),
     onSuccess: (data) => {
-      toast.success(data.message || "OTP sent to your phone/email!");
+      toast.success(data.message || t("otpSentPhone"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to send OTP. Please try again.");
+      toast.error(error.message || t("otpSendFailed"));
     },
   });
 }
@@ -231,6 +240,8 @@ export function useForgetPassword() {
  * Verify password reset OTP hook
  */
 export function useVerifyPasswordReset() {
+  const t = useTranslations("Toast");
+
   return useMutation({
     mutationFn: (params: { auth: string; code: string; phoneCode?: string }) =>
       authService.verifyPasswordReset(
@@ -239,10 +250,10 @@ export function useVerifyPasswordReset() {
         params.phoneCode
       ),
     onSuccess: (data) => {
-      toast.success(data.message || "OTP verified successfully!");
+      toast.success(data.message || t("otpVerified"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Verification failed. Please try again.");
+      toast.error(error.message || t("verificationFailed"));
     },
   });
 }
@@ -252,15 +263,16 @@ export function useVerifyPasswordReset() {
  */
 export function useResetPassword() {
   const router = useRouter();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: ResetPasswordRequest) => authService.resetPassword(data),
     onSuccess: (data) => {
-      toast.success(data.message || "Password reset successfully!");
+      toast.success(data.message || t("passwordResetSuccess"));
       router.push("/signin");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Password reset failed. Please try again.");
+      toast.error(error.message || t("passwordResetFailed"));
     },
   });
 }

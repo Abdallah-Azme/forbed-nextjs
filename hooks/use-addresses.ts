@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { addressService } from "@/services/address.service";
 import type { CreateAddressRequest } from "@/types/api";
 
@@ -37,16 +38,17 @@ export function useAddress(addressId?: string) {
  */
 export function useCreateAddress() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: CreateAddressRequest) =>
       addressService.createAddress(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
-      toast.success("Address added successfully!");
+      toast.success(t("addressAdded"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to add address");
+      toast.error(error.message || t("addressAddFailed"));
     },
   });
 }
@@ -56,6 +58,7 @@ export function useCreateAddress() {
  */
 export function useUpdateAddress() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: ({
@@ -70,10 +73,10 @@ export function useUpdateAddress() {
       queryClient.invalidateQueries({
         queryKey: ["address", variables.addressId],
       });
-      toast.success("Address updated successfully!");
+      toast.success(t("addressUpdated"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update address");
+      toast.error(error.message || t("addressUpdateFailed"));
     },
   });
 }
@@ -83,16 +86,17 @@ export function useUpdateAddress() {
  */
 export function useDeleteAddress() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (addressId: string) => addressService.deleteAddress(addressId),
     onSuccess: (data, addressId) => {
       queryClient.invalidateQueries({ queryKey: ["addresses"] });
       queryClient.removeQueries({ queryKey: ["address", addressId] });
-      toast.success(data.message || "Address deleted successfully!");
+      toast.success(data.message || t("addressDeleted"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete address");
+      toast.error(error.message || t("addressDeleteFailed"));
     },
   });
 }

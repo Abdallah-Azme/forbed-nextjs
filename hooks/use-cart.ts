@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { cartService } from "@/services/cart.service";
 import type { AddToCartRequest } from "@/types/api";
 
@@ -26,15 +27,16 @@ export function useCart() {
  */
 export function useAddToCart() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: AddToCartRequest) => cartService.addToCart(data),
     onSuccess: (data) => {
       queryClient.setQueryData(["cart"], data);
-      toast.success("Added to cart!");
+      toast.success(t("addedToCart"));
     },
     onError: (error: any) => {
-      // toast.error(error.message || "Failed to add to cart");
+      // toast.error(error.message || t("addToCartFailed"));
     },
   });
 }
@@ -44,15 +46,16 @@ export function useAddToCart() {
  */
 export function useApplyCoupon() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (coupon: string) => cartService.applyCoupon(coupon),
     onSuccess: (data) => {
       queryClient.setQueryData(["cart"], data);
-      toast.success("Coupon applied successfully!");
+      toast.success(t("couponApplied"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Invalid or expired coupon");
+      toast.error(error.message || t("couponInvalid"));
     },
   });
 }

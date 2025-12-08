@@ -27,6 +27,12 @@ class ApiClient {
             "https://forbed-nextjs.vercel.app",
     };
 
+    // Add language header
+    if (typeof window !== "undefined") {
+      const locale = localStorage.getItem("locale") || "ar";
+      headers["Accept-Language"] = locale;
+    }
+
     if (includeAuth) {
       const token = tokenManager.getToken();
       if (token) {
@@ -286,6 +292,12 @@ class ApiClient {
           ? window.location.origin
           : process.env.NEXT_PUBLIC_SITE_URL || "https://forbed.com",
     };
+
+    // Add language header
+    if (typeof window !== "undefined") {
+      const locale = localStorage.getItem("locale") || "ar";
+      headers["Accept-Language"] = locale;
+    }
 
     // Add tracking headers
     if (typeof window !== "undefined") {

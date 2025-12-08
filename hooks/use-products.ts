@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { productService } from "@/services/product.service";
 import type { ProductFilters } from "@/types/api";
 
@@ -66,6 +67,7 @@ export function useProduct(productId?: string) {
  */
 export function useToggleFavorite() {
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (productId: string) => productService.toggleFavorite(productId),
@@ -90,12 +92,10 @@ export function useToggleFavorite() {
         ["product", productId],
         context?.previousProduct
       );
-      toast.error("Failed to update favorite status");
+      toast.error(t("favoriteFailed"));
     },
     onSuccess: (data, productId) => {
-      toast.success(
-        data.is_favorite ? "Added to favorites!" : "Removed from favorites!"
-      );
+      toast.success(data.is_favorite ? t("favoriteAdded") : t("favoriteAdded"));
     },
     onSettled: (data, error, productId) => {
       // Refetch after mutation

@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { orderService } from "@/services/order.service";
 import type { CreateOrderRequest } from "@/types/api";
 
@@ -39,6 +40,7 @@ export function useOrder(orderId?: string) {
 export function useCreateOrder() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations("Toast");
 
   return useMutation({
     mutationFn: (data: CreateOrderRequest) => orderService.createOrder(data),
@@ -47,13 +49,13 @@ export function useCreateOrder() {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
 
-      toast.success("Order placed successfully!");
+      toast.success(t("orderPlaced"));
 
       // Redirect to order confirmation page
       router.push(`/orders/${data.id}`);
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to place order");
+      toast.error(error.message || t("orderFailed"));
     },
   });
 }

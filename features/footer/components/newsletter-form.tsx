@@ -15,15 +15,19 @@ import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { contactService } from "@/services/content.service";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Loader2, ArrowRight } from "lucide-react";
 
-const formSchema = z.object({
-  email: z.string().email({
-    message: "البريد الإلكتروني غير صالح",
-  }),
-});
-
 export default function NewsletterForm() {
+  const t = useTranslations("Toast");
+  const tValidation = useTranslations("Validation");
+
+  const formSchema = z.object({
+    email: z.string().email({
+      message: tValidation("emailInvalid"),
+    }),
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,15 +38,11 @@ export default function NewsletterForm() {
   const { mutate, isPending } = useMutation({
     mutationFn: (email: string) => contactService.subscribeToNewsletter(email),
     onSuccess: () => {
-      toast.success("تم الاشتراك بنجاح", {
-        description: "شكراً لاشتراكك في نشرتنا البريدية",
-      });
+      toast.success(t("subscribed"));
       form.reset();
     },
-    onError: (error: any) => {
-      toast.error("حدث خطأ ما", {
-        description: error.response?.data?.message || "فشل الاشتراك في النشرة",
-      });
+    onError: () => {
+      toast.error(t("subscribeFailed"));
     },
   });
 
