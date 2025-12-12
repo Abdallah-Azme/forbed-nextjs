@@ -364,8 +364,8 @@ export default function Header() {
                   locale === "ar" ? t("switchToEnglish") : t("switchToArabic")
                 }
               >
-                <Languages className="size-6" />
-                <span className="text-xs font-medium uppercase">
+                <Languages className="size-6 text-gray-700" />
+                <span className="text-xs font-medium uppercase text-gray-700">
                   {locale === "ar" ? "EN" : "AR"}
                 </span>
               </button>
@@ -387,7 +387,7 @@ export default function Header() {
                           />
                         ) : (
                           <div className="flex items-center justify-center size-full bg-gray-300">
-                            <User className="size-4 text-gray-600" />
+                            <User className="size-6 text-gray-600" />
                           </div>
                         )}
                       </div>
@@ -444,8 +444,8 @@ export default function Header() {
                   href="/signin"
                   className="text-[#848484] hover:underline cursor-pointer"
                 >
-                  {/* <User className="size-6" /> */}
-                  <svg
+                  <User className="size-6" />
+                  {/* <svg
                     xmlns="http://www.w3.org/2000/svg"
                     aria-hidden="true"
                     focusable="false"
@@ -459,7 +459,7 @@ export default function Header() {
                       d="M6 4.5a3 3 0 116 0 3 3 0 01-6 0zm3-4a4 4 0 100 8 4 4 0 000-8zm5.58 12.15c1.12.82 1.83 2.24 1.91 4.85H1.51c.08-2.6.79-4.03 1.9-4.85C4.66 11.75 6.5 11.5 9 11.5s4.35.26 5.58 1.15zM9 10.5c-2.5 0-4.65.24-6.17 1.35C1.27 12.98.5 14.93.5 18v.5h17V18c0-3.07-.77-5.02-2.33-6.15-1.52-1.1-3.67-1.35-6.17-1.35z"
                       fill="currentColor"
                     ></path>
-                  </svg>
+                  </svg> */}
                 </Link>
               )}
 
@@ -576,7 +576,7 @@ export default function Header() {
               className="lg:hidden text-gray-700 cursor-pointer transition-transform duration-300 hover:scale-110"
               onClick={() => setIsMenuOpen(true)}
             >
-              <Menu className="size-11" />
+              <Menu className="size-6" />
             </button>
           </div>
         </div>
