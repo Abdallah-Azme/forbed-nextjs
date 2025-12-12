@@ -19,7 +19,12 @@ export default function AdBar() {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: () => settingsService.getSettings(),
+    staleTime: 0, // Always fetch fresh data
   });
+
+  // Debug logging
+  console.log("AdBar settings:", settings);
+  console.log("AdBar adtext:", settings?.adtext);
 
   return (
     <motion.div
@@ -34,40 +39,40 @@ export default function AdBar() {
           <div className="hidden sm:block w-6"></div>
 
           {/* --- Promo Text (Marquee) --- */}
-          <div className="flex-1 w-full max-w-2xl mx-auto overflow-hidden relative group h-6 pointer-events-none">
-            {/* Styles for marquee */}
+          <div className="flex-1 w-full max-w-2xl mx-auto overflow-hidden relative h-6">
+            {/* Styles for continuous marquee */}
             <style jsx global>{`
-              @keyframes marquee-travel {
+              @keyframes marquee-scroll {
                 0% {
                   left: 100%;
                 }
                 100% {
-                  left: -100%;
+                  left: -20%;
                 }
               }
-              .animate-marquee-travel {
-                animation: marquee-travel 15s linear infinite;
+              .animate-marquee-scroll {
+                animation: marquee-scroll 10s linear infinite;
               }
-              .group:hover .animate-marquee-travel {
+              .animate-marquee-scroll:hover {
                 animation-play-state: paused;
               }
             `}</style>
 
-            {(settings?.adtext?.title || t("promoText")) && (
-              <>
-                {/* Spacer to maintain height / width context if needed, though we set fixed h-6 */}
-                {/* Actual Marquee Element */}
-                <div className="absolute top-0 flex items-center h-full whitespace-nowrap animate-marquee-travel pointer-events-auto">
-                  <Link
-                    href="/categories"
-                    className="hover:underline text-xs sm:text-sm font-medium tracking-wide flex items-center gap-2 px-4"
-                  >
-                    <span>{settings?.adtext?.title || t("promoText")}</span>
-                    <MoveRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </>
-            )}
+            {/* Continuous Marquee - content-width based with small gap */}
+            <div className="absolute top-0 flex items-center h-full whitespace-nowrap animate-marquee-scroll">
+              {/* First copy */}
+              <Link
+                href="/categories"
+                className="hover:underline text-xs sm:text-sm font-medium tracking-wide inline-flex items-center gap-2 px-12"
+              >
+                <span>
+                  {settings?.adtext?.title
+                    ? settings.adtext.title
+                    : t("promoText")}
+                </span>
+                <MoveRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
 
           {/* --- Social Icons --- */}
