@@ -329,6 +329,10 @@
     "quantity": "Quantity",
     "estimatedTotal": "Estimated Total",
     "taxShippingNote": "Taxes, discounts and shipping calculated at checkout",
+    "couponCode": "Coupon Code",
+    "couponPlaceholder": "Enter coupon code",
+    "applyCoupon": "Apply",
+    "applying": "Applying...",
     "cartEmptyDescription": "Add some products to your cart to get started."
   },
   "FilterBar": {

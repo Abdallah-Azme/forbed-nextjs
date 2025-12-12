@@ -8,9 +8,15 @@ import Link from "next/link";
 import { EmptyState } from "@/components/ui/empty-state";
 import ImageFallback from "@/components/image-fallback";
 import { useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
+import { cartService } from "@/services/cart.service";
+import { toast } from "sonner";
+
+const COUPON_STORAGE_KEY = "cart_coupon";
 
 export default function CartPage() {
   const t = useTranslations("Cart");
+  const tToast = useTranslations("Toast");
   const {
     items,
     getTotalPrice,
@@ -20,7 +26,51 @@ export default function CartPage() {
     updateQuantity,
   } = useCartStore();
 
+  const [couponCode, setCouponCode] = useState("");
+  const [isApplying, setIsApplying] = useState(false);
+
   const total = getTotalPrice();
+
+  // Load coupon from local storage and apply it on mount
+  useEffect(() => {
+    const savedCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
+    if (savedCoupon) {
+      setCouponCode(savedCoupon);
+      // Auto-apply the saved coupon
+      applySavedCoupon(savedCoupon);
+    }
+  }, []);
+
+  const applySavedCoupon = async (coupon: string) => {
+    try {
+      await cartService.applyCoupon(coupon);
+      // Silently applied - no toast needed for auto-apply
+    } catch {
+      // If auto-apply fails, clear the saved coupon
+      localStorage.removeItem(COUPON_STORAGE_KEY);
+      setCouponCode("");
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      await cartService.applyCoupon(couponCode);
+      // Save to local storage on successful application
+      localStorage.setItem(COUPON_STORAGE_KEY, couponCode);
+      toast.success(tToast("couponApplied"));
+    } catch {
+      toast.error(tToast("couponInvalid"));
+      // Clear from local storage if invalid
+      localStorage.removeItem(COUPON_STORAGE_KEY);
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   const handleQuantityChange = (id: string, value: string) => {
     const quantity = parseInt(value) || 1;
@@ -197,6 +247,30 @@ export default function CartPage() {
         {!!(items.length > 0) && (
           <div className="mt-8 lg:mt-12 flex w-fit  ">
             <div className="w-full lg:w-96 space-y-6">
+              {/* Coupon Code */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#121212]">
+                  {t("couponCode")}
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder={t("couponPlaceholder")}
+                    className="flex-1 h-12 rounded-none"
+                    disabled={isApplying}
+                  />
+                  <Button
+                    onClick={handleApplyCoupon}
+                    disabled={isApplying || !couponCode.trim()}
+                    className="bg-black text-white rounded-none h-12 px-6 hover:bg-gray-800"
+                  >
+                    {isApplying ? t("applying") : t("applyCoupon")}
+                  </Button>
+                </div>
+              </div>
+
               {/* Total */}
               <div className="flex justify-between gap-2 items-center">
                 <span>{t("estimatedTotal")}</span>

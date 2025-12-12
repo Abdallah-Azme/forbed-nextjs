@@ -330,6 +330,10 @@
     "quantity": "الكمية",
     "estimatedTotal": "الإجمالي التقديري",
     "taxShippingNote": "يتم حساب الضرائب والخصومات والشحن عند الدفع",
+    "couponCode": "كود الخصم",
+    "couponPlaceholder": "أدخل كود الخصم",
+    "applyCoupon": "تطبيق",
+    "applying": "جاري التطبيق...",
     "cartEmptyDescription": "أضف بعض المنتجات إلى سلتك للبدء."
   },
   "FilterBar": {
