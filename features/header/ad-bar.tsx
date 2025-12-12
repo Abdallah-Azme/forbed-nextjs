@@ -22,10 +22,6 @@ export default function AdBar() {
     staleTime: 0, // Always fetch fresh data
   });
 
-  // Debug logging
-  console.log("AdBar settings:", settings);
-  console.log("AdBar adtext:", settings?.adtext);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}

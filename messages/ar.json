@@ -332,6 +332,29 @@
     "taxShippingNote": "يتم حساب الضرائب والخصومات والشحن عند الدفع",
     "cartEmptyDescription": "أضف بعض المنتجات إلى سلتك للبدء."
   },
+  "FilterBar": {
+    "productsCount": "{count} منتج",
+    "sortBy": "ترتيب حسب",
+    "sortByLabel": ":ترتيب حسب",
+    "bestSelling": "الأكثر مبيعاً",
+    "alphabeticallyAZ": "أبجدياً، أ-ي",
+    "alphabeticallyZA": "أبجدياً، ي-أ",
+    "priceLowToHigh": "السعر، من الأقل للأعلى",
+    "priceHighToLow": "السعر، من الأعلى للأقل",
+    "dateNewToOld": "التاريخ، من الأحدث للأقدم",
+    "dateOldToNew": "التاريخ، من الأقدم للأحدث",
+    "price": "السعر",
+    "filterLabel": ":تصفية",
+    "allPrices": "جميع الأسعار",
+    "under5000": "أقل من 5,000 ج.م",
+    "range5000to10000": "5,000 ج.م - 10,000 ج.م",
+    "above10000": "أكثر من 10,000 ج.م",
+    "highestPrice": "أعلى سعر هو {price} ج.م",
+    "reset": "إعادة تعيين",
+    "from": "من",
+    "to": "إلى",
+    "apply": "تطبيق"
+  },
   "Pagination": {
     "previous": "السابق",
     "next": "التالي"

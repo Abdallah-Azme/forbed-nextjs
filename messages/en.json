@@ -331,6 +331,29 @@
     "taxShippingNote": "Taxes, discounts and shipping calculated at checkout",
     "cartEmptyDescription": "Add some products to your cart to get started."
   },
+  "FilterBar": {
+    "productsCount": "{count} products",
+    "sortBy": "Sort by",
+    "sortByLabel": ":Sort by",
+    "bestSelling": "Best selling",
+    "alphabeticallyAZ": "Alphabetically, A-Z",
+    "alphabeticallyZA": "Alphabetically, Z-A",
+    "priceLowToHigh": "Price, low to high",
+    "priceHighToLow": "Price, high to low",
+    "dateNewToOld": "Date, new to old",
+    "dateOldToNew": "Date, old to new",
+    "price": "Price",
+    "filterLabel": ":Filter",
+    "allPrices": "All Prices",
+    "under5000": "Under LE 5,000.00",
+    "range5000to10000": "LE 5,000.00 - LE 10,000.00",
+    "above10000": "Above LE 10,000.00",
+    "highestPrice": "The highest price is LE {price}",
+    "reset": "Reset",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply"
+  },
   "Pagination": {
     "previous": "Previous",
     "next": "Next"

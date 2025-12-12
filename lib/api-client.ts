@@ -56,7 +56,6 @@ class ApiClient {
         headers["User-Agent"] = userAgent;
       }
     }
-
     return headers;
   }
 
