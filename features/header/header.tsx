@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import CartIcon from "../carts/components/cart-icon";
 import AdBar from "./ad-bar";
@@ -44,6 +45,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { mutate: logout } = useLogout();
   const locale = useLocale();
+  const pathname = usePathname();
   const t = useTranslations("Header");
 
   const toggleLanguage = () => {
@@ -97,6 +99,7 @@ export default function Header() {
       ? [
           {
             label: t("categories"),
+            href: "/categories",
             items: categories,
           },
         ]
@@ -179,7 +182,7 @@ export default function Header() {
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <SheetContent
           side="left"
-          className="w-full sm:w-[400px] p-0 flex flex-col"
+          className="w-full sm:w-[400px] p-0 flex flex-col  "
         >
           <SheetHeader className="border-b p-4 sr-only">
             <div className="flex items-center justify-between">
@@ -194,30 +197,48 @@ export default function Header() {
                 x: activeSubmenu ? "-100%" : "0%",
               }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 overflow-y-auto p-6"
+              className="absolute inset-0 overflow-y-auto py-6"
             >
-              <nav className="space-y-4">
-                {navLinks.map((link, index) =>
-                  link.items ? (
+              <nav className="space-y-4" dir="ltr">
+                {navLinks.map((link, index) => {
+                  const isActive =
+                    link.href &&
+                    (link.href === "/"
+                      ? pathname === "/"
+                      : pathname?.startsWith(link.href));
+
+                  return link.items ? (
                     <button
                       key={index}
                       onClick={() => handleSubmenuClick(link.label)}
-                      className="w-full flex items-center justify-between text-gray-700 hover:text-gray-900 text-lg py-2"
+                      className={cn(
+                        "w-full flex items-center justify-between text-left text-gray-700 hover:text-gray-900 py-3 px-6 rounded-none transition-all",
+                        isActive
+                          ? "bg-[#f6f6f6] font-bold text-xl"
+                          : "text-lg font-medium"
+                      )}
                     >
-                      <MoveRight className="w-5 h-5" />
-                      <span>{link.label}</span>
+                      <div className="flex items-center gap-3">
+                        <MoveRight className="w-5 h-5" />
+                        <span>{link.label}</span>
+                      </div>
                     </button>
                   ) : (
                     <Link
                       key={index}
                       href={link.href ?? "#"}
                       onClick={() => setIsMenuOpen(false)}
-                      className="block text-end text-gray-700 hover:text-gray-900 text-lg py-2"
+                      className={cn(
+                        "block text-left text-gray-700 hover:text-gray-900 py-3 px-6 rounded-none transition-all",
+                        isActive
+                          ? "bg-[#f6f6f6] font-bold text-xl"
+                          : "text-lg font-medium"
+                      )}
                     >
                       {link.label}
                     </Link>
-                  )
-                )}
+                  );
+                })}
               </nav>
             </motion.div>
 
@@ -241,7 +262,7 @@ export default function Header() {
                   <h3 className="text-xl font-semibold mb-4">
                     {activeSubmenu}
                   </h3>
-                  <nav className="space-y-3">
+                  <nav className="space-y-3" dir="ltr">
                     {navLinks
                       .find((link) => link.label === activeSubmenu)
                       ?.items?.map((item: any, idx) => (
