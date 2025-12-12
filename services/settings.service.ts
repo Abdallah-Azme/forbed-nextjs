@@ -15,12 +15,18 @@ export const settingsService = {
     const response = await apiClient.get<SettingsResponse>("/general/settings");
 
     // Transform the flat array into a structured object
-    const settings: any = {};
+    const settings: Record<string, unknown> = {};
 
-    response.data.data.forEach((item) => {
-      settings[item.key] = item.value;
-    });
+    // The API returns { data: [...], message, status }
+    // apiClient.get returns this directly, so response.data is the array
+    const settingsArray = (response as unknown as SettingsResponse).data;
 
-    return settings as Settings;
+    if (Array.isArray(settingsArray)) {
+      settingsArray.forEach((item) => {
+        settings[item.key] = item.value;
+      });
+    }
+
+    return settings as unknown as Settings;
   },
 };

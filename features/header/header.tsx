@@ -79,6 +79,7 @@ export default function Header() {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: () => settingsService.getSettings(),
+    staleTime: 1000 * 60 * 10, // 10 minutes - settings rarely change
   });
 
   // Fetch blogs for dropdown

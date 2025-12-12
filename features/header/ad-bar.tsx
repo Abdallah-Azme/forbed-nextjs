@@ -19,7 +19,7 @@ export default function AdBar() {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: () => settingsService.getSettings(),
-    staleTime: 0, // Always fetch fresh data
+    staleTime: 1000 * 60 * 10, // 10 minutes - settings rarely change
   });
 
   return (

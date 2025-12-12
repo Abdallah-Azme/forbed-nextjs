@@ -32,6 +32,7 @@ export default function Footer() {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: () => settingsService.getSettings(),
+    staleTime: 1000 * 60 * 10, // 10 minutes - settings rarely change
   });
 
   // Helper to map API keys to routes
