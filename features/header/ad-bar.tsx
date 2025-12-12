@@ -94,6 +94,7 @@ export default function AdBar() {
                   key={social.id}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className=""
                 >
                   <Link
                     href={social.link}

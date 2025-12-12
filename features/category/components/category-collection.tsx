@@ -89,7 +89,7 @@ export default function CategoriesCollection({
               {collections.map((collection) => (
                 <CarouselItem
                   key={collection.id}
-                  className="pl-2 md:pl-4 basis-[46.5%] sm:basis-1/3 md:basis-1/4"
+                  className="pl-2 md:pl-4 basis-[45%]"
                 >
                   <motion.div
                     variants={itemVariants}
