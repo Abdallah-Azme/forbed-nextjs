@@ -640,7 +640,7 @@ export interface ContactFormData {
 
 export interface SettingItem {
   key: string;
-  value: string | SiteInfo;
+  value: string | SiteInfo | { title: string };
 }
 
 export interface SiteInfo {
@@ -658,6 +658,7 @@ export interface Settings {
   logo: string;
   fav: string;
   site_info: SiteInfo;
+  adtext: { title: string };
 }
 
 export interface SettingsResponse {

@@ -32,19 +32,67 @@ export default function HeroBanner({ sliders = [] }: HeroBannerProps) {
 
   return (
     <section className="relative w-full overflow-hidden">
-      <Carousel
-        plugins={[plugin.current]}
-        className="w-full"
-        opts={{
-          loop: true,
-        }}
-      >
-        <CarouselContent className="ml-0">
-          {sliders.map((slider) => (
-            <CarouselItem key={slider.id} className="pl-0 relative w-full">
-              <div className="relative w-full aspect-2/1 sm:aspect-[2.5/1] lg:aspect-3/1 max-h-[600px]">
-                {slider.link ? (
-                  <Link href={slider.link} className="block w-full h-full">
+      {sliders.length === 1 ? (
+        <div className="relative w-full aspect-2/1 sm:aspect-[2.5/1] lg:aspect-3/1 max-h-[600px]">
+          {sliders[0].link ? (
+            <Link href={sliders[0].link} className="block w-full h-full">
+              <ImageFallback
+                src={sliders[0].image}
+                alt={sliders[0].title}
+                fill
+                className="object-cover w-full h-full"
+                priority
+              />
+            </Link>
+          ) : (
+            <ImageFallback
+              src={sliders[0].image}
+              alt={sliders[0].title}
+              fill
+              className="object-cover w-full h-full"
+              priority
+            />
+          )}
+
+          {/* Optional Overlay Text */}
+          {(sliders[0].title || sliders[0].description) && (
+            <div className="absolute inset-0 bg-linear-to-b from-white/20 via-black/60 to-black/60 pointer-events-none flex flex-col items-center justify-center text-center text-white px-4">
+              {sliders[0].title && (
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 drop-shadow-lg">
+                  {sliders[0].title}
+                </h2>
+              )}
+              {sliders[0].description && (
+                <p className="text-sm sm:text-lg md:text-xl max-w-2xl drop-shadow-md">
+                  {sliders[0].description}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <Carousel
+          plugins={[plugin.current]}
+          className="w-full"
+          opts={{
+            loop: true,
+          }}
+        >
+          <CarouselContent className="ml-0">
+            {sliders.map((slider) => (
+              <CarouselItem key={slider.id} className="pl-0 relative w-full">
+                <div className="relative w-full aspect-2/1 sm:aspect-[2.5/1] lg:aspect-3/1 max-h-[600px]">
+                  {slider.link ? (
+                    <Link href={slider.link} className="block w-full h-full">
+                      <ImageFallback
+                        src={slider.image}
+                        alt={slider.title}
+                        fill
+                        className="object-cover w-full h-full"
+                        priority
+                      />
+                    </Link>
+                  ) : (
                     <ImageFallback
                       src={slider.image}
                       alt={slider.title}
@@ -52,44 +100,35 @@ export default function HeroBanner({ sliders = [] }: HeroBannerProps) {
                       className="object-cover w-full h-full"
                       priority
                     />
-                  </Link>
-                ) : (
-                  <ImageFallback
-                    src={slider.image}
-                    alt={slider.title}
-                    fill
-                    className="object-cover w-full h-full"
-                    priority
-                  />
-                )}
+                  )}
 
-                {/* Optional Overlay Text - Only if title or description exists */}
-                {(slider.title || slider.description) && (
-                  <div className="absolute inset-0 bg-linear-to-b from-white/20 via-black/60 to-black/60 pointer-events-none flex flex-col items-center justify-center text-center text-white px-4">
-                    {slider.title && (
-                      <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 drop-shadow-lg">
-                        {slider.title}
-                      </h2>
-                    )}
-                    {slider.description && (
-                      <p className="text-sm sm:text-lg md:text-xl max-w-2xl drop-shadow-md">
-                        {slider.description}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
+                  {(slider.title || slider.description) && (
+                    <div className="absolute inset-0 bg-linear-to-b from-white/20 via-black/60 to-black/60 pointer-events-none flex flex-col items-center justify-center text-center text-white px-4">
+                      {slider.title && (
+                        <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 drop-shadow-lg">
+                          {slider.title}
+                        </h2>
+                      )}
+                      {slider.description && (
+                        <p className="text-sm sm:text-lg md:text-xl max-w-2xl drop-shadow-md">
+                          {slider.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
 
-        {sliders.length > 1 && (
-          <>
-            <CarouselPrevious className="left-4" />
-            <CarouselNext className="right-4" />
-          </>
-        )}
-      </Carousel>
+          {sliders.length > 1 && (
+            <>
+              <CarouselPrevious className="left-4" />
+              <CarouselNext className="right-4" />
+            </>
+          )}
+        </Carousel>
+      )}
     </section>
   );
 }
