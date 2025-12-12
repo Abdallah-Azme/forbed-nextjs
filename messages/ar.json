@@ -152,7 +152,8 @@
   },
   "Categories": {
     "title": "جميع الفئات",
-    "noCategories": "لا توجد فئات متاحة حالياً"
+    "noCategories": "لا توجد فئات متاحة حالياً",
+    "viewAll": "عرض الكل"
   },
   "Search": {
     "placeholder": "ابحث...",

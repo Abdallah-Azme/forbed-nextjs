@@ -26,7 +26,7 @@ export const CategoryCard = ({
           src={collection.image}
           alt={collection.title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-contain transition-transform duration-500 group-hover:scale-105"
         />
       </div>
       <div className="bg-gray-100 text-end py-4 grow flex items-center justify-end px-3">

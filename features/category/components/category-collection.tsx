@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, easeOut } from "framer-motion";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import GhostLink from "@/components/ghost-link";
 import MainLink from "@/components/main-link";
 import {
@@ -26,6 +26,7 @@ export default function CategoriesCollection({
   secondary?: boolean;
   categories?: HomeCategory[];
 }) {
+  const t = useTranslations("Categories");
   const dir = useLocale() === "ar" ? "rtl" : "ltr";
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -67,7 +68,7 @@ export default function CategoriesCollection({
         <div className="flex justify-between items-center mb-8">
           {!secondary && (
             <GhostLink href="/categories" className="lg:hidden">
-              View all
+              {t("viewAll")}
             </GhostLink>
           )}
 
@@ -137,7 +138,7 @@ export default function CategoriesCollection({
         {!secondary && (
           <div className="mx-auto w-fit my-5 hidden lg:block">
             <MainLink href="/categories" className="px-[30px] py-[10px]">
-              View all
+              {t("viewAll")}
             </MainLink>
           </div>
         )}

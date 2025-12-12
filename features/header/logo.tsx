@@ -13,11 +13,10 @@ export default function Logo({
   height?: number;
   logoUrl?: string;
 }) {
-  const url = "/logo.png";
   return (
     <Link href="/" className={cn("shrink-0")}>
       <ImageFallback
-        src={url || logoUrl || "/pages/home/forbed-logo.png"}
+        src={logoUrl || "/pages/home/forbed-logo.png"}
         alt="Rich House"
         width={100}
         height={80}

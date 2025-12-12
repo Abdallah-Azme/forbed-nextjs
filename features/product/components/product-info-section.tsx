@@ -112,7 +112,7 @@ export default function ProductInfoSection({
             src={product.images[0] || "/placeholder.png"}
             alt={product.name}
             fill
-            className="object-cover"
+            className="object-contain"
           />
         </div>
         {/* Thumbnails if needed */}

@@ -62,7 +62,7 @@ export default function PaymentSection({
                     src={branch.icon}
                     alt={branch.title}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </div>
                 <div className="space-y-2 text-start">

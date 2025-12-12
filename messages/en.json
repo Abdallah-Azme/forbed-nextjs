@@ -151,7 +151,8 @@
   },
   "Categories": {
     "title": "All Categories",
-    "noCategories": "No categories available at the moment"
+    "noCategories": "No categories available at the moment",
+    "viewAll": "View all"
   },
   "Search": {
     "placeholder": "Search...",

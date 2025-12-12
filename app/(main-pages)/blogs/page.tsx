@@ -158,7 +158,7 @@ function BlogCard({
               src={blog.image}
               alt={blog.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              className="object-contain transition-transform duration-500 group-hover:scale-110"
             />
           </div>
         </div>
