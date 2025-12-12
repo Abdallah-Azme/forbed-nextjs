@@ -1,21 +1,21 @@
 "use client";
 
-import { Loader2, PackageX } from "lucide-react";
-import { useCartStore } from "@/features/carts/stores/cart-store";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { productService } from "@/services/product.service";
-import ProductOfCategory from "@/features/home/product-of-category";
-import ProductInfoSection from "./product-info-section";
-import { ProductDetails, HomeProduct } from "@/types/api";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { LoadingState } from "@/components/ui/loading-state";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useCartStore } from "@/features/carts/stores/cart-store";
+import ProductOfCategory from "@/features/home/product-of-category";
 import { cn } from "@/lib/utils";
+import { productService } from "@/services/product.service";
+import { HomeProduct, ProductDetails } from "@/types/api";
+import { useQuery } from "@tanstack/react-query";
+import { PackageX } from "lucide-react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import ProductInfoSection from "./product-info-section";
 
 interface ProductDetailProps {
   productId?: string;

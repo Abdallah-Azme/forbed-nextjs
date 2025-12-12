@@ -5,8 +5,25 @@ import { useEffect } from "react";
 /**
  * HeadersInitializer Component
  * Captures tracking headers from middleware response and stores them in sessionStorage
+ * Also syncs locale between cookie and localStorage for Accept-Language header
  */
 export default function HeadersInitializer() {
+  useEffect(() => {
+    // Sync locale from cookie to localStorage for Accept-Language header
+    const getLocaleFromCookie = () => {
+      const cookies = document.cookie.split(";");
+      const localeCookie = cookies.find((c) => c.trim().startsWith("locale="));
+      return localeCookie ? localeCookie.split("=")[1] : "ar";
+    };
+
+    const cookieLocale = getLocaleFromCookie();
+    const currentLocaleInStorage = localStorage.getItem("locale");
+
+    if (currentLocaleInStorage !== cookieLocale) {
+      localStorage.setItem("locale", cookieLocale);
+    }
+  }, []);
+
   useEffect(() => {
     // Function to capture headers from the initial page load
     const captureHeaders = async () => {

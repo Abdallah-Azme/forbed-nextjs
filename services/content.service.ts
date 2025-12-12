@@ -5,6 +5,7 @@ import type {
   FooterData,
   PageDetails,
   PageDetailsResponse,
+  PaymentMethodsResponse,
 } from "@/types/api";
 
 /**
@@ -98,6 +99,16 @@ export const homeService = {
     // response.data is directly the array [{ id, title, content, image }]
     const pageData = response.data;
     return Array.isArray(pageData) && pageData.length > 0 ? pageData[0] : null;
+  },
+
+  /**
+   * Get payment methods
+   */
+  async getPaymentMethods(): Promise<PaymentMethodsResponse> {
+    const response = await apiClient.get<PaymentMethodsResponse>(
+      "/general/payment/methods"
+    );
+    return response as unknown as PaymentMethodsResponse;
   },
 };
 

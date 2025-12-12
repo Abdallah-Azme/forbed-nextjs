@@ -382,6 +382,11 @@
     "paymentMethod": "طريقة الدفع",
     "payNow": "ادفع الآن",
     "refundPolicy": "سياسة الاسترجاع",
-    "termsOfService": "شروط الخدمة"
+    "termsOfService": "شروط الخدمة",
+    "transactionScreenshot": "صورة الإيصال",
+    "uploadScreenshot": "رفع صورة الإيصال",
+    "screenshotRequired": "يرجى رفع صورة الإيصال",
+    "changeScreenshot": "تغيير الصورة",
+    "screenshotUploaded": "تم رفع الصورة"
   }
 }

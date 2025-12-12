@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/select";
 
 import Link from "next/link";
-import { Loader2, Plus } from "lucide-react";
+import Image from "next/image";
+import { Loader2, Plus, Upload, X } from "lucide-react";
 import { useCartStore } from "@/features/carts/stores/cart-store";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { addressService } from "@/services/address.service";
@@ -24,17 +25,26 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import AddAddressDialog from "@/features/profile/components/add-address-dialog";
 import ImageFallback from "@/components/image-fallback";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import type { PaymentMethod } from "@/types/api";
+
+const COUPON_STORAGE_KEY = "cart_coupon";
 
 export default function Page() {
   const t = useTranslations("Checkout");
   const tCart = useTranslations("Cart");
   const tHome = useTranslations("HomePage");
+  const locale = useLocale();
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [isAddAddressDialogOpen, setIsAddAddressDialogOpen] = useState(false);
-  const [paymentMethodId, setPaymentMethodId] = useState<string>("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod | null>(null);
+  const [transactionScreenshot, setTransactionScreenshot] =
+    useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string>("");
+  const [coupon, setCoupon] = useState<string>("");
 
   // Fetch Cart Data
   const { data: cartData } = useQuery({
@@ -48,18 +58,31 @@ export default function Page() {
     queryFn: () => addressService.getAddresses(),
   });
 
-  // Fetch Home Data for Payment Methods
-  const { data: homeData, isLoading: isLoadingHomeData } = useQuery({
-    queryKey: ["home-data"],
-    queryFn: () => homeService.getHomeData(),
-  });
+  // Fetch Payment Methods from new API
+  const { data: paymentMethodsData, isLoading: isLoadingPaymentMethods } =
+    useQuery({
+      queryKey: ["payment-methods"],
+      queryFn: () => homeService.getPaymentMethods(),
+    });
 
-  // Set default payment method
+  const paymentMethods = paymentMethodsData?.data || [];
+
+  // Load coupon from local storage
   useEffect(() => {
-    if (homeData?.payment_methods?.length) {
-      setPaymentMethodId(homeData.payment_methods[0].id.toString());
+    const savedCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
+    if (savedCoupon) {
+      setCoupon(savedCoupon);
     }
-  }, [homeData]);
+  }, []);
+
+  // Set default payment method (prioritize COD)
+  useEffect(() => {
+    if (paymentMethods.length && !selectedPaymentMethod) {
+      // Find COD payment method, otherwise use first available
+      const codMethod = paymentMethods.find((m) => m.key === "cod");
+      setSelectedPaymentMethod(codMethod || paymentMethods[0]);
+    }
+  }, [paymentMethods, selectedPaymentMethod]);
 
   // Set default selected address
   useEffect(() => {
@@ -96,6 +119,31 @@ export default function Page() {
   const shipping = cartData?.price?.shipping || 0;
   const total = cartData?.price?.total || subtotal + shipping;
 
+  // Handle screenshot upload
+  const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please upload an image file");
+        return;
+      }
+      setTransactionScreenshot(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setScreenshotPreview(previewUrl);
+    }
+  };
+
+  // Remove screenshot
+  const handleRemoveScreenshot = () => {
+    setTransactionScreenshot(null);
+    if (screenshotPreview) {
+      URL.revokeObjectURL(screenshotPreview);
+      setScreenshotPreview("");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -104,15 +152,23 @@ export default function Page() {
       return;
     }
 
-    if (!paymentMethodId) {
+    if (!selectedPaymentMethod) {
       toast.error(t("selectPayment"));
+      return;
+    }
+
+    // Validate screenshot for non-COD payments
+    if (selectedPaymentMethod.key !== "cod" && !transactionScreenshot) {
+      toast.error(t("screenshotRequired"));
       return;
     }
 
     createOrderMutation.mutate({
       address_id: selectedAddressId,
       amount: total,
-      payment_method_id: paymentMethodId,
+      payment_method_id: selectedPaymentMethod.id.toString(),
+      coupon: coupon || undefined,
+      transaction_screenshot: transactionScreenshot || undefined,
     });
   };
 
@@ -303,25 +359,42 @@ export default function Page() {
                 <h2 className="text-xl font-semibold mb-4">
                   {t("paymentMethod")}
                 </h2>
-                {isLoadingHomeData ? (
+                {isLoadingPaymentMethods ? (
                   <div className="flex justify-center py-4">
                     <Loader2 className="animate-spin" />
                   </div>
                 ) : (
                   <RadioGroup
-                    value={paymentMethodId}
-                    onValueChange={setPaymentMethodId}
+                    value={selectedPaymentMethod?.id.toString() || ""}
+                    onValueChange={(value) => {
+                      const method = paymentMethods.find(
+                        (m) => m.id.toString() === value
+                      );
+                      if (method) {
+                        setSelectedPaymentMethod(method);
+                        // Clear screenshot if switching to COD
+                        if (method.key === "cod") {
+                          handleRemoveScreenshot();
+                        }
+                      }
+                    }}
                     className="grid gap-4"
                   >
-                    {homeData?.payment_methods.map((method) => (
+                    {paymentMethods.map((method) => (
                       <div
                         key={method.id}
                         className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                          paymentMethodId === method.id.toString()
+                          selectedPaymentMethod?.id === method.id
                             ? "border-orange-500 bg-orange-50"
                             : "border-gray-200 hover:border-orange-200"
                         }`}
-                        onClick={() => setPaymentMethodId(method.id.toString())}
+                        onClick={() => {
+                          setSelectedPaymentMethod(method);
+                          // Clear screenshot if switching to COD
+                          if (method.key === "cod") {
+                            handleRemoveScreenshot();
+                          }
+                        }}
                       >
                         <div className="flex items-center space-x-2 w-full justify-between">
                           <div className="flex items-center gap-2">
@@ -344,7 +417,7 @@ export default function Page() {
                             htmlFor={`pay-${method.id}`}
                             className="flex-1 cursor-pointer text-start font-medium"
                           >
-                            {method.name}
+                            {locale === "ar" ? method.ar.name : method.en.name}
                           </Label>
                         </div>
                       </div>
@@ -352,6 +425,60 @@ export default function Page() {
                   </RadioGroup>
                 )}
               </div>
+
+              {/* Transaction Screenshot Upload - Only for non-COD payments */}
+              {selectedPaymentMethod && selectedPaymentMethod.key !== "cod" && (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">
+                    {t("transactionScreenshot")}
+                  </h2>
+
+                  {!screenshotPreview ? (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors">
+                      <input
+                        type="file"
+                        id="screenshot-upload"
+                        accept="image/*"
+                        onChange={handleScreenshotUpload}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="screenshot-upload"
+                        className="cursor-pointer flex flex-col items-center gap-2"
+                      >
+                        <Upload className="w-12 h-12 text-gray-400" />
+                        <span className="text-sm font-medium text-gray-700">
+                          {t("uploadScreenshot")}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          PNG, JPG, JPEG
+                        </span>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="relative border rounded-lg p-4">
+                      <div className="relative w-full h-64">
+                        <Image
+                          src={screenshotPreview}
+                          alt="Transaction screenshot"
+                          fill
+                          className="object-contain rounded"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveScreenshot}
+                        className="absolute top-2 right-2 bg-white"
+                      >
+                        <X className="w-4 h-4 mr-1" />
+                        {t("changeScreenshot")}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Submit Button */}
               <Button

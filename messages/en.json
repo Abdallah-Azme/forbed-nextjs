@@ -381,6 +381,11 @@
     "paymentMethod": "Payment Method",
     "payNow": "Pay Now",
     "refundPolicy": "Refund Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "transactionScreenshot": "Transaction Screenshot",
+    "uploadScreenshot": "Upload Screenshot",
+    "screenshotRequired": "Please upload transaction screenshot",
+    "changeScreenshot": "Change Screenshot",
+    "screenshotUploaded": "Screenshot uploaded"
   }
 }

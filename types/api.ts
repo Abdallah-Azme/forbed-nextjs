@@ -421,9 +421,26 @@ export interface CreateOrderRequest {
 
 export interface PaymentMethod {
   id: number;
-  name: string;
-  type: "cash" | "card" | "wallet";
+  image: string;
+  key: string; // 'card', 'apply_pay', 'cod', 'wallet'
   status: number;
+  value: string | null;
+  name: string;
+  description: string | null;
+  ar: {
+    name: string;
+    description: string | null;
+  };
+  en: {
+    name: string;
+    description: string | null;
+  };
+}
+
+export interface PaymentMethodsResponse {
+  data: PaymentMethod[];
+  status: string;
+  message: string;
 }
 
 /**
