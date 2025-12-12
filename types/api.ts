@@ -167,6 +167,7 @@ export interface ProductDetails {
   description: string;
   specifications: ProductSpecification[];
   related: HomeProduct[];
+  stock: number;
 }
 
 export interface ProductSpecification {

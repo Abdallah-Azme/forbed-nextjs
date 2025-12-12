@@ -11,6 +11,7 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  stock?: number; // Available stock for this product
   addedAt: number;
 }
 
@@ -24,7 +25,7 @@ interface CartStore {
     product: Omit<CartItem, "quantity" | "addedAt">,
     quantity?: number,
     specification_id?: string
-  ) => Promise<void>;
+  ) => Promise<{ success: boolean; message?: string }>;
   syncLocalCartToServer: () => Promise<void>;
   fetchServerCart: () => Promise<void>;
   removeFromCart: (id: string) => void;
@@ -203,8 +204,26 @@ export const useCartStore = create<CartStore>()(
         quantity: number = 1,
         specification_id?: string
       ) => {
-        const { checkAuth } = get();
+        const { checkAuth, items } = get();
         const isAuth = checkAuth();
+
+        // Stock validation
+        const existingItem = items.find((item) => item.id === product.id);
+        const currentQuantity = existingItem?.quantity || 0;
+        const requestedTotal = currentQuantity + quantity;
+
+        // Check if stock is available
+        if (product.stock !== undefined && requestedTotal > product.stock) {
+          const maxCanAdd = product.stock - currentQuantity;
+          if (maxCanAdd <= 0) {
+            toast.error("Out of stock");
+            return { success: false, message: "Out of stock" };
+          }
+          toast.warning(
+            `Only ${maxCanAdd} items available. Added maximum quantity.`
+          );
+          quantity = maxCanAdd;
+        }
 
         set({ isLoading: true });
         try {
@@ -212,15 +231,12 @@ export const useCartStore = create<CartStore>()(
             // AUTH FLOW: Call API directly, then refresh state
             await cartService.addToCart({
               product_id: product.id,
-              quantity,
+              quantity: currentQuantity + quantity,
               specification_id,
             });
             await get().fetchServerCart();
           } else {
             // GUEST FLOW: Update local state
-            const existingItem = get().items.find(
-              (item) => item.id === product.id
-            );
             if (existingItem) {
               set((state) => ({
                 items: state.items.map((item) =>
@@ -240,9 +256,10 @@ export const useCartStore = create<CartStore>()(
               }));
             }
           }
+          return { success: true };
         } catch (error) {
-          // console.error("Failed to add to cart:", error);
-          // toast.error("Failed to add to cart");
+          toast.error("Failed to add to cart");
+          return { success: false, message: "Failed to add to cart" };
         } finally {
           set({ isLoading: false });
         }
@@ -261,7 +278,12 @@ export const useCartStore = create<CartStore>()(
               quantity: 0,
             });
             await get().fetchServerCart();
-          } catch (error) {
+          } catch (error: unknown) {
+            const errorMessage =
+              error instanceof Error
+                ? error.message
+                : "Failed to remove from cart";
+            toast.error(errorMessage);
             console.error("Failed to remove from cart:", error);
           }
         } else {
@@ -283,6 +305,15 @@ export const useCartStore = create<CartStore>()(
 
         const newQuantity = currentItem.quantity + amount;
 
+        // Stock validation
+        if (
+          currentItem.stock !== undefined &&
+          newQuantity > currentItem.stock
+        ) {
+          toast.warning("Maximum stock reached");
+          return;
+        }
+
         if (isAuth) {
           // AUTH FLOW: Call API with new TOTAL quantity
           try {
@@ -291,7 +322,13 @@ export const useCartStore = create<CartStore>()(
               quantity: newQuantity,
             });
             await get().fetchServerCart();
-          } catch (error) {
+          } catch (error: unknown) {
+            // Show backend error message to user
+            const errorMessage =
+              error instanceof Error && "message" in error
+                ? (error as any).message
+                : "Failed to update quantity";
+            toast.error(errorMessage);
             console.error("Failed to update quantity:", error);
           }
         } else {
@@ -340,12 +377,19 @@ export const useCartStore = create<CartStore>()(
 
       // Update item quantity directly
       updateQuantity: async (id: string, quantity: number) => {
-        const { checkAuth } = get();
+        const { checkAuth, items } = get();
         const isAuth = checkAuth();
 
         if (quantity <= 0) {
           await get().removeFromCart(id);
           return;
+        }
+
+        // Stock validation
+        const currentItem = items.find((item) => item.id === id);
+        if (currentItem?.stock !== undefined && quantity > currentItem.stock) {
+          toast.warning(`Maximum stock is ${currentItem.stock}`);
+          quantity = currentItem.stock;
         }
 
         if (isAuth) {

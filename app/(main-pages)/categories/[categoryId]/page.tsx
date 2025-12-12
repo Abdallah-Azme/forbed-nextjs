@@ -36,6 +36,18 @@ export default function Page() {
     queryFn: () => categoryService.getCategory(categoryId, parseInt(page)),
   });
 
+  // Fetch filter data (min/max price) using category ID
+  const { data: filterData } = useQuery({
+    queryKey: ["category-filters", categoryDetails?.category?.id],
+    queryFn: () => {
+      if (!categoryDetails?.category?.id) {
+        throw new Error("Category ID not available");
+      }
+      return categoryService.getCategoryFilters(categoryDetails.category.id);
+    },
+    enabled: !!categoryDetails?.category?.id,
+  });
+
   const handlePageChange = (newPage: number) => {
     router.push(`/categories/${categoryId}?page=${newPage}`);
   };
@@ -90,6 +102,7 @@ export default function Page() {
         count={products.meta.total}
         onSortChange={setSortBy}
         onPriceChange={setPriceRange}
+        maxPrice={filterData?.max_price}
       />
 
       {products.data.length === 0 ? (

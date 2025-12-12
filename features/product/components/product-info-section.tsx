@@ -33,7 +33,11 @@ export default function ProductInfoSection({
       : ""
   );
 
-  const increase = () => setQuantity((prev) => prev + 1);
+  const increase = () => {
+    if (product.stock > 0 && quantity < product.stock) {
+      setQuantity((prev) => prev + 1);
+    }
+  };
   const decrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   const handleAddToCart = (redirect: boolean) => {
@@ -50,6 +54,10 @@ export default function ProductInfoSection({
   // Otherwise fallback to the product's main price.
   const currentPrice =
     selectedSpec?.price || product.price.price_after_discount;
+
+  // Check if product is out of stock
+  const isOutOfStock = product.stock === 0;
+  const isLowStock = product.stock > 0 && product.stock < 10;
 
   // For the "before discount" price, we might not have specific data per spec in the provided snippet,
   // so we'll stick to the main product's before-discount price if we are showing the main price,
@@ -159,6 +167,14 @@ export default function ProductInfoSection({
               {product.price.discount.toLocaleString()}
             </span>
           )}
+          {/* Stock availability message */}
+          {isOutOfStock ? (
+            <p className="text-sm text-red-600 font-medium">Out of Stock</p>
+          ) : isLowStock ? (
+            <p className="text-sm text-orange-600 font-medium">
+              Only {product.stock} left in stock
+            </p>
+          ) : null}
         </div>
 
         {/* Specifications / Size Selector */}
@@ -211,6 +227,7 @@ export default function ProductInfoSection({
               variant="ghost"
               size="icon"
               onClick={decrease}
+              disabled={isOutOfStock}
               className="h-full rounded-none hover:bg-gray-50 border-none"
             >
               <Minus className="w-4 h-4" />
@@ -219,14 +236,17 @@ export default function ProductInfoSection({
               value={quantity}
               onChange={(e) => {
                 const val = parseInt(e.target.value) || 1;
-                setQuantity(Math.max(1, val));
+                const maxQty = Math.min(val, product.stock);
+                setQuantity(Math.max(1, maxQty));
               }}
+              disabled={isOutOfStock}
               className="h-full text-center border-none focus-visible:ring-0 rounded-none"
             />
             <Button
               variant="ghost"
               size="icon"
               onClick={increase}
+              disabled={isOutOfStock || quantity >= product.stock}
               className="h-full rounded-none hover:bg-gray-50 border-none"
             >
               <Plus className="w-4 h-4" />
@@ -247,6 +267,7 @@ export default function ProductInfoSection({
             onClick={() => handleAddToCart(false)}
             className="w-full h-12 rounded-none border-gray-900 text-gray-900 hover:bg-gray-50 font-normal"
             disabled={
+              isOutOfStock ||
               (product.specifications &&
                 product.specifications.length > 0 &&
                 product.price.start_from &&
@@ -257,19 +278,20 @@ export default function ProductInfoSection({
             {isAddingToCart ? (
               <Loader2 className="h-4 w-4 animate-spin ml-2" />
             ) : null}
-            {t("addToCart")}
+            {isOutOfStock ? "Out of Stock" : t("addToCart")}
           </Button>
           <Button
             onClick={() => handleAddToCart(true)}
             className="w-full h-12 rounded-none bg-black text-white hover:bg-gray-800 font-normal"
             disabled={
-              product.specifications &&
-              product.specifications.length > 0 &&
-              product.price.start_from &&
-              !selectedSpecId
+              isOutOfStock ||
+              (product.specifications &&
+                product.specifications.length > 0 &&
+                product.price.start_from &&
+                !selectedSpecId)
             }
           >
-            {t("buyNow")}
+            {isOutOfStock ? "Out of Stock" : t("buyNow")}
           </Button>
         </motion.div>
 

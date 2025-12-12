@@ -15,6 +15,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 
 interface ProductDetailProps {
   productId?: string;
@@ -41,6 +42,7 @@ export default function ProductDetail({
     enabled: !!productId && !productData,
   });
 
+  console.log({ fetchedProduct });
   // Convert HomeProduct to ProductDetails format if productData is provided
   const product: ProductDetails | undefined = productData
     ? {
@@ -52,6 +54,7 @@ export default function ProductDetail({
         description: "", // HomeProduct doesn't have description
         specifications: [], // HomeProduct doesn't have specifications
         related: [], // HomeProduct doesn't have related products
+        stock: productData.stock,
       }
     : fetchedProduct;
 
@@ -62,21 +65,23 @@ export default function ProductDetail({
   ) => {
     if (!product) return;
 
-    await addToCart(
+    const result = await addToCart(
       {
         id: product.id.toString(),
         name: product.name,
         price: product.price.price_after_discount,
         image: product.images[0] || "/placeholder.png",
+        stock: product.stock,
       },
       quantity,
       specification_id
     );
 
-    toast.success(t("addedToCart"));
-
-    if (redirect) {
-      router.push("/cart");
+    if (result.success) {
+      toast.success(t("addedToCart"));
+      if (redirect) {
+        router.push("/cart");
+      }
     }
   };
 
@@ -112,20 +117,22 @@ export default function ProductDetail({
   }
 
   return (
-    <>
-      <ProductInfoSection
-        product={product}
-        onAddToCart={handleAddToCart}
-        isAddingToCart={isAddingToCart}
-      />
-
-      {/* Related Products - only show if fetched from API */}
-      {fetchedProduct?.related && fetchedProduct.related.length > 0 && (
-        <ProductOfCategory
-          title={t("relatedProducts")}
-          products={fetchedProduct.related}
+    <div className={cn(productData && "bg-[#f3f3f3]  w-full")}>
+      <div className={cn(productData && " container mx-auto px-4")}>
+        <ProductInfoSection
+          product={product}
+          onAddToCart={handleAddToCart}
+          isAddingToCart={isAddingToCart}
         />
-      )}
-    </>
+
+        {/* Related Products - only show if fetched from API */}
+        {fetchedProduct?.related && fetchedProduct.related.length > 0 && (
+          <ProductOfCategory
+            title={t("relatedProducts")}
+            products={fetchedProduct.related}
+          />
+        )}
+      </div>
+    </div>
   );
 }

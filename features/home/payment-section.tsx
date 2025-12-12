@@ -41,7 +41,43 @@ export default function PaymentSection({
   if (!paymentMethods.length && !branches.length) return null;
 
   return (
-    <section className="py-2 w-full overflow-hidden space-y-12">
+    <section className="py-2 w-full overflow-hidden space-y-12 mb-10">
+      {/* Branches */}
+      {branches.length > 0 && (
+        <div className="container mx-auto px-4">
+          <div className=" my-5 ">
+            <HeaderSection title={t("ourBranches")} />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {branches.map((branch) => (
+              <Link
+                key={branch.id}
+                href={branch.map_link}
+                target="_blank"
+                className="flex flex-col items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow group"
+              >
+                <div className="shrink-0 relative size-40 rounded-sm overflow-hidden bg-gray-100">
+                  <ImageFallback
+                    src={branch.icon}
+                    alt={branch.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="space-y-2 text-start">
+                  <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                    {branch.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {branch.text}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Payment Methods */}
       {paymentMethods.length > 0 && (
         <div className="container mx-auto px-4">
@@ -114,43 +150,6 @@ export default function PaymentSection({
                   {payment.name}
                 </span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Branches */}
-      {branches.length > 0 && (
-        <div className="container mx-auto px-4">
-          <div className=" my-5 ">
-            <HeaderSection title={t("ourBranches")} />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {branches.map((branch) => (
-              <Link
-                key={branch.id}
-                href={branch.map_link}
-                target="_blank"
-                className="flex flex-col items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow group"
-              >
-                <div className="shrink-0 relative size-40 rounded-sm overflow-hidden bg-gray-100">
-                  <ImageFallback
-                    src={branch.icon}
-                    alt={branch.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="space-y-2 text-start">
-                  <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
-                    {branch.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {branch.text}
-                  </p>
-                </div>
-              </Link>
             ))}
           </div>
         </div>

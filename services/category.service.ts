@@ -35,4 +35,20 @@ export const categoryService = {
     const response = await apiClient.get<Category[]>("/client/header/category");
     return response.data;
   },
+
+  /**
+   * Get category filters (min/max price, etc.)
+   */
+  async getCategoryFilters(categoryId: number): Promise<{
+    min_price: number;
+    max_price: number;
+    filter: string[];
+  }> {
+    const response = await apiClient.get<{
+      min_price: number;
+      max_price: number;
+      filter: string[];
+    }>(`/client/products/filter?category_id=${categoryId}`);
+    return response.data;
+  },
 };
