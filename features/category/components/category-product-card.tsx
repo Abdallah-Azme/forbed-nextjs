@@ -12,7 +12,7 @@ export function CategoryProductCard({ product }: { product: HomeProduct }) {
         <ImageFallback
           src={product.thumbnail}
           alt={product.name}
-          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+          className="object-contain w-full h-full transition-transform duration-300 group-hover:scale-105"
           fill
         />
         {product.price.has_offer && (

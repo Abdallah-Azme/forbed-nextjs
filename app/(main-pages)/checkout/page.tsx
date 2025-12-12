@@ -224,7 +224,7 @@ export default function Page() {
                           src={product.image}
                           alt={product.name}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                         />
                         {/* Qty badge */}
                         <span className="absolute -top-2 border-2 border-white -right-2 bg-black text-white text-xs rounded-md size-6 flex items-center justify-center">

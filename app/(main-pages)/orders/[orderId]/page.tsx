@@ -161,7 +161,7 @@ export default function OrderDetailsPage() {
                           src={item.thumbnail}
                           alt={item.name}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full text-gray-400">

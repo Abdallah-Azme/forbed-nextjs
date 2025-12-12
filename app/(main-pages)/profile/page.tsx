@@ -117,7 +117,7 @@ export default function ProfilePage() {
                       src={user.image}
                       alt={user.full_name || t("user")}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                     />
                   ) : (
                     <div className="flex items-center justify-center size-full bg-gray-300 text-gray-600 text-2xl font-semibold">

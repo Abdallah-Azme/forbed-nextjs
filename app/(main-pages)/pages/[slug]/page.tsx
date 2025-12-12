@@ -41,7 +41,7 @@ export default async function Page({
             src={page.image}
             alt={page.title}
             fill
-            className="object-cover"
+            className="object-contain"
           />
         </div>
       )}

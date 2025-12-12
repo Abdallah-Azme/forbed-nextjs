@@ -7,7 +7,7 @@ export function ProductCard({ product }: { product: any }) {
         <ImageFallback
           src={product.image}
           alt={product.name}
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+          className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300"
           fill
         />
         {product.soldOut && (

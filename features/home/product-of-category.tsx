@@ -123,7 +123,7 @@ function ProductCard({ product }: { product: HomeProduct }) {
         <ImageFallback
           src={product.thumbnail}
           alt={product.name}
-          className="object-cover w-full h-full transition-transform duration-300"
+          className="object-contain w-full h-full transition-transform duration-300"
           fill
         />
         {isSoldOut && (

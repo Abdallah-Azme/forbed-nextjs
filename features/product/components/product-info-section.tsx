@@ -127,7 +127,7 @@ export default function ProductInfoSection({
                   src={img}
                   alt={`${product.name} ${idx + 1}`}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
               </div>
             ))}

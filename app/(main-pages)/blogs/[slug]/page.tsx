@@ -47,7 +47,7 @@ export default function BlogDetailsPage() {
           src={blog.image}
           alt={blog.title}
           fill
-          className="object-cover"
+          className="object-contain"
           priority
         />
         <div className="absolute inset-0 bg-black/40" />
