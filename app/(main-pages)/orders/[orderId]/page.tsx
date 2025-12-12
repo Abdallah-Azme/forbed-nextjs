@@ -274,21 +274,23 @@ export default function OrderDetailsPage() {
             </div>
 
             {/* Payment Info */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="font-semibold mb-4 flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-gray-500" />
-                {tCheckout("paymentMethod")}
-              </h2>
-              <div className="text-sm text-gray-600">
-                {order.payment_method ? (
-                  <div className="flex items-center gap-2">
-                    <span>{order.payment_method.name}</span>
-                  </div>
-                ) : (
-                  <span>{t("cod")}</span>
-                )}
+            {!!order.payment_method?.name && (
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h2 className="font-semibold mb-4 flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-gray-500" />
+                  {tCheckout("paymentMethod")}
+                </h2>
+                <div className="text-sm text-gray-600">
+                  {order.payment_method ? (
+                    <div className="flex items-center gap-2">
+                      <span>{order.payment_method.name}</span>
+                    </div>
+                  ) : (
+                    <span>{t("cod")}</span>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
