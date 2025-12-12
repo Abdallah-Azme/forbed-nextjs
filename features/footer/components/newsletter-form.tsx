@@ -15,12 +15,13 @@ import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { contactService } from "@/services/content.service";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
-import { Loader2, ArrowRight } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function NewsletterForm() {
   const t = useTranslations("Toast");
   const tValidation = useTranslations("Validation");
+  const locale = useLocale();
 
   const formSchema = z.object({
     email: z.string().email({
@@ -57,10 +58,7 @@ export default function NewsletterForm() {
       </h3>
 
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex items-start gap-0 flex-row-reverse"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
           <FormField
             control={form.control}
             name="email"
@@ -71,26 +69,28 @@ export default function NewsletterForm() {
                     <Input
                       placeholder="البريد الإلكتروني"
                       dir="ltr"
-                      className="bg-transparent border-gray-600 text-white placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-white rounded-none h-12 ltr:pl-4 rtl:pr-4"
+                      className="bg-transparent border border-gray-600 text-white placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-white rounded-none h-12 w-full ltr:pr-14 ltr:pl-4 rtl:pl-14 rtl:pr-4"
                       {...field}
                     />
+                    <Button
+                      type="submit"
+                      disabled={isPending}
+                      className="absolute right-0 top-0 h-12 px-4 rounded-none bg-transparent hover:bg-transparent border-0"
+                    >
+                      {isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                      ) : locale === "ar" ? (
+                        <ArrowRight className="h-4 w-4 text-white" />
+                      ) : (
+                        <ArrowLeft className="h-4 w-4 text-white" />
+                      )}
+                    </Button>
                   </div>
                 </FormControl>
                 <FormMessage className="text-red-400 text-xs mt-1 text-end" />
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="h-12 px-4 rounded-none bg-white hover:bg-gray-200 text-black border border-white"
-          >
-            {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <ArrowRight className="h-4 w-4 rotate-180" />
-            )}
-          </Button>
         </form>
       </Form>
     </div>

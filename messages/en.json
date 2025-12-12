@@ -331,6 +331,10 @@
     "taxShippingNote": "Taxes, discounts and shipping calculated at checkout",
     "cartEmptyDescription": "Add some products to your cart to get started."
   },
+  "Pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
   "Checkout": {
     "total": "Total",
     "quantity": "Quantity",

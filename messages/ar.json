@@ -332,6 +332,10 @@
     "taxShippingNote": "يتم حساب الضرائب والخصومات والشحن عند الدفع",
     "cartEmptyDescription": "أضف بعض المنتجات إلى سلتك للبدء."
   },
+  "Pagination": {
+    "previous": "السابق",
+    "next": "التالي"
+  },
   "Checkout": {
     "total": "الإجمالي",
     "quantity": "الكمية",
