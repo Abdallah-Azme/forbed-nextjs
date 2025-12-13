@@ -29,7 +29,7 @@ export default function CartIcon() {
 
   return (
     <Link href={"/cart"} className="relative">
-      <div className="text-[#848484] cursor-pointer hover:underline">
+      <div className=" not-first: cursor-pointer hover:underline">
         <ShoppingBag className="size-6 text-gray-700" />
         {/* <svg
           className="icon icon-cart size-11  "

@@ -359,13 +359,12 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <button
                 onClick={toggleLanguage}
-                className="text-[#848484] hover:underline cursor-pointer flex items-center gap-1"
+                className=" hover:underline cursor-pointer flex items-center gap-1"
                 title={
                   locale === "ar" ? t("switchToEnglish") : t("switchToArabic")
                 }
               >
-                <Languages className="size-6 text-gray-700" />
-                <span className="text-xs font-medium uppercase text-gray-700">
+                <span className="text-xl font-medium uppercase text-gray-700">
                   {locale === "ar" ? "EN" : "AR"}
                 </span>
               </button>
@@ -387,11 +386,11 @@ export default function Header() {
                           />
                         ) : (
                           <div className="flex items-center justify-center size-full bg-gray-300">
-                            <User className="size-6 text-gray-600" />
+                            <User className="size-6 text-gray-700" />
                           </div>
                         )}
                       </div>
-                      <ChevronDown className="size-4 text-gray-600" />
+                      <ChevronDown className="size-4 text-gray-700" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-64">
@@ -407,7 +406,7 @@ export default function Header() {
                             />
                           ) : (
                             <div className="flex items-center justify-center size-full bg-gray-300">
-                              <User className="size-5 text-gray-600" />
+                              <User className="size-5 text-gray-700" />
                             </div>
                           )}
                         </div>
@@ -442,7 +441,7 @@ export default function Header() {
               ) : (
                 <Link
                   href="/signin"
-                  className="text-[#848484] hover:underline cursor-pointer"
+                  className="text-gray-700 hover:underline cursor-pointer"
                 >
                   <User className="size-6" />
                   {/* <svg
@@ -465,7 +464,7 @@ export default function Header() {
 
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="text-[#848484] hover:underline cursor-pointer"
+                className="text-gray-700 hover:underline cursor-pointer"
               >
                 <Search className="size-6" />
               </button>
