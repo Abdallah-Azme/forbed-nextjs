@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { Assistant } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import FloatingWhatsapp from "@/features/footer/components/floating-whatsapp";
 
@@ -27,6 +28,7 @@ export default async function RootLayout({
       dir={l === "ar" ? "rtl" : "ltr"}
       className="overflow-x-hidden"
     >
+      <GoogleTagManager gtmId="GTM-KGJKV3JP" />
       <body className={`${assistant.className} antialiased overflow-x-hidden`}>
         <NextIntlClientProvider>
           {children}
