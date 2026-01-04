@@ -9,11 +9,18 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
+import { Service } from "@/types/api";
 import { easeOut, motion } from "framer-motion";
 import { useLocale } from "next-intl";
 import * as React from "react";
 
-export default function FeaturesSection() {
+interface FeaturesSectionProps {
+  services?: Service[];
+}
+
+export default function FeaturesSection({
+  services = [],
+}: FeaturesSectionProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -27,32 +34,12 @@ export default function FeaturesSection() {
     api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
   }, [api]);
 
-  const features = [
-    {
-      id: 1,
-      title: "Shipping All over Egypt",
-      description: "Free shipping on all orders or orders above 25k",
-      icon: "/service.webp",
-    },
-    {
-      id: 2,
-      title: "After Sales Service",
-      description: "Simply return it within 30 days for an exchange.",
-      icon: "/service.webp",
-    },
-    {
-      id: 3,
-      title: "Secure Payment",
-      description: "We ensure secure payment with PEV",
-      icon: "/service.webp",
-    },
-    {
-      id: 4,
-      title: "24/7 Support",
-      description: "Contact us 24 hours a day, 7 days a week",
-      icon: "/service.webp",
-    },
-  ];
+  const features = services.map((service) => ({
+    id: service.id,
+    title: service.title,
+    description: service.description,
+    icon: service.image,
+  }));
 
   const itemVariants = {
     hidden: { opacity: 0, y: 40 },
@@ -62,6 +49,8 @@ export default function FeaturesSection() {
       transition: { duration: 0.5, ease: easeOut },
     },
   };
+
+  if (!features.length) return null;
 
   return (
     <section className="py-4 bg-white overflow-x-hidden">

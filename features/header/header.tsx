@@ -1,24 +1,37 @@
 "use client";
 
+import ImageFallback from "@/components/image-fallback";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import { useLogout } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import { accountService } from "@/services/account.service";
+import { categoryService } from "@/services/category.service";
+import { blogService, homeService } from "@/services/content.service";
+import { settingsService } from "@/services/settings.service";
+import { useQuery } from "@tanstack/react-query";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import {
   ChevronDown,
   ChevronLeft,
+  ChevronRight,
+  Languages,
+  LogOut,
   Menu,
   MoveRight,
   Search,
   User,
   X,
 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import CartIcon from "../carts/components/cart-icon";
 import AdBar from "./ad-bar";
@@ -30,6 +43,56 @@ export default function Header() {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  const { mutate: logout } = useLogout();
+  const locale = useLocale();
+  const pathname = usePathname();
+  const t = useTranslations("Header");
+
+  const toggleLanguage = () => {
+    const newLocale = locale === "ar" ? "en" : "ar";
+
+    // Update cookie
+    document.cookie = `locale=${newLocale}; path=/; max-age=31536000`;
+
+    // Update localStorage to sync with Accept-Language header
+    localStorage.setItem("locale", newLocale);
+
+    // Reload to apply language changes
+    window.location.reload();
+  };
+
+  // Fetch user account data (synced with profile updates)
+  const { data: user } = useQuery({
+    queryKey: ["user-account"],
+    queryFn: accountService.getAccount,
+    retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Fetch categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => categoryService.getCategories(),
+  });
+
+  // Fetch settings
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => settingsService.getSettings(),
+    staleTime: 1000 * 60 * 10, // 10 minutes - settings rarely change
+  });
+
+  // Fetch blogs for dropdown
+  const { data: blogs = [] } = useQuery({
+    queryKey: ["blogs-dropdown"],
+    queryFn: () => blogService.getBlogsForDropdown(),
+  });
+
+  // Fetch social media links
+  const { data: socials = [] } = useQuery({
+    queryKey: ["socials"],
+    queryFn: homeService.getSocials,
+  });
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrolled = latest > 50;
@@ -38,24 +101,33 @@ export default function Header() {
     }
   });
 
+  const handleLogout = () => {
+    logout({});
+  };
+
   const navLinks = [
-    { label: "الرئيسية", href: "/" },
-    { label: "الشتوي", href: "/winter" },
-    {
-      label: "مجموعة المراتب",
-      items: ["مراتب فوربد", "مراتب طبية", "مراتب سوست"],
-    },
-    {
-      label: "اعرف أكثر",
-      items: [
-        "مقدمة عن أفضل أنواع المراتب في مصر",
-        "إيه بتقدمه فوربد؟",
-        "ماهي المراتب الطبية؟",
-        "تعرف إيه عن مراتب فوربد الطبية؟",
-        "إيه الفرق بين السوست المنفصلة والمتصلة؟",
-      ],
-    },
-    { label: "تواصل معنا", href: "/contact" },
+    { label: t("home"), href: "/" },
+    // Only show orders link if user is logged in
+    ...(user ? [{ label: t("orders"), href: "/orders" }] : []),
+    ...(categories.length > 0
+      ? [
+          {
+            label: t("categories"),
+            href: "/categories",
+            items: categories,
+          },
+        ]
+      : []),
+    { label: t("contact"), href: "/contact" },
+    ...(blogs.length > 0
+      ? [
+          {
+            label: t("learnMore"),
+            href: "/blogs",
+            items: blogs,
+          },
+        ]
+      : []),
   ];
 
   const handleSubmenuClick = (label: string) => {
@@ -76,16 +148,25 @@ export default function Header() {
           opacity: isSearchOpen ? 1 : 0,
         }}
         transition={{ duration: 0.3 }}
-        className="overflow-hidden bg-white border-b"
+        className="overflow-hidden  "
       >
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="Search"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg"
+                placeholder={t("searchPlaceholder")}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-none focus:outline-none focus:border-gray-900 text-lg  "
                 autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const target = e.target as HTMLInputElement;
+                    if (target.value.trim()) {
+                      window.location.href = `/search?keyword=${target.value}`;
+                      setIsSearchOpen(false);
+                    }
+                  }
+                }}
               />
               <button className="absolute left-4 top-1/2 -translate-y-1/2">
                 <Search className="w-5 h-5 text-gray-600" />
@@ -115,7 +196,7 @@ export default function Header() {
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <SheetContent
           side="left"
-          className="w-full sm:w-[400px] p-0 flex flex-col"
+          className="w-full sm:w-[400px] p-0 flex flex-col  "
         >
           <SheetHeader className="border-b p-4 sr-only">
             <div className="flex items-center justify-between">
@@ -130,30 +211,46 @@ export default function Header() {
                 x: activeSubmenu ? "-100%" : "0%",
               }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 overflow-y-auto p-6"
+              className="absolute inset-0 overflow-y-auto py-6"
             >
-              <nav className="space-y-4">
-                {navLinks.map((link, index) =>
-                  link.items ? (
+              <nav className="space-y-4" dir="ltr">
+                {navLinks.map((link, index) => {
+                  const isActive =
+                    link.href &&
+                    (link.href === "/"
+                      ? pathname === "/"
+                      : pathname?.startsWith(link.href));
+
+                  return link.items ? (
                     <button
                       key={index}
                       onClick={() => handleSubmenuClick(link.label)}
-                      className="w-full flex items-center justify-between text-gray-700 hover:text-gray-900 text-lg py-2"
+                      className={cn(
+                        "w-full flex items-center font-bold text-xl justify-between text-left text-gray-700 hover:text-gray-900 py-3 px-6 rounded-none transition-all",
+                        isActive ? "bg-[#f6f6f6] " : " "
+                      )}
                     >
-                      <MoveRight className="w-5 h-5" />
-                      <span>{link.label}</span>
+                      <div className="flex items-center gap-3">
+                        <MoveRight className="w-5 h-5" />
+                        <span>{link.label}</span>
+                      </div>
                     </button>
                   ) : (
                     <Link
                       key={index}
                       href={link.href ?? "#"}
                       onClick={() => setIsMenuOpen(false)}
-                      className="block text-end text-gray-700 hover:text-gray-900 text-lg py-2"
+                      className={cn(
+                        "block text-left text-gray-700 hover:text-gray-900 py-3 px-6 rounded-none transition-all",
+                        isActive
+                          ? "bg-[#f6f6f6] font-bold text-xl"
+                          : "text-lg font-medium"
+                      )}
                     >
                       {link.label}
                     </Link>
-                  )
-                )}
+                  );
+                })}
               </nav>
             </motion.div>
 
@@ -172,23 +269,50 @@ export default function Header() {
                     className="flex items-center gap-2 text-gray-700 hover:text-gray-900 mb-6"
                   >
                     <ChevronLeft className="w-5 h-5" />
-                    <span>رجوع</span>
+                    <span>{t("back")}</span>
                   </button>
                   <h3 className="text-xl font-semibold mb-4">
                     {activeSubmenu}
                   </h3>
-                  <nav className="space-y-3">
+                  <nav className="space-y-3" dir="ltr">
                     {navLinks
                       .find((link) => link.label === activeSubmenu)
-                      ?.items?.map((item, idx) => (
-                        <Link
-                          key={idx}
-                          href="#"
-                          onClick={() => setIsMenuOpen(false)}
-                          className="block text-gray-600 hover:text-gray-900 py-2"
-                        >
-                          {item}
-                        </Link>
+                      ?.items?.map((item: any, idx) => (
+                        <div key={idx}>
+                          <Link
+                            href={
+                              typeof item === "string"
+                                ? "#"
+                                : item.name
+                                ? `/categories/${item.slug}`
+                                : `/blogs/${item.slug}`
+                            }
+                            onClick={() => setIsMenuOpen(false)}
+                            className="block text-gray-600 hover:text-gray-900 py-2 font-medium"
+                          >
+                            {typeof item === "string"
+                              ? item
+                              : item.name || item.title}
+                          </Link>
+                          {/* Subcategories in mobile menu */}
+                          {item.subcategories &&
+                            item.subcategories.length > 0 && (
+                              <div className="ms-4 space-y-2 border-s ps-4 mt-1">
+                                {item.subcategories.map(
+                                  (sub: any, subIdx: number) => (
+                                    <Link
+                                      key={subIdx}
+                                      href={`/categories/${sub.slug}`}
+                                      onClick={() => setIsMenuOpen(false)}
+                                      className="block text-sm text-gray-500 hover:text-gray-900 py-1"
+                                    >
+                                      {sub.name}
+                                    </Link>
+                                  )
+                                )}
+                              </div>
+                            )}
+                        </div>
                       ))}
                   </nav>
                 </>
@@ -198,17 +322,25 @@ export default function Header() {
 
           {/* Footer with social icons */}
           <div className="border-t p-6">
-            <div className="flex gap-4">
-              <button className="text-gray-700 hover:text-gray-900">
-                <svg className="size-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-              </button>
-              <button className="text-gray-700 hover:text-gray-900">
-                <svg className="size-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                </svg>
-              </button>
+            <div className="flex gap-4" dir="ltr">
+              {socials.map((social) => (
+                <Link
+                  key={social.id}
+                  href={social.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-700 hover:text-gray-900"
+                  aria-label={social.title}
+                >
+                  <ImageFallback
+                    src={social.icon}
+                    alt={social.title}
+                    width={24}
+                    height={24}
+                    className="size-6 object-contain"
+                  />
+                </Link>
+              ))}
             </div>
           </div>
         </SheetContent>
@@ -226,21 +358,120 @@ export default function Header() {
             {/* --- Header Icons --- */}
             <div className="flex items-center gap-3">
               <button
+                onClick={toggleLanguage}
+                className=" hover:underline cursor-pointer flex items-center gap-1"
+                title={
+                  locale === "ar" ? t("switchToEnglish") : t("switchToArabic")
+                }
+              >
+                <span className="text-xl font-medium uppercase text-gray-700">
+                  {locale === "ar" ? "EN" : "AR"}
+                </span>
+              </button>
+
+              <CartIcon />
+
+              {/* User Avatar or Sign In */}
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                      <div className="relative size-8 rounded-full overflow-hidden bg-gray-200">
+                        {user.image ? (
+                          <ImageFallback
+                            src={user.image}
+                            alt={user.full_name || "User"}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center size-full bg-gray-300">
+                            <User className="size-6 text-gray-700" />
+                          </div>
+                        )}
+                      </div>
+                      <ChevronDown className="size-4 text-gray-700" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64">
+                    <div className="px-3 py-2">
+                      <div className="flex items-center gap-3">
+                        <div className="relative size-10 rounded-full overflow-hidden bg-gray-200">
+                          {user.image ? (
+                            <ImageFallback
+                              src={user.image}
+                              alt={user.full_name || "User"}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center size-full bg-gray-300">
+                              <User className="size-5 text-gray-700" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {user.full_name ||
+                              user.email ||
+                              user.phone_complete_form}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/profile"
+                        className="cursor-pointer flex-row-reverse"
+                      >
+                        <User className="size-4 ms-2" />
+                        {t("profile")}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer text-red-600 focus:text-red-600 flex-row-reverse"
+                    >
+                      <LogOut className="size-4 ms-2" />
+                      {t("logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  href="/signin"
+                  className="text-gray-700 hover:underline cursor-pointer"
+                >
+                  <User className="size-6" />
+                  {/* <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    focusable="false"
+                    className="icon icon-account size-6 "
+                    fill="none"
+                    viewBox="0 0 18 19"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M6 4.5a3 3 0 116 0 3 3 0 01-6 0zm3-4a4 4 0 100 8 4 4 0 000-8zm5.58 12.15c1.12.82 1.83 2.24 1.91 4.85H1.51c.08-2.6.79-4.03 1.9-4.85C4.66 11.75 6.5 11.5 9 11.5s4.35.26 5.58 1.15zM9 10.5c-2.5 0-4.65.24-6.17 1.35C1.27 12.98.5 14.93.5 18v.5h17V18c0-3.07-.77-5.02-2.33-6.15-1.52-1.1-3.67-1.35-6.17-1.35z"
+                      fill="currentColor"
+                    ></path>
+                  </svg> */}
+                </Link>
+              )}
+
+              <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="text-[#848484] hover:underline cursor-pointer"
+                className="text-gray-700 hover:underline cursor-pointer"
               >
                 <Search className="size-6" />
               </button>
-              <Link
-                href="/signin"
-                className="text-[#848484] hover:underline  cursor-pointer"
-              >
-                <User className="size-6" />
-              </Link>
-              <CartIcon />
             </div>
 
             <Logo
+              logoUrl={settings?.logo}
               className={cn(
                 "shrink-0 transition-all duration-300 block lg:hidden ",
                 isScrolled ? "size-[75px]" : "size-[100px]"
@@ -253,22 +484,69 @@ export default function Header() {
                 link.items ? (
                   <DropdownMenu key={index}>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-1  hover:underline cursor-pointer transition-colors">
-                        {link.label}
-                        <ChevronDown className="w-4 h-4" />
-                      </button>
+                      {link.href ? (
+                        <Link
+                          href={link.href}
+                          className="flex items-center gap-1 hover:underline cursor-pointer transition-colors"
+                        >
+                          {link.label}
+                          <ChevronDown className="w-4 h-4" />
+                        </Link>
+                      ) : (
+                        <button className="flex items-center gap-1  hover:underline cursor-pointer transition-colors">
+                          {link.label}
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                      )}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="text-right bg-white border shadow-md"
+                      className="bg-white border shadow-md min-w-[200px]"
                     >
-                      {link.items.map((item, idx) => (
-                        <DropdownMenuItem
-                          key={idx}
-                          className="hover:underline cursor-pointer"
-                        >
-                          {item}
-                        </DropdownMenuItem>
+                      {link.items.map((item: any, idx) => (
+                        <div key={idx} className="relative group/item">
+                          <DropdownMenuItem
+                            className="hover:underline cursor-pointer justify-between w-full"
+                            asChild
+                          >
+                            <Link
+                              href={
+                                typeof item === "string"
+                                  ? "#"
+                                  : item.name
+                                  ? `/categories/${item.slug}`
+                                  : `/blogs/${item.slug}`
+                              }
+                              className="flex items-center justify-between w-full"
+                            >
+                              {typeof item === "string"
+                                ? item
+                                : item.name || item.title}
+                              {item.subcategories &&
+                                item.subcategories.length > 0 && (
+                                  <ChevronRight className="w-4 h-4" />
+                                )}
+                            </Link>
+                          </DropdownMenuItem>
+
+                          {/* Nested Dropdown for Subcategories */}
+                          {item.subcategories &&
+                            item.subcategories.length > 0 && (
+                              <div className="absolute left-full top-0 hidden group-hover/item:block min-w-[200px] bg-white border shadow-md rounded-md p-1 ms-1">
+                                {item.subcategories.map(
+                                  (sub: any, subIdx: number) => (
+                                    <Link
+                                      key={subIdx}
+                                      href={`/categories/${sub.slug}`}
+                                      className="block px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-sm"
+                                    >
+                                      {sub.name}
+                                    </Link>
+                                  )
+                                )}
+                              </div>
+                            )}
+                        </div>
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -286,6 +564,7 @@ export default function Header() {
 
             {/* --- Logo --- */}
             <Logo
+              logoUrl={settings?.logo}
               className={cn(
                 "shrink-0 transition-all duration-300 hidden lg:block ",
                 isScrolled ? "size-[75px]" : "size-[100px]"
@@ -296,7 +575,7 @@ export default function Header() {
               className="lg:hidden text-gray-700 cursor-pointer transition-transform duration-300 hover:scale-110"
               onClick={() => setIsMenuOpen(true)}
             >
-              <Menu className="size-11" />
+              <Menu className="size-6" />
             </button>
           </div>
         </div>

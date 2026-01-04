@@ -1,6 +1,5 @@
-import React from "react";
-import Image from "next/image";
 import ImageFallback from "@/components/image-fallback";
+import React from "react";
 
 export default async function RootLayout({
   children,

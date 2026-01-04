@@ -1,0 +1,98 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { contactService } from "@/services/content.service";
+import { toast } from "sonner";
+import { useTranslations, useLocale } from "next-intl";
+import { Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+
+export default function NewsletterForm() {
+  const t = useTranslations("Toast");
+  const tValidation = useTranslations("Validation");
+  const locale = useLocale();
+
+  const formSchema = z.object({
+    email: z.string().email({
+      message: tValidation("emailInvalid"),
+    }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (email: string) => contactService.subscribeToNewsletter(email),
+    onSuccess: () => {
+      toast.success(t("subscribed"));
+      form.reset();
+    },
+    onError: () => {
+      toast.error(t("subscribeFailed"));
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    mutate(values.email);
+  }
+
+  return (
+    <div className="max-w-md w-full">
+      <h3 className="text-white text-lg mb-3 text-end">
+        اشترك في نشرتنا البريدية
+      </h3>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      placeholder="البريد الإلكتروني"
+                      dir="ltr"
+                      className="bg-transparent border border-gray-600 text-white placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-white rounded-none h-12 w-full ltr:pr-14 ltr:pl-4 rtl:pl-14 rtl:pr-4"
+                      {...field}
+                    />
+                    <Button
+                      type="submit"
+                      disabled={isPending}
+                      className="absolute right-0 top-0 h-12 px-4 rounded-none bg-transparent hover:bg-transparent border-0"
+                    >
+                      {isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                      ) : locale === "ar" ? (
+                        <ArrowRight className="h-4 w-4 text-white" />
+                      ) : (
+                        <ArrowLeft className="h-4 w-4 text-white" />
+                      )}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-red-400 text-xs mt-1 text-end" />
+              </FormItem>
+            )}
+          />
+        </form>
+      </Form>
+    </div>
+  );
+}

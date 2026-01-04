@@ -1,17 +1,17 @@
-import ProductOfCategory from "@/features/home/product-of-category";
 import ProductDetails from "@/features/product/components/product-details";
-import SimilarProducts from "@/features/product/components/similar-products";
 
-export default function page() {
+interface PageProps {
+  params: Promise<{
+    productId: string;
+  }>;
+}
+
+export default async function page({ params }: PageProps) {
+  const { productId } = await params;
+
   return (
     <main className="container px-4 mx-auto">
-      <ProductDetails />
-      <ProductOfCategory
-        main
-        number={5}
-        title="You may also like
-"
-      />
+      <ProductDetails productId={productId} />
     </main>
   );
 }

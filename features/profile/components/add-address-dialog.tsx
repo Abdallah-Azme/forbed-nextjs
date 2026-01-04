@@ -1,0 +1,402 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { addressService } from "@/services/address.service";
+import { toast } from "sonner";
+import { parsePhoneNumber } from "react-phone-number-input";
+
+const addressSchema = z.object({
+  lat: z.string().min(1, "خط العرض مطلوب"),
+  lng: z.string().min(1, "خط الطول مطلوب"),
+  address: z.string().min(1, "العنوان مطلوب"),
+  city: z.string().min(1, "المدينة مطلوبة"),
+  type: z.string().min(1, "نوع العنوان مطلوب"),
+  description: z.string().optional(),
+  phone_code: z.string().min(1, "كود الدولة مطلوب"),
+  phone: z.string().min(1, "رقم الهاتف مطلوب"),
+});
+
+type AddressFormData = z.infer<typeof addressSchema>;
+
+interface AddAddressDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  address?: any; // Existing address for editing
+}
+
+export default function AddAddressDialog({
+  open,
+  onOpenChange,
+  address,
+}: AddAddressDialogProps) {
+  const queryClient = useQueryClient();
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+
+  const form = useForm<AddressFormData>({
+    resolver: zodResolver(addressSchema),
+    defaultValues: {
+      lat: "",
+      lng: "",
+      address: "",
+      city: "",
+      type: "home",
+      description: "",
+      phone_code: "966",
+      phone: "",
+    },
+  });
+
+  const isEditMode = !!address?.id;
+
+  // Reset form when address changes or dialog opens
+  useEffect(() => {
+    if (open && address) {
+      // For edit mode: convert to E.164 format for react-phone-number-input
+      let phoneValue = "";
+      if (address.phone) {
+        // If phone already has +, use as is
+        if (address.phone.startsWith("+")) {
+          phoneValue = address.phone;
+        } else {
+          // Otherwise, construct E.164 format: +[country_code][number]
+          const countryCode = address.phone_code || "966";
+          phoneValue = `+${countryCode}${address.phone}`;
+        }
+      }
+
+      form.reset({
+        lat: address?.lat?.toString() || "",
+        lng: address?.lng?.toString() || "",
+        address: address?.address || "",
+        city: address?.city || "",
+        type: (address?.type as "home" | "work" | "other") || "home",
+        description: address?.description || "",
+        phone_code: address?.phone_code || "966",
+        phone: phoneValue,
+      });
+    } else if (open && !address) {
+      // For create mode: reset to empty values
+      form.reset({
+        lat: "",
+        lng: "",
+        address: "",
+        city: "",
+        type: "home",
+        description: "",
+        phone_code: "966",
+        phone: "",
+      });
+    }
+  }, [open, address, form]);
+
+  const { mutate: createAddress, isPending: isCreating } = useMutation({
+    mutationFn: addressService.createAddress,
+    onSuccess: () => {
+      toast.success("تم إضافة العنوان بنجاح!");
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+      onOpenChange(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "فشل إضافة العنوان");
+    },
+  });
+
+  const { mutate: updateAddress, isPending: isUpdating } = useMutation({
+    mutationFn: (data: any) => addressService.updateAddress(address.id, data),
+    onSuccess: () => {
+      toast.success("تم تحديث العنوان بنجاح!");
+      queryClient.invalidateQueries({ queryKey: ["addresses"] });
+      onOpenChange(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "فشل تحديث العنوان");
+    },
+  });
+
+  const isPending = isCreating || isUpdating;
+
+  function onSubmit(values: AddressFormData) {
+    // Parse the E.164 phone number to extract national number and country code
+    let phone = values.phone || "";
+    let phone_code = "966";
+
+    try {
+      const phoneNumber = parsePhoneNumber(values.phone);
+      if (phoneNumber) {
+        phone = phoneNumber.nationalNumber;
+        phone_code = phoneNumber.countryCallingCode;
+      }
+    } catch (error) {
+      console.error("Phone parsing error:", error);
+      // If parsing fails, try to extract manually
+      if (values.phone.startsWith("+")) {
+        phone_code = values.phone.substring(1, 4); // Extract country code
+        phone = values.phone.substring(4); // Extract national number
+      }
+    }
+
+    const payload = {
+      lat: values.lat,
+      lng: values.lng,
+      address: values.address,
+      city: values.city,
+      type: values.type as "home" | "work" | "other",
+      description: values.description || "",
+      phone_code: phone_code,
+      phone: phone,
+    };
+
+    if (isEditMode) {
+      updateAddress(payload);
+    } else {
+      createAddress(payload);
+    }
+  }
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("الموقع الجغرافي غير مدعوم من قبل المتصفح");
+      return;
+    }
+
+    setIsGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        form.setValue("lat", position.coords.latitude.toString());
+        form.setValue("lng", position.coords.longitude.toString());
+        toast.success("تم تحديد الموقع!");
+        setIsGettingLocation(false);
+      },
+      (error) => {
+        toast.error("فشل تحديد الموقع: " + error.message);
+        setIsGettingLocation(false);
+      }
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{address ? "تعديل العنوان" : "إضافة عنوان"}</DialogTitle>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Location Coordinates */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">الموقع</label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={getCurrentLocation}
+                  disabled={isGettingLocation}
+                >
+                  {isGettingLocation
+                    ? "جاري تحديد الموقع..."
+                    : "استخدم موقعي الحالي"}
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="lat"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="خط العرض" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lng"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="خط الطول" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Address Type */}
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>نوع العنوان</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="flex-row-reverse">
+                        <SelectValue placeholder="اختر النوع" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem
+                        value="home"
+                        className="flex-row-reverse justify-end"
+                      >
+                        المنزل
+                      </SelectItem>
+                      <SelectItem
+                        value="work"
+                        className="flex-row-reverse justify-end"
+                      >
+                        العمل
+                      </SelectItem>
+                      <SelectItem
+                        value="other"
+                        className="flex-row-reverse justify-end"
+                      >
+                        آخر
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* City */}
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>المدينة</FormLabel>
+                  <FormControl>
+                    <Input placeholder="أدخل المدينة" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Address */}
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>العنوان</FormLabel>
+                  <FormControl>
+                    <Input placeholder="اسم الشارع" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>وصف إضافي</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="تفاصيل إضافية (رقم الشقة، اسم المبنى...)"
+                      {...field}
+                      rows={3}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Phone */}
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>رقم الهاتف</FormLabel>
+                  <div className="" dir="ltr">
+                    <FormControl>
+                      <PhoneInput
+                        placeholder="رقم الهاتف"
+                        {...field}
+                        {...({ country: "SA" } as any)}
+                      />
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+                disabled={isPending}
+              >
+                إلغاء
+              </Button>
+              <Button
+                type="submit"
+                className="bg-orange-500 hover:bg-orange-600"
+                disabled={isPending}
+              >
+                {isPending
+                  ? isEditMode
+                    ? "جاري التحديث..."
+                    : "جاري الحفظ..."
+                  : isEditMode
+                  ? "تحديث"
+                  : "حفظ"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

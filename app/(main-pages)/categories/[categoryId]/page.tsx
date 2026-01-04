@@ -1,56 +1,174 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { FilterBar } from "@/features/category/components/filter-bar";
 import { CategoryProductCard } from "@/features/category/components/category-product-card";
+import { useQuery } from "@tanstack/react-query";
+import { categoryService } from "@/services/category.service";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { FolderOpen } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
+import { ErrorState } from "@/components/ui/error-state";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function Page() {
-  const products = [
-    {
-      id: 1,
-      name: "مرتبة سوست منفصلة فوربد كومباكت",
-      price: "LE 4,352.00 EGP",
-      oldPrice: "LE 5,120.00 EGP",
-      image: "/mrtba.webp",
-      sale: true,
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const categoryId = params.categoryId as string;
+  const page = searchParams.get("page") || "1";
+  const t = useTranslations("Pagination");
+
+  // State hooks must be called before any conditional returns
+  const [sortBy, setSortBy] = useState("best-selling");
+  const [priceRange, setPriceRange] = useState("all");
+
+  const {
+    data: categoryDetails,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["category", categoryId, page],
+    queryFn: () => categoryService.getCategory(categoryId, parseInt(page)),
+  });
+
+  // Fetch filter data (min/max price) using category ID
+  const { data: filterData } = useQuery({
+    queryKey: ["category-filters", categoryDetails?.category?.id],
+    queryFn: () => {
+      if (!categoryDetails?.category?.id) {
+        throw new Error("Category ID not available");
+      }
+      return categoryService.getCategoryFilters(categoryDetails.category.id);
     },
-    {
-      id: 2,
-      name: "مرتبه فوربد سوست منفصله كلاس",
-      price: "LE 4,926.00 EGP",
-      oldPrice: "LE 5,795.00 EGP",
-      image: "/mrtba.webp",
-      sale: true,
-    },
-    {
-      id: 3,
-      name: "مرتبه سوست منفصله فوربد برايم",
-      price: "LE 5,542.00 EGP",
-      oldPrice: "LE 6,520.00 EGP",
-      image: "/mrtba.webp",
-      sale: true,
-    },
-    {
-      id: 4,
-      name: "مرتبه بوكت سوست منفصله فوربد اليجانس",
-      price: "LE 9,359.00 EGP",
-      oldPrice: "LE 10,130.00 EGP",
-      image: "/mrtba.webp",
-      sale: true,
-    },
-  ];
+    enabled: !!categoryDetails?.category?.id,
+  });
+
+  const handlePageChange = (newPage: number) => {
+    router.push(`/categories/${categoryId}?page=${newPage}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="h-12 w-48 bg-gray-200 rounded mb-8 animate-pulse" />
+        <LoadingState type="skeleton" count={4} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorState
+          title="فشل تحميل الفئة"
+          description="لم نتمكن من تحميل هذه الفئة. يرجى المحاولة مرة أخرى."
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
+  }
+
+  if (!categoryDetails || !categoryDetails.category) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <EmptyState
+          icon={FolderOpen}
+          title="الفئة غير موجودة"
+          description="الفئة التي تبحث عنها غير موجودة أو تم حذفها."
+          action={
+            <Link href="/categories">
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                تصفح جميع الفئات
+              </Button>
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
+  const { category, products } = categoryDetails;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-medium text-right mb-8">
-        سوست منفصلة (فوربد)
-      </h1>
+      <h1 className="text-3xl font-medium mb-8">{category.name}</h1>
 
-      <FilterBar count={9} />
+      <FilterBar
+        count={products.meta.total}
+        onSortChange={setSortBy}
+        onPriceChange={setPriceRange}
+        maxPrice={filterData?.max_price}
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <CategoryProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {products.data.length === 0 ? (
+        <EmptyState
+          icon={FolderOpen}
+          title="لا توجد منتجات في هذه الفئة"
+          description="لا توجد منتجات في هذه الفئة بعد. تحقق مرة أخرى لاحقاً!"
+          action={
+            <Link href="/">
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                تصفح جميع المنتجات
+              </Button>
+            </Link>
+          }
+        />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {products.data.map((product) => (
+              <CategoryProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {products.meta.last_page > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-12">
+              <button
+                onClick={() => handlePageChange(products.meta.current_page - 1)}
+                disabled={products.meta.current_page === 1}
+                className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {t("previous")}
+              </button>
+
+              <div className="flex gap-2">
+                {Array.from(
+                  { length: products.meta.last_page },
+                  (_, i) => i + 1
+                ).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => handlePageChange(p)}
+                    className={`w-10 h-10 rounded-md transition-colors ${
+                      products.meta.current_page === p
+                        ? "bg-orange-600 text-white"
+                        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => handlePageChange(products.meta.current_page + 1)}
+                disabled={
+                  products.meta.current_page === products.meta.last_page
+                }
+                className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {t("next")}
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

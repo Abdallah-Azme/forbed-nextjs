@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, easeOut } from "framer-motion";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import GhostLink from "@/components/ghost-link";
 import MainLink from "@/components/main-link";
 import {
@@ -15,14 +15,18 @@ import {
 } from "@/components/ui/carousel";
 import { CategoryCard } from "./category-card";
 import HeaderSection from "@/components/header-section";
+import { HomeCategory } from "@/types/api";
 
 export default function CategoriesCollection({
   title,
   secondary = false,
+  categories = [],
 }: {
   title: string;
   secondary?: boolean;
+  categories?: HomeCategory[];
 }) {
+  const t = useTranslations("Categories");
   const dir = useLocale() === "ar" ? "rtl" : "ltr";
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -37,26 +41,13 @@ export default function CategoriesCollection({
     api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
   }, [api]);
 
-  const collections = [
-    { id: 1, title: "مراتب", image: "/mrtba.webp", href: "/mattresses" },
-    { id: 2, title: "مفروشات", image: "/mrtba.webp", href: "/bedding" },
-    {
-      id: 3,
-      title: "اكسسوارات السرير",
-      image: "/mrtba.webp",
-      href: "/bed-accessories",
-    },
-    { id: 4, title: "شتاء 2025", image: "/mrtba.webp", href: "/winter-2025" },
-    { id: 5, title: "مراتب", image: "/mrtba.webp", href: "/mattresses" },
-    { id: 6, title: "مفروشات", image: "/mrtba.webp", href: "/bedding" },
-    {
-      id: 7,
-      title: "اكسسوارات السرير",
-      image: "/mrtba.webp",
-      href: "/bed-accessories",
-    },
-    { id: 8, title: "شتاء 2025", image: "/mrtba.webp", href: "/winter-2025" },
-  ];
+  // Map HomeCategory to the format expected by CategoryCard
+  const collections = categories.map((cat) => ({
+    id: cat.id,
+    title: cat.name,
+    image: cat.image,
+    href: cat.slug,
+  }));
 
   // Animations
   const itemVariants = {
@@ -68,6 +59,8 @@ export default function CategoriesCollection({
     },
   };
 
+  if (!collections.length) return null;
+
   return (
     <section className="pt-4 pb-4 w-full">
       <div className="container mx-auto px-4">
@@ -75,7 +68,7 @@ export default function CategoriesCollection({
         <div className="flex justify-between items-center mb-8">
           {!secondary && (
             <GhostLink href="/categories" className="lg:hidden">
-              View all
+              {t("viewAll")}
             </GhostLink>
           )}
 
@@ -97,7 +90,7 @@ export default function CategoriesCollection({
               {collections.map((collection) => (
                 <CarouselItem
                   key={collection.id}
-                  className="pl-2 md:pl-4 basis-[46.5%] sm:basis-1/3 md:basis-1/4"
+                  className="pl-2 md:pl-4 basis-[45%]"
                 >
                   <motion.div
                     variants={itemVariants}
@@ -145,7 +138,7 @@ export default function CategoriesCollection({
         {!secondary && (
           <div className="mx-auto w-fit my-5 hidden lg:block">
             <MainLink href="/categories" className="px-[30px] py-[10px]">
-              View all
+              {t("viewAll")}
             </MainLink>
           </div>
         )}

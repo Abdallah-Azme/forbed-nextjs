@@ -8,8 +8,10 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import * as React from "react";
 import { ProductCard } from "./product-card";
+import { useTranslations } from "next-intl";
 
 export default function SimilarProducts() {
+  const t = useTranslations("Product");
   const products = [
     {
       id: 1,
@@ -85,7 +87,9 @@ export default function SimilarProducts() {
   return (
     <section className="py-16 bg-gray-50 w-full overflow-hidden">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">منتاجات مشابهة</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">
+          {t("similarProducts")}
+        </h2>
 
         <Carousel
           dir="rtl"

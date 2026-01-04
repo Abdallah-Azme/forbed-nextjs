@@ -1,56 +1,134 @@
 "use client";
 
+import * as React from "react";
+import Autoplay from "embla-carousel-autoplay";
 import { motion } from "framer-motion";
 import ImageFallback from "@/components/image-fallback";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Slider } from "@/types/api";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 
-export default function HeroBanner() {
+interface HeroBannerProps {
+  sliders?: Slider[];
+}
+
+export default function HeroBanner({ sliders = [] }: HeroBannerProps) {
+  const plugin = React.useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true })
+  );
+
+  if (!sliders.length) {
+    return (
+      <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px] bg-gray-100 animate-pulse" />
+    );
+  }
+
   return (
-    <motion.section
-      initial={{ opacity: 0, scale: 1.02 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1, ease: "easeOut" }}
-      className="relative  w-full overflow-hidden"
-    >
-      {/* Background Image */}
-      <motion.div
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 2, ease: "easeOut" }}
-        className="relative w-full"
-      >
-        <ImageFallback
-          src="/pages/home/hero-image.webp"
-          alt="Forbed Mattresses"
-          width={0}
-          height={0}
-          sizes="100vw"
-          className="w-full h-auto"
-        />
-        {/* <div className="absolute inset-0 bg-black/30" /> */}
-      </motion.div>
+    <section className="relative w-full overflow-hidden">
+      {sliders.length === 1 ? (
+        <div className="relative w-full aspect-2/1 sm:aspect-[2.5/1] lg:aspect-3/1 max-h-[600px]">
+          {sliders[0].link ? (
+            <Link href={sliders[0].link} className="block w-full h-full">
+              <ImageFallback
+                src={sliders[0].image}
+                alt={sliders[0].title}
+                fill
+                className="object-cover w-full h-full"
+                priority
+              />
+            </Link>
+          ) : (
+            <ImageFallback
+              src={sliders[0].image}
+              alt={sliders[0].title}
+              fill
+              className="object-cover w-full h-full"
+              priority
+            />
+          )}
 
-      {/* Optional Overlay Text */}
-      {/* <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4"
-      >
-        <h1 className="text-3xl sm:text-5xl font-bold mb-4">
-          فوربد خفّضت الأسعار 🔥
-        </h1>
-        <p className="max-w-xl text-sm sm:text-lg text-gray-200 mb-6">
-          اكتشف أفضل المراتب الطبية والمريحة بأسعار تناسب الجميع.
-        </p>
-        <motion.a
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          href="/collections"
-          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-full transition-colors"
+          {/* Optional Overlay Text */}
+          {(sliders[0].title || sliders[0].description) && (
+            <div className="absolute inset-0 bg-linear-to-b from-white/20 via-black/60 to-black/60 pointer-events-none flex flex-col items-center justify-center text-center text-white px-4">
+              {sliders[0].title && (
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 drop-shadow-lg">
+                  {sliders[0].title}
+                </h2>
+              )}
+              {sliders[0].description && (
+                <p className="text-sm sm:text-lg md:text-xl max-w-2xl drop-shadow-md">
+                  {sliders[0].description}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <Carousel
+          plugins={[plugin.current]}
+          className="w-full"
+          opts={{
+            loop: true,
+          }}
         >
-          تسوّق الآن
-        </motion.a>
-      </motion.div> */}
-    </motion.section>
+          <CarouselContent className="ml-0">
+            {sliders.map((slider) => (
+              <CarouselItem key={slider.id} className="pl-0 relative w-full">
+                <div className="relative w-full aspect-2/1 sm:aspect-[2.5/1] lg:aspect-3/1 max-h-[600px]">
+                  {slider.link ? (
+                    <Link href={slider.link} className="block w-full h-full">
+                      <ImageFallback
+                        src={slider.image}
+                        alt={slider.title}
+                        fill
+                        className="object-cover w-full h-full"
+                        priority
+                      />
+                    </Link>
+                  ) : (
+                    <ImageFallback
+                      src={slider.image}
+                      alt={slider.title}
+                      fill
+                      className="object-cover w-full h-full"
+                      priority
+                    />
+                  )}
+
+                  {(slider.title || slider.description) && (
+                    <div className="absolute inset-0 bg-linear-to-b from-white/20 via-black/60 to-black/60 pointer-events-none flex flex-col items-center justify-center text-center text-white px-4">
+                      {slider.title && (
+                        <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 drop-shadow-lg">
+                          {slider.title}
+                        </h2>
+                      )}
+                      {slider.description && (
+                        <p className="text-sm sm:text-lg md:text-xl max-w-2xl drop-shadow-md">
+                          {slider.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+
+          {sliders.length > 1 && (
+            <>
+              <CarouselPrevious className="left-4" />
+              <CarouselNext className="right-4" />
+            </>
+          )}
+        </Carousel>
+      )}
+    </section>
   );
 }

@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Facebook, Link, MessageCircle, Share2, Twitter } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function ShareProduct() {
+  const t = useTranslations("Product");
   const productUrl = typeof window !== "undefined" ? window.location.href : "";
   const productTitle = "كوفرتة 3 قطع فريب مجوز قطن مخلوط";
 
@@ -12,14 +14,12 @@ export default function ShareProduct() {
       try {
         await navigator.share({
           title: productTitle,
-          text: "شاهد هذا المنتج الرائع:",
+          text: t("shareText"),
           url: productUrl,
         });
-      } catch (err) {
-        console.log("Share canceled or failed", err);
-      }
+      } catch (err) {}
     } else {
-      alert("المشاركة غير مدعومة على هذا المتصفح.");
+      alert(t("shareNotSupported"));
     }
   };
 
@@ -67,7 +67,7 @@ export default function ShareProduct() {
         className="flex items-center gap-2 text-gray-700 font-medium cursor-pointer select-none"
       >
         <Share2 className="w-5 h-5" />
-        <span>شارك المنتج</span>
+        <span>{t("shareProduct")}</span>
       </motion.div>
 
       {/* Always visible social icons */}
@@ -92,7 +92,7 @@ export default function ShareProduct() {
           transition={{ type: "spring", stiffness: 300 }}
           onClick={() => navigator.clipboard.writeText(productUrl)}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-800 hover:text-white shadow-sm hover:shadow-md transition-all duration-300"
-          title="نسخ الرابط"
+          title={t("copyLink")}
         >
           <Link className="w-5 h-5" />
         </motion.button>

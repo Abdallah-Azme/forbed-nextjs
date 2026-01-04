@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ImageFallback from "@/components/image-fallback";
+import { useTranslations } from "next-intl";
 import HeaderSection from "@/components/header-section";
 import Link from "next/link";
 import * as React from "react";
@@ -17,35 +18,15 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import MainLink from "@/components/main-link";
+import { Blog } from "@/types/api";
+import { cn } from "@/lib/utils";
 
-const blogs = [
-  {
-    title: "مقدمة عن أفضل أنواع المراتب في مصر",
-    image: "/mrtba.webp",
-    excerpt:
-      "اختيار المرتبة المناسبة يساعد في توفير راحة دائمة للنوم. في هذا المقال نستعرض أفضل أنواع المراتب الموجودة في مصر.",
-  },
-  {
-    title: "ماهي المراتب الطبية؟",
-    image: "/mrtba.webp",
-    excerpt:
-      "تعتبر المراتب الطبية من الأنواع الأكثر انتشارًا لتحسين صحة العمود الفقري والنوم الصحي. تعرف على ميزاتها.",
-  },
-  {
-    title: "تعرف ايه عن مراتب فورد الطبية؟",
-    image: "/mrtba.webp",
-    excerpt:
-      "كل اللي محتاج تعرفه عن مراتب فورد الطبية من حيث الجودة والراحة. اختيار مثالي للنوم الصحي والدعم الكامل للجسم.",
-  },
-  {
-    title: "ايه الفرق بين السوست المنفصلة والمتصلة؟",
-    image: "/mrtba.webp",
-    excerpt:
-      "تعرف على الفرق بين مراتب السوست المنفصلة والمتصلة، وأيها الأفضل لك حسب احتياجاتك وراحتك أثناء النوم.",
-  },
-];
+interface BlogSectionProps {
+  blogs?: Blog[];
+}
 
-export function BlogSection() {
+export function BlogSection({ blogs = [] }: BlogSectionProps) {
+  const t = useTranslations("HomePage");
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -59,25 +40,12 @@ export function BlogSection() {
     api.on("select", () => setCurrent(api.selectedScrollSnap() + 1));
   }, [api]);
 
-  // Animation variants for cards
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50, rotateX: -10 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      rotateX: 0,
-      transition: {
-        delay: i * 0.15,
-        duration: 0.6,
-        ease: "easeOut" as const,
-      },
-    }),
-  };
+  if (!blogs.length) return null;
 
   return (
     <section className="container mx-auto py-2 px-4 space-y-8">
       <div className=" my-5 ">
-        <HeaderSection title="المقالات" />
+        <HeaderSection title={t("blogsTitle")} />
       </div>
 
       {/* MOBILE CAROUSEL */}
@@ -122,15 +90,15 @@ export function BlogSection() {
       </div>
 
       <div className="mx-auto w-fit my-5 hidden lg:block">
-        <MainLink href="/collections" className="px-[30px] py-[10px]">
-          View all
+        <MainLink href="/blogs" className="px-[30px] py-[10px]">
+          {t("viewAll")}
         </MainLink>
       </div>
     </section>
   );
 }
 
-function BlogCard({ blog, index }: { blog: any; index: number }) {
+function BlogCard({ blog, index }: { blog: Blog; index: number }) {
   const cardVariants = {
     hidden: { opacity: 0, y: 50, rotateX: -10 },
     visible: {
@@ -155,7 +123,7 @@ function BlogCard({ blog, index }: { blog: any; index: number }) {
       transition={{ type: "tween", duration: 0.2 }}
     >
       <Link
-        href={`/blog/${123}`}
+        href={blog.slug ? `/blogs/${blog.slug}` : "#"}
         className="group flex rounded-none border-none flex-col overflow-hidden h-auto transition-all duration-300 bg-white pt-0"
       >
         <div className="p-0 overflow-hidden">
@@ -164,17 +132,17 @@ function BlogCard({ blog, index }: { blog: any; index: number }) {
               src={blog.image}
               alt={blog.title}
               fill
-              className="object-cover transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
+              className="object-contain transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-110"
             />
           </div>
         </div>
 
         <div className="p-4 space-y-3">
-          <h3 className="font-semibold text-lg leading-snug text-right group-hover:underline transition-all duration-200">
+          <h3 className="font-semibold text-lg leading-snug   group-hover:underline transition-all duration-200 line-clamp-2">
             {blog.title}
           </h3>
-          <p className="text-sm min-h-[70px] text-gray-600 leading-relaxed line-clamp-3 text-right">
-            {blog.excerpt}
+          <p className="text-sm min-h-[70px] text-gray-600 leading-relaxed line-clamp-3">
+            {blog.text}
           </p>
         </div>
       </Link>
